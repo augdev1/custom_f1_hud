@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +8,9 @@
   <!-- Google Fonts: Rajdhani & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800;900&family=Rajdhani:wght@600;700;800;900&family=Titillium+Web:wght@600;700;900&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800;900&family=Rajdhani:wght@600;700;800;900&family=Titillium+Web:wght@600;700;900&display=swap"
+    rel="stylesheet">
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Lucide Icons -->
@@ -24,12 +27,13 @@
       box-sizing: border-box;
     }
 
-    /* True 32-bit Transparent Canvas (Zero Black / White Border) */
-    html, body {
+    /* True 32-bit Transparent Canvas with Glassmorphism Base */
+    html,
+    body {
       background-color: transparent !important;
       background: transparent !important;
       margin: 0 !important;
-      padding: 0 !important;
+      padding: 3px !important;
       border: none !important;
       outline: none !important;
       width: 100%;
@@ -45,31 +49,37 @@
       -webkit-app-region: drag;
       cursor: grab;
     }
+
     .pywebview-drag-region:active {
       cursor: grabbing;
     }
 
-    /* AUTHENTIC AERODYNAMIC HALO CHASSIS - Zero Border & Zero Glitches */
+    /* AUTHENTIC AERODYNAMIC HALO CHASSIS - Modern Frosted Glassmorphism */
     .halo-chassis {
-      background: radial-gradient(circle at 50% 10%, #111726 0%, #07090e 100%);
-      border-radius: 0px !important;
-      border: none !important;
+      background: linear-gradient(135deg, rgba(14, 20, 34, 0.72) 0%, rgba(7, 10, 18, 0.82) 100%) !important;
+      backdrop-filter: blur(18px) saturate(160%);
+      -webkit-backdrop-filter: blur(18px) saturate(160%);
+      border-radius: 14px !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
       outline: none !important;
-      box-shadow: 
-        inset 0 1px 0 rgba(255, 255, 255, 0.08),
-        inset 0 -4px 14px rgba(0, 0, 0, 0.9);
+      box-shadow:
+        0 14px 34px -8px rgba(0, 0, 0, 0.55),
+        inset 0 1px 0 0 rgba(255, 255, 255, 0.22),
+        inset 0 -1px 0 0 rgba(0, 0, 0, 0.60) !important;
       overflow: hidden;
       transition: all 0.2s ease;
     }
 
-    /* CENTER SPEEDOMETER POD - Precision High-Tech Racing Dial */
+    /* CENTER SPEEDOMETER POD - Precision High-Tech Racing Dial (Frosted Glass) */
     .halo-speed-pod {
-      background: 
-        radial-gradient(circle at 50% 35%, rgba(20, 28, 45, 0.98) 0%, rgba(6, 8, 14, 0.99) 100%);
-      border: 2px solid rgba(255, 255, 255, 0.12);
-      box-shadow: 
-        0 0 20px var(--accent-glow, rgba(0, 210, 190, 0.4)),
-        inset 0 0 25px rgba(0, 0, 0, 0.92);
+      background: radial-gradient(circle at 45% 35%, rgba(26, 38, 60, 0.68) 0%, rgba(8, 12, 22, 0.84) 100%) !important;
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1.5px solid rgba(255, 255, 255, 0.16) !important;
+      box-shadow:
+        0 0 22px var(--accent-glow, rgba(0, 210, 190, 0.35)),
+        inset 0 1px 1px rgba(255, 255, 255, 0.25),
+        inset 0 0 18px rgba(0, 0, 0, 0.85) !important;
       border-radius: 50%;
       width: 114px;
       height: 114px;
@@ -86,11 +96,13 @@
       pointer-events: none;
       transform: rotate(-90deg);
     }
+
     .rpm-arc-bg {
       fill: none;
       stroke: rgba(255, 255, 255, 0.06);
       stroke-width: 4.5;
     }
+
     .rpm-arc-meter {
       fill: none;
       stroke: var(--accent-color, #00D2BE);
@@ -101,6 +113,7 @@
       transition: stroke-dashoffset 0.04s linear, stroke 0.12s ease;
       filter: drop-shadow(0 0 6px var(--accent-color, #00D2BE));
     }
+
     .rpm-arc-redline {
       stroke: #FF1744 !important;
       filter: drop-shadow(0 0 10px #FF1744) !important;
@@ -108,43 +121,57 @@
 
     /* SHIFT ALERT FLASH OVERLAY ON CUTOFF */
     @keyframes shiftFlashAnim {
-      0%, 100% { opacity: 0; }
-      50% { opacity: 0.85; }
+
+      0%,
+      100% {
+        opacity: 0;
+      }
+
+      50% {
+        opacity: 0.85;
+      }
     }
+
     .shift-alert-flash {
       animation: shiftFlashAnim 0.09s infinite ease-in-out;
       background: radial-gradient(circle, rgba(155, 81, 224, 0.5) 0%, transparent 75%) !important;
     }
 
-    /* VERTICAL SEGMENTED PEDAL GAUGES (F1 Telemetry Specs) */
+    /* VERTICAL SEGMENTED PEDAL GAUGES (Frosted Glass Container) */
     .pedal-meter-container {
       display: flex;
       flex-direction: column-reverse;
       gap: 2px;
       width: 22px;
       height: 80px;
-      background: rgba(4, 6, 10, 0.85);
+      background: rgba(10, 15, 25, 0.60);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
       padding: 3px 2px;
-      border-radius: 4px;
-      border: 1px solid rgba(255, 255, 255, 0.08);
-      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.9);
+      border-radius: 6px;
+      border: 1px solid rgba(255, 255, 255, 0.10);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 0 0 12px rgba(0, 0, 0, 0.8);
       position: relative;
     }
+
     .pedal-seg {
       width: 100%;
       height: 3.5px;
       border-radius: 1px;
-      background: rgba(255, 255, 255, 0.07);
+      background: rgba(255, 255, 255, 0.08);
       transition: background-color 0.03s ease, box-shadow 0.03s ease;
     }
+
     .pedal-seg.active-thr {
       background: #00E676 !important;
       box-shadow: 0 0 8px rgba(0, 230, 118, 0.95) !important;
     }
+
     .pedal-seg.active-brk {
       background: #FF1744 !important;
       box-shadow: 0 0 8px rgba(255, 23, 68, 0.95) !important;
     }
+
     /* Peak Hold Marker line */
     .pedal-peak-marker {
       position: absolute;
@@ -163,7 +190,7 @@
     .gear-item {
       font-family: 'JetBrains Mono', monospace;
       font-weight: 800;
-      color: rgba(255, 255, 255, 0.3);
+      color: rgba(255, 255, 255, 0.35);
       font-size: 10.5px;
       width: 17px;
       height: 17px;
@@ -173,6 +200,7 @@
       border-radius: 3px;
       transition: all 0.08s ease;
     }
+
     .gear-item.active {
       color: #000000 !important;
       background-color: var(--accent-color, #00D2BE) !important;
@@ -180,6 +208,7 @@
       font-weight: 900 !important;
       transform: scale(1.15);
     }
+
     .gear-item.active-reverse {
       color: #ffffff !important;
       background-color: #ef4444 !important;
@@ -193,24 +222,28 @@
       flex: 1;
       height: 6.5px;
       border-radius: 1px;
-      background-color: rgba(255, 255, 255, 0.07);
+      background-color: rgba(255, 255, 255, 0.08);
       transition: none;
     }
-    .led-shift.active-green { 
-      background-color: #00E676; 
-      box-shadow: 0 0 9px #00E676, inset 0 1px 1px rgba(255,255,255,0.6); 
+
+    .led-shift.active-green {
+      background-color: #00E676;
+      box-shadow: 0 0 9px #00E676, inset 0 1px 1px rgba(255, 255, 255, 0.6);
     }
-    .led-shift.active-red { 
-      background-color: #FF1744; 
-      box-shadow: 0 0 9px #FF1744, inset 0 1px 1px rgba(255,255,255,0.6); 
+
+    .led-shift.active-red {
+      background-color: #FF1744;
+      box-shadow: 0 0 9px #FF1744, inset 0 1px 1px rgba(255, 255, 255, 0.6);
     }
-    .led-shift.active-purple { 
-      background-color: #9B51E0; 
-      box-shadow: 0 0 11px #9B51E0, inset 0 1px 1px rgba(255,255,255,0.8); 
+
+    .led-shift.active-purple {
+      background-color: #9B51E0;
+      box-shadow: 0 0 11px #9B51E0, inset 0 1px 1px rgba(255, 255, 255, 0.8);
     }
-    .led-shift.active-blue { 
-      background-color: #00B0FF; 
-      box-shadow: 0 0 11px #00B0FF, inset 0 1px 1px rgba(255,255,255,0.8); 
+
+    .led-shift.active-blue {
+      background-color: #00B0FF;
+      box-shadow: 0 0 11px #00B0FF, inset 0 1px 1px rgba(255, 255, 255, 0.8);
     }
 
     /* STEERING GAUGE BAR */
@@ -222,6 +255,7 @@
       border-radius: 2px;
       overflow: hidden;
     }
+
     .steer-bar-center {
       position: absolute;
       top: 0;
@@ -231,6 +265,7 @@
       margin-left: -1px;
       background: rgba(255, 255, 255, 0.35);
     }
+
     .steer-bar-thumb {
       position: absolute;
       top: 0;
@@ -241,23 +276,49 @@
       transition: left 0.03s linear, width 0.03s linear;
     }
 
-    /* WING SURFACE STYLING */
+    /* FROSTED GLASS SURFACE STYLING */
     .wing-block {
-      background: rgba(11, 15, 24, 0.65);
-      border: 1px solid rgba(255, 255, 255, 0.07);
+      background: rgba(14, 20, 32, 0.55) !important;
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border: 1px solid rgba(255, 255, 255, 0.09) !important;
       border-radius: 8px;
-      padding: 5px 7px;
+      padding: 5px 8px;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    }
+
+    .glass-surface {
+      background: rgba(10, 14, 24, 0.55) !important;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.08) !important;
+    }
+
+    .glass-btn {
+      background: rgba(255, 255, 255, 0.08) !important;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      transition: all 0.15s ease;
+    }
+
+    .glass-btn:hover {
+      background: rgba(255, 255, 255, 0.15) !important;
+      border-color: rgba(255, 255, 255, 0.22) !important;
     }
 
     /* MINIMAL TOP CONTROL HEADER */
     #topControlBar {
       transition: opacity 0.2s ease, transform 0.2s ease;
     }
+
     body.is-locked #topControlBar {
       opacity: 0;
       pointer-events: none;
       transform: translateY(-4px);
     }
+
     body.is-locked:hover #topControlBar {
       opacity: 0.85;
       pointer-events: auto;
@@ -266,18 +327,19 @@
   </style>
 </head>
 
-<body class="w-full h-full p-0 m-0 select-none flex flex-col justify-center items-center overflow-hidden">
+<body class="w-full h-full p-1 select-none flex flex-col justify-center items-center overflow-hidden">
 
   <!-- UNIFIED F1 REALISTIC HALO COCKPIT HUD -->
   <div id="hudRoot" class="halo-chassis w-full h-full p-2 flex flex-col justify-between relative select-none">
-    
+
     <!-- 0. SLIM TOP BAR: Drag Handle, Telemetry Status & Controls -->
     <div id="topControlBar" class="w-full h-5 px-2 flex items-center justify-between text-xs font-mono select-none">
       <!-- Drag Region & Status -->
       <div class="pywebview-drag-region flex items-center gap-2 cursor-grab flex-1 h-full">
         <i data-lucide="grip-horizontal" class="w-3.5 h-3.5 text-cyan-400"></i>
         <span class="font-bold tracking-widest uppercase text-[9px] text-gray-300">F1 HALO COCKPIT</span>
-        <div id="statusPill" class="flex items-center gap-1 px-1.5 py-0.2 rounded bg-white/5 border border-white/10 text-[8px]">
+        <div id="statusPill"
+          class="flex items-center gap-1 px-1.5 py-0.2 rounded-md glass-surface text-[8px]">
           <span id="statusDot" class="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse"></span>
           <span id="statusLabel" class="text-gray-300 uppercase">Aguardando F1 24...</span>
         </div>
@@ -285,49 +347,62 @@
 
       <!-- Quick Action Buttons -->
       <div class="flex items-center gap-1">
-        <button id="btnThemeToggle" onclick="toggleThemeMenu(event)" class="px-1.5 py-0.5 rounded bg-white/10 hover:bg-white/20 text-cyan-300 text-[8.5px] font-semibold flex items-center gap-1 transition active:scale-95">
+        <button id="btnThemeToggle" onclick="toggleThemeMenu(event)"
+          class="glass-btn px-2 py-0.5 rounded-md text-cyan-300 text-[8.5px] font-semibold flex items-center gap-1 transition active:scale-95">
           <i data-lucide="palette" class="w-2.5 h-2.5 text-cyan-400"></i> Cores
         </button>
-        <button id="btnResetPos" onclick="centerHud(event)" class="px-1.5 py-0.5 rounded bg-white/10 hover:bg-white/20 text-gray-300 text-[8.5px] font-semibold transition active:scale-95" title="Centralizar na tela">
+        <button id="btnResetPos" onclick="centerHud(event)"
+          class="glass-btn px-2 py-0.5 rounded-md text-gray-300 text-[8.5px] font-semibold transition active:scale-95"
+          title="Centralizar na tela">
           Centralizar
         </button>
-        <button id="btnLockPos" onclick="toggleLock(event)" class="px-1.5 py-0.5 rounded bg-cyan-400 hover:bg-cyan-300 text-black font-bold text-[8.5px] flex items-center gap-1 transition active:scale-95">
+        <button id="btnLockPos" onclick="toggleLock(event)"
+          class="px-2 py-0.5 rounded-md bg-cyan-400/90 hover:bg-cyan-300 text-black font-extrabold text-[8.5px] flex items-center gap-1 shadow-md transition active:scale-95">
           <i data-lucide="lock" class="w-2.5 h-2.5"></i> <span id="lockBtnText">TRAVAR (F8)</span>
         </button>
       </div>
     </div>
 
     <!-- 0.1 Team Color Palette Modal (Dropdown) -->
-    <div id="themeMenu" class="hidden absolute top-7 left-3 right-3 p-2.5 rounded-xl bg-black/95 backdrop-blur-xl border border-cyan-400/50 shadow-2xl font-mono text-[10px] z-50 flex flex-col gap-2">
+    <div id="themeMenu"
+      class="hidden absolute top-7 left-3 right-3 p-2.5 rounded-xl bg-slate-950/85 backdrop-blur-2xl border border-white/15 shadow-2xl font-mono text-[10px] z-50 flex flex-col gap-2">
       <div class="flex items-center justify-between border-b border-white/10 pb-1">
         <span class="font-bold uppercase tracking-wider text-white flex items-center gap-1.5">
           <i data-lucide="palette" class="w-3.5 h-3.5 text-cyan-400"></i> Temas Oficiais F1
         </span>
         <div class="flex items-center gap-2">
-          <button onclick="toggleMockSimulator(event)" id="btnSimToggle" class="px-2 py-0.5 rounded bg-green-500/20 hover:bg-green-500/40 text-green-300 border border-green-500/40 flex items-center gap-1 font-bold transition">
+          <button onclick="toggleMockSimulator(event)" id="btnSimToggle"
+            class="px-2 py-0.5 rounded bg-green-500/20 hover:bg-green-500/40 text-green-300 border border-green-500/40 flex items-center gap-1 font-bold transition">
             <i data-lucide="play" class="w-3 h-3 text-green-400"></i> <span id="simBtnText">Testar Giro</span>
           </button>
-          <button onclick="toggleThemeMenu(event)" class="text-gray-400 hover:text-white text-sm px-1 font-bold leading-none">&times;</button>
+          <button onclick="toggleThemeMenu(event)"
+            class="text-gray-400 hover:text-white text-sm px-1 font-bold leading-none">&times;</button>
         </div>
       </div>
 
       <div class="grid grid-cols-6 gap-1.5">
-        <button onclick="selectTheme('aston')" class="px-1.5 py-1 rounded bg-white/5 hover:bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 font-bold transition flex items-center justify-center gap-1">
+        <button onclick="selectTheme('aston')"
+          class="px-1.5 py-1 rounded bg-white/5 hover:bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 font-bold transition flex items-center justify-center gap-1">
           <span class="w-2 h-2 rounded-full bg-[#00E676]"></span> Aston
         </button>
-        <button onclick="selectTheme('mercedes')" class="px-1.5 py-1 rounded bg-white/5 hover:bg-cyan-500/20 border border-cyan-400/40 text-cyan-300 font-bold transition flex items-center justify-center gap-1">
+        <button onclick="selectTheme('mercedes')"
+          class="px-1.5 py-1 rounded bg-white/5 hover:bg-cyan-500/20 border border-cyan-400/40 text-cyan-300 font-bold transition flex items-center justify-center gap-1">
           <span class="w-2 h-2 rounded-full bg-[#00D2BE]"></span> Mercedes
         </button>
-        <button onclick="selectTheme('ferrari')" class="px-1.5 py-1 rounded bg-white/5 hover:bg-red-500/20 border border-red-500/40 text-red-400 font-bold transition flex items-center justify-center gap-1">
+        <button onclick="selectTheme('ferrari')"
+          class="px-1.5 py-1 rounded bg-white/5 hover:bg-red-500/20 border border-red-500/40 text-red-400 font-bold transition flex items-center justify-center gap-1">
           <span class="w-2 h-2 rounded-full bg-[#E10600]"></span> Ferrari
         </button>
-        <button onclick="selectTheme('mclaren')" class="px-1.5 py-1 rounded bg-white/5 hover:bg-orange-500/20 border border-orange-500/40 text-orange-400 font-bold transition flex items-center justify-center gap-1">
+        <button onclick="selectTheme('mclaren')"
+          class="px-1.5 py-1 rounded bg-white/5 hover:bg-orange-500/20 border border-orange-500/40 text-orange-400 font-bold transition flex items-center justify-center gap-1">
           <span class="w-2 h-2 rounded-full bg-[#FF8000]"></span> McLaren
         </button>
-        <button onclick="selectTheme('redbull')" class="px-1.5 py-1 rounded bg-white/5 hover:bg-yellow-500/20 border border-yellow-400/40 text-yellow-300 font-bold transition flex items-center justify-center gap-1">
+        <button onclick="selectTheme('redbull')"
+          class="px-1.5 py-1 rounded bg-white/5 hover:bg-yellow-500/20 border border-yellow-400/40 text-yellow-300 font-bold transition flex items-center justify-center gap-1">
           <span class="w-2 h-2 rounded-full bg-[#FFD100]"></span> Red Bull
         </button>
-        <button onclick="selectTheme('cyberpunk')" class="px-1.5 py-1 rounded bg-white/5 hover:bg-purple-500/20 border border-purple-400/40 text-purple-300 font-bold transition flex items-center justify-center gap-1">
+        <button onclick="selectTheme('cyberpunk')"
+          class="px-1.5 py-1 rounded bg-white/5 hover:bg-purple-500/20 border border-purple-400/40 text-purple-300 font-bold transition flex items-center justify-center gap-1">
           <span class="w-2 h-2 rounded-full bg-[#9B51E0]"></span> Neon
         </button>
       </div>
@@ -335,7 +410,8 @@
       <div class="flex items-center justify-between pt-1 border-t border-white/10 text-[9px] text-gray-300">
         <span>Cor Customizada:</span>
         <div class="flex items-center gap-2">
-          <input type="color" id="customColorPicker" value="#00d2be" oninput="setCustomAccent(this.value)" class="w-6 h-5 rounded cursor-pointer bg-transparent border-0">
+          <input type="color" id="customColorPicker" value="#00d2be" oninput="setCustomAccent(this.value)"
+            class="w-6 h-5 rounded cursor-pointer bg-transparent border-0">
           <span id="customColorCode" class="text-cyan-400 font-mono">#00D2BE</span>
         </div>
       </div>
@@ -343,28 +419,32 @@
 
     <!-- 1. MAIN TELEMETRY ARCH (Exact 1:1 F1 Halo HUD Geometry) -->
     <div class="w-full flex-1 flex items-center justify-between px-1 my-0.5 min-h-0 relative">
-      
+
       <!-- LEFT WING: DRS, ERS & BRAKE SEGMENTS -->
       <div class="flex-1 flex items-center justify-end gap-2.5 pr-1.5">
-        
-        <!-- Left Wing Sub-panel: DRS, ERS Battery & Deploy Mode -->
-        <div class="flex flex-col gap-1.5 justify-center">
+
+        <!-- Left Wing Sub-panel: DRS, ERS Battery & Deploy Mode (Frosted Aero Wing Block) -->
+        <div class="wing-block flex flex-col gap-1.5 justify-center min-w-[108px]">
           <!-- ERS Battery Charge Bar + Mode Indicator -->
           <div class="flex flex-col gap-0.5">
             <div class="flex items-center justify-between text-[8px] font-mono font-bold text-gray-400">
               <span class="flex items-center gap-1">
                 <span>ERS</span>
-                <span id="ersModeBadge" class="text-[7.5px] px-1 py-0.2 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-extrabold uppercase">MED</span>
+                <span id="ersModeBadge"
+                  class="text-[7.5px] px-1 py-0.2 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-extrabold uppercase">MED</span>
               </span>
               <span id="ersPctText" class="text-emerald-400">100%</span>
             </div>
-            <div class="w-24 h-2 bg-black/80 rounded-sm border border-white/10 overflow-hidden p-0.5">
-              <div id="ersBar" class="h-full rounded-sm bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-500 transition-none" style="width: 100%;"></div>
+            <div class="w-full h-2 glass-surface rounded-sm overflow-hidden p-0.5">
+              <div id="ersBar"
+                class="h-full rounded-sm bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-500 transition-none"
+                style="width: 100%;"></div>
             </div>
           </div>
 
           <!-- DRS Pill Badge (Angled Motorsport Pill with Status Indicator) -->
-          <div id="drsBadge" class="flex items-center justify-center gap-1.5 px-2.5 py-1 rounded bg-white/5 border border-white/10 text-[9.5px] font-mono font-bold text-gray-400 transition-all">
+          <div id="drsBadge"
+            class="flex items-center justify-center gap-1.5 px-2.5 py-1 rounded-md glass-surface text-[9.5px] font-mono font-bold text-gray-400 transition-all">
             <i data-lucide="wind" class="w-3 h-3"></i>
             <span id="drsText">DRS</span>
           </div>
@@ -383,8 +463,9 @@
 
       <!-- CENTER POD: PRECISION HIGH-TECH RACING SPEEDOMETER & CIRCULAR RPM TACHOMETER -->
       <div class="flex flex-col items-center justify-center flex-shrink-0 mx-1.5 z-10">
-        <div class="halo-speed-pod flex flex-col items-center justify-center relative overflow-hidden" id="centerPodContainer">
-          
+        <div class="halo-speed-pod flex flex-col items-center justify-center relative overflow-hidden"
+          id="centerPodContainer">
+
           <!-- SVG Circular RPM Arc with Crisp Vector Gauge -->
           <svg class="rpm-arc-svg" viewBox="0 0 126 126">
             <circle class="rpm-arc-bg" cx="63" cy="63" r="54"></circle>
@@ -392,16 +473,18 @@
           </svg>
 
           <!-- Label: SPEED + Top Speed Indicator -->
-          <div class="flex items-center gap-1 -mt-1 text-[7.5px] font-mono font-bold text-gray-400 tracking-widest uppercase">
+          <div
+            class="flex items-center gap-1 -mt-1 text-[7.5px] font-mono font-bold text-gray-400 tracking-widest uppercase">
             <span>SPEED</span>
             <span id="topSpeedText" class="text-cyan-400/80 text-[7px] font-semibold">MAX 0</span>
           </div>
-          
+
           <!-- Big Bold Speed Value (High Contrast Tabular Figures) -->
-          <span id="speedVal" class="text-4xl font-black font-display text-white tracking-tighter leading-none drop-shadow-[0_0_12px_rgba(255,255,255,0.45)]">
+          <span id="speedVal"
+            class="text-4xl font-black font-display text-white tracking-tighter leading-none drop-shadow-[0_0_12px_rgba(255,255,255,0.45)]">
             0
           </span>
-          
+
           <!-- Center Pod Gear Indicator (Crisp Motorsport Monospace) -->
           <div class="flex items-center justify-center mt-0.5">
             <span id="gearInPod" class="text-[12.5px] font-black font-mono text-yellow-400">N</span>
@@ -412,7 +495,7 @@
 
       <!-- RIGHT WING: THROTTLE SEGMENTS, STEERING ANGLE, GEAR STRIP & RPM / SHIFT LIGHTS -->
       <div class="flex-1 flex items-center justify-start gap-2.5 pl-1.5">
-        
+
         <!-- Vertical THROTTLE Meter (Segmented LEDs + Peak Hold) -->
         <div class="flex flex-col items-center gap-1">
           <div class="pedal-meter-container" id="throttleMeter">
@@ -422,11 +505,11 @@
           <span class="text-[7.5px] font-mono font-black text-green-400 tracking-wider">THROTTLE</span>
         </div>
 
-        <!-- Gear Sequence Strip (R N 1 2 3 4 5 6 7 8), 16-LED Bar & Steering Angle -->
-        <div class="flex flex-col gap-1.5 justify-center">
-          
+        <!-- Gear Sequence Strip (R N 1 2 3 4 5 6 7 8), 16-LED Bar & Steering Angle (Frosted Aero Wing Block) -->
+        <div class="wing-block flex flex-col gap-1.5 justify-center">
+
           <!-- 16-LED Shift Light Bar (High-Visibility Formula Standard) -->
-          <div class="w-full flex gap-1 p-0.5 bg-black/70 rounded-sm border border-white/10" id="ledsContainer">
+          <div class="w-full flex gap-1 p-1 glass-surface rounded" id="ledsContainer">
             <!-- 16 LEDs dynamically injected -->
           </div>
 
@@ -436,7 +519,7 @@
               <span>GEAR</span>
               <span id="rpmNumText" class="text-white font-mono tracking-tight font-extrabold">0 RPM</span>
             </div>
-            <div class="flex items-center gap-[2.5px] p-0.5 rounded bg-black/70 border border-white/10" id="gearStrip">
+            <div class="flex items-center gap-[2.5px] p-0.5 rounded glass-surface" id="gearStrip">
               <span id="gR" class="gear-item">R</span>
               <span id="gN" class="gear-item active">N</span>
               <span id="g1" class="gear-item">1</span>
@@ -518,7 +601,9 @@
     <div class="w-full flex items-center justify-between px-2 text-[9px] font-mono text-gray-400 select-none">
       <!-- Watermark: made by augrocky™ -->
       <div id="augrockyTrademark" class="flex items-center gap-1">
-        <span class="tracking-wider uppercase font-medium">made by <span class="font-bold text-gray-200">augrocky</span><span id="trademarkSymbol" class="text-white font-bold text-[9px] ml-0.5">™</span></span>
+        <span class="tracking-wider uppercase font-medium">made by <span
+            class="font-bold text-gray-200">augrocky</span><span id="trademarkSymbol"
+            class="text-white font-bold text-[9px] ml-0.5">™</span></span>
       </div>
 
       <!-- Telemetry Info -->
@@ -634,8 +719,8 @@
       if (gearInPod) {
         gearInPod.textContent = charStr;
         gearInPod.className = charStr === 'R' ? 'text-[12.5px] font-black font-mono text-red-400' :
-                              charStr === 'N' ? 'text-[12.5px] font-black font-mono text-yellow-400' :
-                              'text-[12.5px] font-black font-mono text-cyan-300';
+          charStr === 'N' ? 'text-[12.5px] font-black font-mono text-yellow-400' :
+            'text-[12.5px] font-black font-mono text-cyan-300';
       }
     }
 
@@ -939,11 +1024,11 @@
 
     // PYWEBVIEW CONTROLS: Click-through Lock & Centering
     let isLocked = false;
-    window.toggleLock = function(e) {
+    window.toggleLock = function (e) {
       if (e) e.stopPropagation();
       isLocked = !isLocked;
       document.body.classList.toggle('is-locked', isLocked);
-      
+
       if (isLocked) {
         lockBtnText.textContent = 'DESTRAVAR';
         if (window.pywebview && window.pywebview.api) {
@@ -957,7 +1042,7 @@
       }
     };
 
-    window.centerHud = function(e) {
+    window.centerHud = function (e) {
       if (e) e.stopPropagation();
       if (window.pywebview && window.pywebview.api) {
         window.pywebview.api.center_hud();
@@ -981,7 +1066,7 @@
           const sin = Math.sin(mockAngle);
           const rpmNorm = (Math.sin(mockAngle * 2) + 1) / 2;
           const currentGear = Math.min(8, Math.max(1, Math.floor(rpmNorm * 8) + 1));
-          
+
           renderTelemetry({
             speed: Math.floor(120 + sin * 180),
             gear: currentGear,
@@ -1060,15 +1145,15 @@
       };
 
       ws.onerror = () => {
-        try { ws.close(); } catch(e) {}
+        try { ws.close(); } catch (e) { }
       };
     }
 
     // INITIAL LOAD
     async function loadInitialConfig() {
       try {
-        const configUrl = window.location.protocol === 'file:' 
-          ? 'http://127.0.0.1:8000/api/config' 
+        const configUrl = window.location.protocol === 'file:'
+          ? 'http://127.0.0.1:8000/api/config'
           : '/api/config';
         const res = await fetch(configUrl);
         if (res.ok) {
@@ -1077,11 +1162,12 @@
             applyAccentColor(cfg.accentColor);
           }
         }
-      } catch (e) {}
+      } catch (e) { }
     }
 
     loadInitialConfig();
     connectWs();
   </script>
 </body>
+
 </html>
