@@ -38,7 +38,7 @@ dwmapi = ctypes.windll.dwmapi
 CONFIG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "hud_position.json")
 
 HUD_WIDTH = 896
-HUD_HEIGHT = 160
+HUD_HEIGHT = 175
 
 is_clickthrough_active = False
 app_window = None
@@ -195,6 +195,15 @@ class OverlayAPI:
                 print("[HUD Overlay] MODO MOVER ATIVADO: Clique e arraste para posicionar a HUD onde quiser!")
             return True
         return False
+
+    def close_hud(self):
+        """Closes the overlay window cleanly and exits."""
+        try:
+            if app_window:
+                app_window.destroy()
+        except Exception:
+            pass
+        return True
 
     def center_hud(self):
         screen_w = user32.GetSystemMetrics(0)
