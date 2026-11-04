@@ -16,6 +16,7 @@ src-tauri/target/
 # Local Dev Scratch & State
 scratch/
 hud_position.json
+*.log
 
 # System
 Thumbs.db

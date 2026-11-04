@@ -4,10 +4,18 @@ Zero-backpressure dropping queue architecture ensuring sub-5ms latency at 60Hz.
 """
 
 from __future__ import annotations
+import sys
+import os
+
+# Guarantee stdout and stderr exist when running headless under pythonw on Windows
+if sys.stdout is None:
+    sys.stdout = open(os.devnull, "w", encoding="utf-8")
+if sys.stderr is None:
+    sys.stderr = open(os.devnull, "w", encoding="utf-8")
+
 import asyncio
 import json
 import logging
-import os
 import time
 from contextlib import asynccontextmanager
 from typing import Set, Dict, Any, Optional

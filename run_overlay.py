@@ -312,8 +312,9 @@ BACKEND_BASE_URL = os.getenv("HUD_BACKEND_URL", f"http://{BACKEND_HOST}:{BACKEND
 
 def ensure_backend_running():
     """
-    Verifies if the telemetry backend is running on the configured host/port (Local or Docker VM).
-    If localhost and not running, automatically spawns backend.server as a background process.
+    Verifies if the telemetry backend is running on localhost:8000.
+    If not running, automatically spawns backend.server as a silent background process on Windows,
+    binding both UDP 20777 and WebSocket 8000 without requiring Docker.
     """
     import urllib.request
     health_url = f"{BACKEND_BASE_URL}/health"
@@ -325,28 +326,36 @@ def ensure_backend_running():
     except Exception:
         pass
 
-    # If backend is running externally (e.g. VM / Docker), don't spawn local process
-    if BACKEND_HOST not in ("127.0.0.1", "localhost"):
-        print(f"[HUD Overlay] Servidor backend em {BACKEND_BASE_URL} não respondeu.")
-        print("[HUD Overlay] Verifique se o container Docker na VM VirtualBox está rodando com as portas mapeadas.")
-        return False
-
-    print("[HUD Overlay] Servidor backend local não detectado. Iniciando backend.server automaticamente...")
+    print("[HUD Overlay] Servidor backend de telemetria não detectado. Iniciando servidor local na porta 20777 (UDP)...")
     try:
         import subprocess
         base_dir = os.path.dirname(os.path.abspath(__file__))
+        
+        # Prefer python.exe with CREATE_NO_WINDOW and log output redirection to avoid pythonw stdout crashes
+        python_exe = sys.executable
+        if "pythonw" in python_exe.lower():
+            alt = python_exe.lower().replace("pythonw.exe", "python.exe")
+            if os.path.exists(alt):
+                python_exe = alt
+
+        log_file = os.path.join(base_dir, "backend_server.log")
+        f_log = open(log_file, "a", encoding="utf-8")
+
         flags = subprocess.CREATE_NO_WINDOW if os.name == "nt" else 0
         subprocess.Popen(
-            [sys.executable, "-m", "backend.server"],
+            [python_exe, "-m", "backend.server"],
             cwd=base_dir,
+            stdout=f_log,
+            stderr=subprocess.STDOUT,
             creationflags=flags
         )
-        for _ in range(25):
+
+        for _ in range(30):
             time.sleep(0.2)
             try:
-                with urllib.request.urlopen(health_url, timeout=0.3) as r:
+                with urllib.request.urlopen(health_url, timeout=0.4) as r:
                     if r.status == 200:
-                        print(f"[HUD Overlay] Servidor backend iniciado com sucesso em {BACKEND_BASE_URL}.")
+                        print(f"[HUD Overlay] Servidor backend iniciado com sucesso! Escutando UDP 20777.")
                         return True
             except Exception:
                 pass

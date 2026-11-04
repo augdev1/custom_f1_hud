@@ -617,6 +617,7 @@
         }
       };
 
+      let gameConnected = false;
       ws.onmessage = (evt) => {
         try {
           const raw = JSON.parse(evt.data);
@@ -632,6 +633,14 @@
 
           const data = (raw.type === 'telemetry' && raw.data) ? raw.data : raw;
           if (data && (data.speed !== undefined || data.engineRPM !== undefined || data.engine_rpm !== undefined)) {
+            if (!gameConnected) {
+              gameConnected = true;
+              const badge = document.getElementById('coordsBadge');
+              if (badge) {
+                badge.textContent = 'F1 24 CONECTADO';
+                badge.className = 'hidden sm:inline-block px-1.5 py-0.2 rounded bg-cyan-500/20 text-cyan-300 font-mono text-[8px] border border-cyan-400/30';
+              }
+            }
             renderTelemetry(data);
           }
         } catch (e) { }
