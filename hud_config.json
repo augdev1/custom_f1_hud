@@ -1,6 +1,6 @@
 {
-  "accentColor": "#00E676",
-  "panelBg": "#090d16",
+  "accentColor": "#00D2BE",
+  "panelBg": "#9427aa",
   "opacity": 88,
   "borderRadius": 0,
   "borderWidth": 0,
@@ -8,6 +8,6 @@
   "borderGlowIntensity": 0,
   "ledHeight": 12,
   "gearSize": "text-7xl",
-  "scale": 100,
+  "scale": 99,
   "theme": "mercedes"
 }
