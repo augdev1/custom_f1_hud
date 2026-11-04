@@ -20,6 +20,7 @@ WS_EX_TRANSPARENT = 0x00000020
 WS_EX_TOOLWINDOW = 0x00000080
 WS_EX_NOACTIVATE = 0x08000000
 LWA_COLORKEY = 0x00000001
+LWA_ALPHA = 0x00000002
 VK_F8 = 0x77
 
 GWLP_HWNDPARENT = -8
@@ -105,36 +106,41 @@ def get_overlay_hwnd():
 
 def configure_window_transparency(hwnd, clickthrough=False):
     """
-    Applies 32-bit DWM Hardware Transparency with smooth rounded corners and glassmorphism.
-    Forces the window to stay strictly superimposed on top of F1 24 in Borderless Windowed mode.
+    Applies DWM Frame Extension, HWND_TOPMOST, and Layered Chroma Key + Alpha Blending.
+    Guarantees 100% transparent background outside the HUD chassis with ZERO white borders,
+    renders 20px rounded corners with translucent glassmorphism,
+    and forces the window to stay strictly superimposed on top of F1 24 in Borderless Windowed mode.
     """
     if not hwnd:
         return
 
     try:
-        # 1. DWM Extended Frame for complete client-area 32-bit ARGB transparency
+        # 1. DWM Extended Frame for complete client-area transparency
         margins = MARGINS(-1, -1, -1, -1)
         dwmapi.DwmExtendFrameIntoClientArea(hwnd, ctypes.byref(margins))
     except Exception:
         pass
 
     try:
-        # 2. Window Extended Styles: TOPMOST + TOOLWINDOW + NOACTIVATE (+ LAYERED/TRANSPARENT when clickthrough)
+        # 2. Window Extended Styles: TOPMOST + LAYERED + TOOLWINDOW + NOACTIVATE (+ TRANSPARENT when clickthrough)
         initial = user32.GetWindowLongW(hwnd, GWL_EXSTYLE)
-        flags = initial | WS_EX_TOPMOST | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE
+        flags = initial | WS_EX_TOPMOST | WS_EX_LAYERED | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE
         if clickthrough:
-            flags |= (WS_EX_LAYERED | WS_EX_TRANSPARENT)
+            flags |= WS_EX_TRANSPARENT
         else:
             flags &= ~WS_EX_TRANSPARENT
 
         user32.SetWindowLongW(hwnd, GWL_EXSTYLE, flags)
 
-        # 3. Attach Ownership to F1 24 if running (Owned windows stay strictly above owner)
+        # 3. Chroma Key (Black 0x00000000 is 100% transparent) + Alpha (235 for translucent glass)
+        user32.SetLayeredWindowAttributes(hwnd, 0x00000000, 235, LWA_COLORKEY | LWA_ALPHA)
+
+        # 4. Attach Ownership to F1 24 if running (Owned windows stay strictly above owner)
         f1_hwnd = find_f1_game_hwnd()
         if f1_hwnd and user32.IsWindow(f1_hwnd):
             user32.SetWindowLongPtrW(hwnd, GWLP_HWNDPARENT, f1_hwnd)
 
-        # 4. Immediate Z-Order reinforcement to HWND_TOPMOST
+        # 5. Immediate Z-Order reinforcement to HWND_TOPMOST
         user32.SetWindowPos(
             hwnd,
             HWND_TOPMOST,
