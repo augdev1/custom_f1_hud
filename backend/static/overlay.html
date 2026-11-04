@@ -51,27 +51,28 @@
 
     /* AUTHENTIC AERODYNAMIC HALO CHASSIS - Zero Border & Zero Glitches */
     .halo-chassis {
-      background: #090d16;
+      background: radial-gradient(circle at 50% 10%, #111726 0%, #07090e 100%);
       border-radius: 0px !important;
       border: none !important;
       outline: none !important;
       box-shadow: 
-        inset 0 1px 0 rgba(255, 255, 255, 0.05),
-        inset 0 -2px 10px rgba(0, 0, 0, 0.85);
+        inset 0 1px 0 rgba(255, 255, 255, 0.08),
+        inset 0 -4px 14px rgba(0, 0, 0, 0.9);
       overflow: hidden;
       transition: all 0.2s ease;
     }
 
-    /* CENTER SPEEDOMETER POD */
+    /* CENTER SPEEDOMETER POD - Precision High-Tech Racing Dial */
     .halo-speed-pod {
-      background: radial-gradient(circle at 50% 40%, rgba(18, 24, 38, 0.98) 0%, rgba(8, 10, 16, 0.99) 100%);
-      border: 2.5px solid var(--accent-color, #00D2BE);
+      background: 
+        radial-gradient(circle at 50% 35%, rgba(20, 28, 45, 0.98) 0%, rgba(6, 8, 14, 0.99) 100%);
+      border: 2px solid rgba(255, 255, 255, 0.12);
       box-shadow: 
-        0 0 25px var(--accent-glow, rgba(0, 210, 190, 0.5)),
-        inset 0 0 20px rgba(0, 0, 0, 0.85);
+        0 0 20px var(--accent-glow, rgba(0, 210, 190, 0.4)),
+        inset 0 0 25px rgba(0, 0, 0, 0.92);
       border-radius: 50%;
-      width: 112px;
-      height: 112px;
+      width: 114px;
+      height: 114px;
       position: relative;
     }
 
@@ -80,107 +81,172 @@
       position: absolute;
       top: -6px;
       left: -6px;
-      width: 124px;
-      height: 124px;
+      width: 126px;
+      height: 126px;
       pointer-events: none;
       transform: rotate(-90deg);
     }
     .rpm-arc-bg {
       fill: none;
-      stroke: rgba(255, 255, 255, 0.08);
-      stroke-width: 4;
+      stroke: rgba(255, 255, 255, 0.06);
+      stroke-width: 4.5;
     }
     .rpm-arc-meter {
       fill: none;
       stroke: var(--accent-color, #00D2BE);
-      stroke-width: 4.5;
+      stroke-width: 5;
       stroke-linecap: round;
       stroke-dasharray: 360;
       stroke-dashoffset: 360;
-      transition: stroke-dashoffset 0.05s linear, stroke 0.15s ease;
-      filter: drop-shadow(0 0 4px var(--accent-color, #00D2BE));
+      transition: stroke-dashoffset 0.04s linear, stroke 0.12s ease;
+      filter: drop-shadow(0 0 6px var(--accent-color, #00D2BE));
     }
     .rpm-arc-redline {
       stroke: #FF1744 !important;
-      filter: drop-shadow(0 0 8px #FF1744) !important;
+      filter: drop-shadow(0 0 10px #FF1744) !important;
     }
 
-    /* VERTICAL SEGMENTED PEDAL GAUGES (Exact 1:1 match to reference) */
+    /* SHIFT ALERT FLASH OVERLAY ON CUTOFF */
+    @keyframes shiftFlashAnim {
+      0%, 100% { opacity: 0; }
+      50% { opacity: 0.85; }
+    }
+    .shift-alert-flash {
+      animation: shiftFlashAnim 0.09s infinite ease-in-out;
+      background: radial-gradient(circle, rgba(155, 81, 224, 0.5) 0%, transparent 75%) !important;
+    }
+
+    /* VERTICAL SEGMENTED PEDAL GAUGES (F1 Telemetry Specs) */
     .pedal-meter-container {
       display: flex;
       flex-direction: column-reverse;
-      gap: 2.5px;
-      width: 24px;
+      gap: 2px;
+      width: 22px;
       height: 80px;
-      background: rgba(0, 0, 0, 0.65);
-      padding: 3px;
+      background: rgba(4, 6, 10, 0.85);
+      padding: 3px 2px;
       border-radius: 4px;
-      border: 1px solid rgba(255, 255, 255, 0.12);
-      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.8);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.9);
+      position: relative;
     }
     .pedal-seg {
       width: 100%;
-      height: 4px;
+      height: 3.5px;
       border-radius: 1px;
-      background: rgba(255, 255, 255, 0.08);
-      transition: background-color 0.04s ease, box-shadow 0.04s ease;
+      background: rgba(255, 255, 255, 0.07);
+      transition: background-color 0.03s ease, box-shadow 0.03s ease;
     }
     .pedal-seg.active-thr {
       background: #00E676 !important;
-      box-shadow: 0 0 6px rgba(0, 230, 118, 0.9) !important;
+      box-shadow: 0 0 8px rgba(0, 230, 118, 0.95) !important;
     }
     .pedal-seg.active-brk {
       background: #FF1744 !important;
-      box-shadow: 0 0 6px rgba(255, 23, 68, 0.9) !important;
+      box-shadow: 0 0 8px rgba(255, 23, 68, 0.95) !important;
+    }
+    /* Peak Hold Marker line */
+    .pedal-peak-marker {
+      position: absolute;
+      left: 1px;
+      right: 1px;
+      height: 2px;
+      background: #ffffff;
+      box-shadow: 0 0 6px #ffffff;
+      pointer-events: none;
+      transition: bottom 0.08s ease-out;
+      bottom: 0px;
+      border-radius: 1px;
     }
 
     /* GEAR STRIP (R N 1 2 3 4 5 6 7 8) */
     .gear-item {
       font-family: 'JetBrains Mono', monospace;
       font-weight: 800;
-      color: rgba(255, 255, 255, 0.35);
+      color: rgba(255, 255, 255, 0.3);
       font-size: 10.5px;
       width: 17px;
       height: 17px;
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 4px;
+      border-radius: 3px;
       transition: all 0.08s ease;
     }
     .gear-item.active {
       color: #000000 !important;
       background-color: var(--accent-color, #00D2BE) !important;
-      box-shadow: 0 0 12px var(--accent-color, #00D2BE) !important;
+      box-shadow: 0 0 14px var(--accent-color, #00D2BE) !important;
       font-weight: 900 !important;
       transform: scale(1.15);
     }
     .gear-item.active-reverse {
       color: #ffffff !important;
       background-color: #ef4444 !important;
-      box-shadow: 0 0 14px rgba(239, 68, 68, 0.95) !important;
+      box-shadow: 0 0 16px rgba(239, 68, 68, 0.95) !important;
       font-weight: 900 !important;
       transform: scale(1.15);
     }
 
-    /* SHIFT LIGHT BAR (15 LEDs) */
+    /* 16-LED SHIFT LIGHT BAR (Racing Wheel Formula Spec) */
     .led-shift {
       flex: 1;
-      height: 6px;
-      border-radius: 1.5px;
-      background-color: rgba(255, 255, 255, 0.08);
+      height: 6.5px;
+      border-radius: 1px;
+      background-color: rgba(255, 255, 255, 0.07);
       transition: none;
     }
-    .led-shift.active-green { background-color: #00E676; box-shadow: 0 0 8px #00E676; }
-    .led-shift.active-red { background-color: #E10600; box-shadow: 0 0 8px #E10600; }
-    .led-shift.active-purple { background-color: #9B51E0; box-shadow: 0 0 10px #9B51E0; }
+    .led-shift.active-green { 
+      background-color: #00E676; 
+      box-shadow: 0 0 9px #00E676, inset 0 1px 1px rgba(255,255,255,0.6); 
+    }
+    .led-shift.active-red { 
+      background-color: #FF1744; 
+      box-shadow: 0 0 9px #FF1744, inset 0 1px 1px rgba(255,255,255,0.6); 
+    }
+    .led-shift.active-purple { 
+      background-color: #9B51E0; 
+      box-shadow: 0 0 11px #9B51E0, inset 0 1px 1px rgba(255,255,255,0.8); 
+    }
+    .led-shift.active-blue { 
+      background-color: #00B0FF; 
+      box-shadow: 0 0 11px #00B0FF, inset 0 1px 1px rgba(255,255,255,0.8); 
+    }
+
+    /* STEERING GAUGE BAR */
+    .steer-bar-track {
+      width: 100%;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.08);
+      position: relative;
+      border-radius: 2px;
+      overflow: hidden;
+    }
+    .steer-bar-center {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 2px;
+      margin-left: -1px;
+      background: rgba(255, 255, 255, 0.35);
+    }
+    .steer-bar-thumb {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      background: var(--accent-color, #00D2BE);
+      box-shadow: 0 0 6px var(--accent-color, #00D2BE);
+      border-radius: 1px;
+      transition: left 0.03s linear, width 0.03s linear;
+    }
 
     /* WING SURFACE STYLING */
     .wing-block {
-      background: rgba(14, 18, 28, 0.55);
-      border: 1px solid rgba(255, 255, 255, 0.06);
-      border-radius: 12px;
-      padding: 6px 8px;
+      background: rgba(11, 15, 24, 0.65);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      border-radius: 8px;
+      padding: 5px 7px;
     }
 
     /* MINIMAL TOP CONTROL HEADER */
@@ -279,82 +345,98 @@
     <div class="w-full flex-1 flex items-center justify-between px-1 my-0.5 min-h-0 relative">
       
       <!-- LEFT WING: DRS, ERS & BRAKE SEGMENTS -->
-      <div class="flex-1 flex items-center justify-end gap-3 pr-2">
+      <div class="flex-1 flex items-center justify-end gap-2.5 pr-1.5">
         
-        <!-- Left Wing Sub-panel: DRS & ERS Battery -->
+        <!-- Left Wing Sub-panel: DRS, ERS Battery & Deploy Mode -->
         <div class="flex flex-col gap-1.5 justify-center">
-          <!-- ERS Battery Charge Bar -->
-          <div class="flex items-center gap-1.5">
-            <span class="text-[9px] font-mono font-bold text-gray-400 w-7">ERS</span>
-            <div class="w-24 h-2.5 bg-black/70 rounded border border-white/15 overflow-hidden p-0.5">
+          <!-- ERS Battery Charge Bar + Mode Indicator -->
+          <div class="flex flex-col gap-0.5">
+            <div class="flex items-center justify-between text-[8px] font-mono font-bold text-gray-400">
+              <span class="flex items-center gap-1">
+                <span>ERS</span>
+                <span id="ersModeBadge" class="text-[7.5px] px-1 py-0.2 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-extrabold uppercase">MED</span>
+              </span>
+              <span id="ersPctText" class="text-emerald-400">100%</span>
+            </div>
+            <div class="w-24 h-2 bg-black/80 rounded-sm border border-white/10 overflow-hidden p-0.5">
               <div id="ersBar" class="h-full rounded-sm bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-500 transition-none" style="width: 100%;"></div>
             </div>
-            <span id="ersPctText" class="text-[9px] font-mono font-bold text-emerald-400 w-7 text-right">100%</span>
           </div>
 
-          <!-- DRS Pill Badge (Angled Motorsport Pill) -->
-          <div id="drsBadge" class="flex items-center justify-center gap-1 px-3 py-1 rounded bg-white/5 border border-white/10 text-[10px] font-mono font-bold text-gray-400 transition-all">
+          <!-- DRS Pill Badge (Angled Motorsport Pill with Status Indicator) -->
+          <div id="drsBadge" class="flex items-center justify-center gap-1.5 px-2.5 py-1 rounded bg-white/5 border border-white/10 text-[9.5px] font-mono font-bold text-gray-400 transition-all">
             <i data-lucide="wind" class="w-3 h-3"></i>
             <span id="drsText">DRS</span>
           </div>
         </div>
 
-        <!-- Vertical BRAKE Meter (Segmented LEDs) -->
+        <!-- Vertical BRAKE Meter (Segmented LEDs + Peak Hold) -->
         <div class="flex flex-col items-center gap-1">
           <div class="pedal-meter-container" id="brakeMeter">
-            <!-- 12 LED segments generated via JS -->
+            <div class="pedal-peak-marker" id="brakePeakMarker"></div>
+            <!-- 16 LED segments generated via JS -->
           </div>
-          <span class="text-[8px] font-mono font-black text-red-400 tracking-wider">BRAKE</span>
+          <span class="text-[7.5px] font-mono font-black text-red-400 tracking-wider">BRAKE</span>
         </div>
 
       </div>
 
-      <!-- CENTER POD: ICONIC CIRCULAR SPEED DIAL WITH CIRCULAR RPM TACHOMETER -->
-      <div class="flex flex-col items-center justify-center flex-shrink-0 mx-2 z-10">
-        <div class="halo-speed-pod flex flex-col items-center justify-center">
+      <!-- CENTER POD: PRECISION HIGH-TECH RACING SPEEDOMETER & CIRCULAR RPM TACHOMETER -->
+      <div class="flex flex-col items-center justify-center flex-shrink-0 mx-1.5 z-10">
+        <div class="halo-speed-pod flex flex-col items-center justify-center relative overflow-hidden" id="centerPodContainer">
           
-          <!-- SVG Circular RPM Arc -->
-          <svg class="rpm-arc-svg" viewBox="0 0 124 124">
-            <circle class="rpm-arc-bg" cx="62" cy="62" r="54"></circle>
-            <circle id="rpmArcMeter" class="rpm-arc-meter" cx="62" cy="62" r="54"></circle>
+          <!-- SVG Circular RPM Arc with Crisp Vector Gauge -->
+          <svg class="rpm-arc-svg" viewBox="0 0 126 126">
+            <circle class="rpm-arc-bg" cx="63" cy="63" r="54"></circle>
+            <circle id="rpmArcMeter" class="rpm-arc-meter" cx="63" cy="63" r="54"></circle>
           </svg>
 
-          <!-- Label: SPEED -->
-          <span class="text-[8px] font-mono font-bold text-gray-400 tracking-widest uppercase -mt-1">SPEED</span>
+          <!-- Label: SPEED + Top Speed Indicator -->
+          <div class="flex items-center gap-1 -mt-1 text-[7.5px] font-mono font-bold text-gray-400 tracking-widest uppercase">
+            <span>SPEED</span>
+            <span id="topSpeedText" class="text-cyan-400/80 text-[7px] font-semibold">MAX 0</span>
+          </div>
           
-          <!-- Big Bold Speed Value -->
-          <span id="speedVal" class="text-4xl font-black font-display text-white tracking-tighter leading-none drop-shadow-[0_0_12px_rgba(255,255,255,0.4)]">
+          <!-- Big Bold Speed Value (High Contrast Tabular Figures) -->
+          <span id="speedVal" class="text-4xl font-black font-display text-white tracking-tighter leading-none drop-shadow-[0_0_12px_rgba(255,255,255,0.45)]">
             0
           </span>
           
-          <!-- Center Pod Gear Indicator (Clean, without KM/H) -->
+          <!-- Center Pod Gear Indicator (Crisp Motorsport Monospace) -->
           <div class="flex items-center justify-center mt-0.5">
-            <span id="gearInPod" class="text-[12px] font-black font-mono text-yellow-400">N</span>
+            <span id="gearInPod" class="text-[12.5px] font-black font-mono text-yellow-400">N</span>
           </div>
 
         </div>
       </div>
 
-      <!-- RIGHT WING: THROTTLE SEGMENTS, GEAR STRIP & RPM / SHIFT LIGHTS -->
-      <div class="flex-1 flex items-center justify-start gap-3 pl-2">
+      <!-- RIGHT WING: THROTTLE SEGMENTS, STEERING ANGLE, GEAR STRIP & RPM / SHIFT LIGHTS -->
+      <div class="flex-1 flex items-center justify-start gap-2.5 pl-1.5">
         
-        <!-- Vertical THROTTLE Meter (Segmented LEDs) -->
+        <!-- Vertical THROTTLE Meter (Segmented LEDs + Peak Hold) -->
         <div class="flex flex-col items-center gap-1">
           <div class="pedal-meter-container" id="throttleMeter">
-            <!-- 12 LED segments generated via JS -->
+            <div class="pedal-peak-marker" id="throttlePeakMarker"></div>
+            <!-- 16 LED segments generated via JS -->
           </div>
-          <span class="text-[8px] font-mono font-black text-green-400 tracking-wider">THROTTLE</span>
+          <span class="text-[7.5px] font-mono font-black text-green-400 tracking-wider">THROTTLE</span>
         </div>
 
-        <!-- Gear Sequence Strip (R N 1 2 3 4 5 6 7 8) & RPM readout -->
+        <!-- Gear Sequence Strip (R N 1 2 3 4 5 6 7 8), 16-LED Bar & Steering Angle -->
         <div class="flex flex-col gap-1.5 justify-center">
-          <!-- Gear Header & Strip -->
-          <div class="flex flex-col gap-0.5">
+          
+          <!-- 16-LED Shift Light Bar (High-Visibility Formula Standard) -->
+          <div class="w-full flex gap-1 p-0.5 bg-black/70 rounded-sm border border-white/10" id="ledsContainer">
+            <!-- 16 LEDs dynamically injected -->
+          </div>
+
+          <!-- Gear Header, Strip & Steer Bar -->
+          <div class="flex flex-col gap-1">
             <div class="flex items-center justify-between text-[8px] font-mono text-gray-400 font-bold uppercase">
               <span>GEAR</span>
-              <span id="rpmNumText" class="text-white font-mono">0 RPM</span>
+              <span id="rpmNumText" class="text-white font-mono tracking-tight font-extrabold">0 RPM</span>
             </div>
-            <div class="flex items-center gap-[3px] p-0.5 rounded bg-black/60 border border-white/10" id="gearStrip">
+            <div class="flex items-center gap-[2.5px] p-0.5 rounded bg-black/70 border border-white/10" id="gearStrip">
               <span id="gR" class="gear-item">R</span>
               <span id="gN" class="gear-item active">N</span>
               <span id="g1" class="gear-item">1</span>
@@ -366,36 +448,64 @@
               <span id="g7" class="gear-item">7</span>
               <span id="g8" class="gear-item">8</span>
             </div>
-          </div>
 
-          <!-- 15-LED Shift Light Bar -->
-          <div class="w-full flex gap-1 p-0.5 bg-black/60 rounded border border-white/10" id="ledsContainer">
-            <!-- 15 LEDs dynamically injected -->
+            <!-- Steering Angle Indicator Track -->
+            <div class="flex items-center gap-1 pt-0.5">
+              <span class="text-[7px] font-mono text-gray-400 font-bold">STEER</span>
+              <div class="steer-bar-track flex-1" id="steerTrack">
+                <div class="steer-bar-center"></div>
+                <div class="steer-bar-thumb" id="steerThumb" style="left: 50%; width: 0%;"></div>
+              </div>
+            </div>
           </div>
         </div>
 
-        <!-- 4-Corner Tyres & Brakes Thermal Telemetry (Compact Motorsport Layout) -->
-        <div class="wing-block flex flex-col gap-1 text-[8px] font-mono min-w-[96px] flex-shrink-0">
+        <!-- 4-Corner Tyres & Brakes Thermal Telemetry (With Brakes + Tyres Integrated) -->
+        <div class="wing-block flex flex-col gap-1 text-[8px] font-mono min-w-[100px] flex-shrink-0">
           <div class="flex justify-between items-center text-gray-400 border-b border-white/10 pb-0.5">
-            <span class="font-bold">TYRES</span>
+            <span class="font-bold tracking-wider">TYRES / BRK</span>
             <span class="text-cyan-400">°C</span>
           </div>
-          <div class="grid grid-cols-2 gap-x-2.5 gap-y-0.5 whitespace-nowrap">
-            <div class="flex items-center gap-1 justify-between">
-              <span class="text-gray-500 font-bold">FL</span>
-              <span id="tyreFL" class="text-cyan-400 font-bold">90°</span>
+          <div class="grid grid-cols-2 gap-x-2.5 gap-y-1 whitespace-nowrap">
+            <div class="flex flex-col">
+              <div class="flex items-center justify-between">
+                <span class="text-gray-500 font-bold text-[7.5px]">FL</span>
+                <span id="tyreFL" class="text-cyan-400 font-bold">90°</span>
+              </div>
+              <div class="flex items-center justify-between text-[7px] text-gray-400">
+                <span class="text-gray-600">B</span>
+                <span id="brakeFL" class="text-gray-300">350°</span>
+              </div>
             </div>
-            <div class="flex items-center gap-1 justify-between">
-              <span class="text-gray-500 font-bold">FR</span>
-              <span id="tyreFR" class="text-cyan-400 font-bold">90°</span>
+            <div class="flex flex-col">
+              <div class="flex items-center justify-between">
+                <span class="text-gray-500 font-bold text-[7.5px]">FR</span>
+                <span id="tyreFR" class="text-cyan-400 font-bold">90°</span>
+              </div>
+              <div class="flex items-center justify-between text-[7px] text-gray-400">
+                <span class="text-gray-600">B</span>
+                <span id="brakeFR" class="text-gray-300">350°</span>
+              </div>
             </div>
-            <div class="flex items-center gap-1 justify-between">
-              <span class="text-gray-500 font-bold">RL</span>
-              <span id="tyreRL" class="text-cyan-400 font-bold">90°</span>
+            <div class="flex flex-col">
+              <div class="flex items-center justify-between">
+                <span class="text-gray-500 font-bold text-[7.5px]">RL</span>
+                <span id="tyreRL" class="text-cyan-400 font-bold">90°</span>
+              </div>
+              <div class="flex items-center justify-between text-[7px] text-gray-400">
+                <span class="text-gray-600">B</span>
+                <span id="brakeRL" class="text-gray-300">350°</span>
+              </div>
             </div>
-            <div class="flex items-center gap-1 justify-between">
-              <span class="text-gray-500 font-bold">RR</span>
-              <span id="tyreRR" class="text-cyan-400 font-bold">90°</span>
+            <div class="flex flex-col">
+              <div class="flex items-center justify-between">
+                <span class="text-gray-500 font-bold text-[7.5px]">RR</span>
+                <span id="tyreRR" class="text-cyan-400 font-bold">90°</span>
+              </div>
+              <div class="flex items-center justify-between text-[7px] text-gray-400">
+                <span class="text-gray-600">B</span>
+                <span id="brakeRR" class="text-gray-300">350°</span>
+              </div>
             </div>
           </div>
         </div>
@@ -424,8 +534,8 @@
   <script>
     lucide.createIcons();
 
-    // Generate 12 Pedal Segments for Brake & Throttle
-    const TOTAL_SEGMENTS = 12;
+    // Generate 16 Pedal Segments for Brake & Throttle
+    const TOTAL_SEGMENTS = 16;
     const brakeMeter = document.getElementById('brakeMeter');
     const throttleMeter = document.getElementById('throttleMeter');
     const brakeSegments = [];
@@ -443,9 +553,9 @@
       throttleSegments.push(tSeg);
     }
 
-    // Generate 15 LEDs for Shift Light Bar
+    // Generate 16 LEDs for Shift Light Bar (5 Green, 5 Red, 3 Purple, 3 Blue)
     const ledsContainer = document.getElementById('ledsContainer');
-    const TOTAL_LEDS = 15;
+    const TOTAL_LEDS = 16;
     const leds = [];
     for (let i = 0; i < TOTAL_LEDS; i++) {
       const led = document.createElement('div');
@@ -456,12 +566,15 @@
 
     // DOM Elements
     const hudRoot = document.getElementById('hudRoot');
+    const centerPodContainer = document.getElementById('centerPodContainer');
     const speedVal = document.getElementById('speedVal');
+    const topSpeedText = document.getElementById('topSpeedText');
     const gearInPod = document.getElementById('gearInPod');
     const rpmArcMeter = document.getElementById('rpmArcMeter');
     const rpmNumText = document.getElementById('rpmNumText');
     const ersBar = document.getElementById('ersBar');
     const ersPctText = document.getElementById('ersPctText');
+    const ersModeBadge = document.getElementById('ersModeBadge');
     const drsBadge = document.getElementById('drsBadge');
     const drsText = document.getElementById('drsText');
     const themeMenu = document.getElementById('themeMenu');
@@ -469,10 +582,22 @@
     const statusDot = document.getElementById('statusDot');
     const statusLabel = document.getElementById('statusLabel');
     const lockBtnText = document.getElementById('lockBtnText');
+    const steerThumb = document.getElementById('steerThumb');
+    const brakePeakMarker = document.getElementById('brakePeakMarker');
+    const throttlePeakMarker = document.getElementById('throttlePeakMarker');
     const tyreFL = document.getElementById('tyreFL');
     const tyreFR = document.getElementById('tyreFR');
     const tyreRL = document.getElementById('tyreRL');
     const tyreRR = document.getElementById('tyreRR');
+    const brakeFL = document.getElementById('brakeFL');
+    const brakeFR = document.getElementById('brakeFR');
+    const brakeRL = document.getElementById('brakeRL');
+    const brakeRR = document.getElementById('brakeRR');
+
+    // Peak Hold tracking
+    let brakePeak = 0;
+    let throttlePeak = 0;
+    let maxSpeedRecord = 0;
 
     // Gear sequence list
     const gearIds = ['gR', 'gN', 'g1', 'g2', 'g3', 'g4', 'g5', 'g6', 'g7', 'g8'];
@@ -508,18 +633,39 @@
       }
       if (gearInPod) {
         gearInPod.textContent = charStr;
-        gearInPod.className = charStr === 'R' ? 'text-[11px] font-black font-mono text-red-400' :
-                              charStr === 'N' ? 'text-[11px] font-black font-mono text-yellow-400' :
-                              'text-[11px] font-black font-mono text-cyan-300';
+        gearInPod.className = charStr === 'R' ? 'text-[12.5px] font-black font-mono text-red-400' :
+                              charStr === 'N' ? 'text-[12.5px] font-black font-mono text-yellow-400' :
+                              'text-[12.5px] font-black font-mono text-cyan-300';
       }
     }
 
-    // Update Pedals (Brake & Throttle Segments) - Supports both 0.0-1.0 and 0-100 values
+    // Update Pedals (Brake & Throttle Segments + Peak Hold decay)
     function updatePedals(throttlePct, brakePct) {
       let tPct = Number(throttlePct) || 0;
       if (tPct > 0 && tPct <= 1.0) tPct = tPct * 100.0;
       let bPct = Number(brakePct) || 0;
       if (bPct > 0 && bPct <= 1.0) bPct = bPct * 100.0;
+
+      // Peak Hold with smooth decay
+      if (bPct >= brakePeak) {
+        brakePeak = bPct;
+      } else {
+        brakePeak = Math.max(0, brakePeak - 1.2);
+      }
+      if (tPct >= throttlePeak) {
+        throttlePeak = tPct;
+      } else {
+        throttlePeak = Math.max(0, throttlePeak - 1.5);
+      }
+
+      if (brakePeakMarker) {
+        brakePeakMarker.style.bottom = `${Math.min(76, (brakePeak / 100) * 76)}px`;
+        brakePeakMarker.style.opacity = brakePeak > 2 ? '0.9' : '0';
+      }
+      if (throttlePeakMarker) {
+        throttlePeakMarker.style.bottom = `${Math.min(76, (throttlePeak / 100) * 76)}px`;
+        throttlePeakMarker.style.opacity = throttlePeak > 2 ? '0.9' : '0';
+      }
 
       const activeThrCount = Math.round((Math.min(100, Math.max(0, tPct)) / 100) * TOTAL_SEGMENTS);
       for (let i = 0; i < TOTAL_SEGMENTS; i++) {
@@ -536,7 +682,7 @@
       }
     }
 
-    // Update RPM (Circular Arc & 15-LED Shift Light Bar)
+    // Update RPM (Circular Arc & 16-LED Formula Shift Light Bar + Cutoff Flash)
     const ARC_CIRCUMFERENCE = 339.29; // 2 * PI * 54
     function updateRpm(rpm, maxRpm) {
       if (rpmNumText) rpmNumText.textContent = `${rpm} RPM`;
@@ -553,14 +699,24 @@
         }
       }
 
-      // 15-LED Shift Lights
+      // Cutoff Flash Alert at 96%+ RPM
+      if (centerPodContainer) {
+        if (pct >= 0.96) {
+          centerPodContainer.classList.add('shift-alert-flash');
+        } else {
+          centerPodContainer.classList.remove('shift-alert-flash');
+        }
+      }
+
+      // 16-LED Shift Lights: 5 Green, 5 Red, 3 Purple, 3 Blue
       const activeLeds = Math.floor(pct * TOTAL_LEDS);
       for (let i = 0; i < TOTAL_LEDS; i++) {
         if (leds[i]) {
           if (i < activeLeds) {
             if (i < 5) leds[i].className = 'led-shift active-green';
             else if (i < 10) leds[i].className = 'led-shift active-red';
-            else leds[i].className = 'led-shift active-purple';
+            else if (i < 13) leds[i].className = 'led-shift active-purple';
+            else leds[i].className = 'led-shift active-blue';
           } else {
             leds[i].className = 'led-shift';
           }
@@ -568,29 +724,59 @@
       }
     }
 
+    // Update Steering Gauge Bar (-1.0 left to +1.0 right)
+    function updateSteer(steerVal) {
+      if (!steerThumb) return;
+      const cleanSteer = Math.max(-1.0, Math.min(1.0, Number(steerVal) || 0));
+      if (Math.abs(cleanSteer) < 0.02) {
+        steerThumb.style.width = '0%';
+        steerThumb.style.left = '50%';
+      } else if (cleanSteer > 0) {
+        const wPct = cleanSteer * 50;
+        steerThumb.style.left = '50%';
+        steerThumb.style.width = `${wPct}%`;
+      } else {
+        const wPct = Math.abs(cleanSteer) * 50;
+        steerThumb.style.left = `${50 - wPct}%`;
+        steerThumb.style.width = `${wPct}%`;
+      }
+    }
+
     // Update DRS Badge
     function updateDrs(drsStatus) {
       if (!drsBadge || !drsText) return;
       if (drsStatus === 1) { // Active
-        drsBadge.className = 'flex items-center justify-center gap-1 px-3 py-1 rounded bg-emerald-500 text-black font-black font-mono text-[10px] shadow-[0_0_15px_rgba(0,230,118,0.7)]';
-        drsText.textContent = 'DRS ACTIVE';
+        drsBadge.className = 'flex items-center justify-center gap-1.5 px-2.5 py-1 rounded bg-emerald-500 text-black font-black font-mono text-[9.5px] shadow-[0_0_14px_rgba(0,230,118,0.8)]';
+        drsText.textContent = 'DRS ON';
       } else if (drsStatus === 2) { // Available
-        drsBadge.className = 'flex items-center justify-center gap-1 px-3 py-1 rounded bg-yellow-400 text-black font-bold font-mono text-[10px] shadow-[0_0_12px_rgba(250,204,21,0.6)]';
+        drsBadge.className = 'flex items-center justify-center gap-1.5 px-2.5 py-1 rounded bg-yellow-400 text-black font-bold font-mono text-[9.5px] shadow-[0_0_12px_rgba(250,204,21,0.7)]';
         drsText.textContent = 'DRS AVAIL';
       } else { // Closed / Inactive
-        drsBadge.className = 'flex items-center justify-center gap-1 px-3 py-1 rounded bg-white/5 border border-white/10 text-[10px] font-mono font-bold text-gray-400';
+        drsBadge.className = 'flex items-center justify-center gap-1.5 px-2.5 py-1 rounded bg-white/5 border border-white/10 text-[9.5px] font-mono font-bold text-gray-400';
         drsText.textContent = 'DRS';
       }
     }
 
-    // Update ERS Battery
-    function updateErs(pct) {
+    // Update ERS Battery & Deploy Mode
+    const ERS_MODES = ['OFF', 'MED', 'HOTLAP', 'OVERTAKE'];
+    function updateErs(pct, mode) {
       const cleanPct = Math.max(0, Math.min(100, pct));
       if (ersBar) ersBar.style.width = `${cleanPct}%`;
       if (ersPctText) ersPctText.textContent = `${Math.round(cleanPct)}%`;
+      if (ersModeBadge) {
+        const modeLabel = ERS_MODES[mode] || 'MED';
+        ersModeBadge.textContent = modeLabel;
+        if (mode === 3) {
+          ersModeBadge.className = 'text-[7.5px] px-1 py-0.2 rounded bg-purple-500/30 text-purple-300 border border-purple-500/50 font-extrabold uppercase animate-pulse';
+        } else if (mode === 2) {
+          ersModeBadge.className = 'text-[7.5px] px-1 py-0.2 rounded bg-red-500/25 text-red-300 border border-red-500/40 font-extrabold uppercase';
+        } else {
+          ersModeBadge.className = 'text-[7.5px] px-1 py-0.2 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 font-extrabold uppercase';
+        }
+      }
     }
 
-    // Update Tyre Thermal Readings
+    // Update Tyre & Brake Thermal Readings
     function formatTyreTemp(el, temp) {
       if (!el) return;
       el.textContent = `${temp}°`;
@@ -599,59 +785,105 @@
       else el.className = 'text-red-400 font-bold';
     }
 
-    function updateTyres(fl, fr, rl, rr) {
-      formatTyreTemp(tyreFL, fl);
-      formatTyreTemp(tyreFR, fr);
-      formatTyreTemp(tyreRL, rl);
-      formatTyreTemp(tyreRR, rr);
+    function formatBrakeTemp(el, temp) {
+      if (!el) return;
+      el.textContent = `${temp}°`;
+      if (temp > 650) el.className = 'text-red-400 font-bold';
+      else if (temp > 450) el.className = 'text-yellow-300 font-medium';
+      else el.className = 'text-gray-400';
+    }
+
+    function updateThermal(tyres, brakes) {
+      if (tyres && tyres.length >= 4) {
+        formatTyreTemp(tyreFL, tyres[0]);
+        formatTyreTemp(tyreFR, tyres[1]);
+        formatTyreTemp(tyreRL, tyres[2]);
+        formatTyreTemp(tyreRR, tyres[3]);
+      }
+      if (brakes && brakes.length >= 4) {
+        formatBrakeTemp(brakeFL, brakes[0]);
+        formatBrakeTemp(brakeFR, brakes[1]);
+        formatBrakeTemp(brakeRL, brakes[2]);
+        formatBrakeTemp(brakeRR, brakes[3]);
+      }
     }
 
     // RENDER LIVE FRAME (Handles both raw server frames and nested schemas)
     function renderTelemetry(data) {
       if (!data) return;
 
-      // 1. Speed (KM/H)
-      if (speedVal) speedVal.textContent = Math.round(data.speed || 0);
+      // 1. Speed (KM/H) & Top Speed Peak Record
+      const currentSpeed = Math.round(data.speed || 0);
+      if (speedVal) speedVal.textContent = currentSpeed;
+      if (currentSpeed > maxSpeedRecord) {
+        maxSpeedRecord = currentSpeed;
+        if (topSpeedText) topSpeedText.textContent = `MAX ${maxSpeedRecord}`;
+      }
 
       // 2. Gear
       updateGear(data.gear !== undefined ? data.gear : 0);
 
-      // 3. Pedals (Auto-normalizes float 0.0-1.0 to 0-100)
+      // 3. Pedals (Auto-normalizes float 0.0-1.0 to 0-100) + Peak Hold
       updatePedals(data.throttle || 0, data.brake || 0);
 
-      // 4. Engine RPM (Supports engineRPM or engine_rpm)
+      // 4. Engine RPM (Supports engineRPM or engine_rpm) + Shift Cutoff Alert
       const rpm = data.engineRPM !== undefined ? data.engineRPM : (data.engine_rpm || 0);
       const maxRpm = data.maxRPM !== undefined ? data.maxRPM : (data.max_rpm || 13500);
       updateRpm(rpm, maxRpm);
 
-      // 5. DRS (1 = Active, 2 = Available)
+      // 5. Steering Angle (-1.0 to 1.0)
+      if (data.steer !== undefined) {
+        updateSteer(data.steer);
+      }
+
+      // 6. DRS (1 = Active, 2 = Available)
       const drsState = data.drs === 1 ? 1 : (data.drsAllowed === 1 ? 2 : (data.drs || 0));
       updateDrs(drsState);
 
-      // 6. ERS (Supports Joules [4,000,000 max] or percentage 0-100)
+      // 7. ERS Battery & Deploy Mode (Supports Joules or 0-100%)
       let ersPct = 100;
       if (data.ersStoreEnergy !== undefined) {
         ersPct = Math.min(100, Math.max(0, (data.ersStoreEnergy / 4000000) * 100));
       } else if (data.ers_store !== undefined) {
         ersPct = data.ers_store;
       }
-      updateErs(ersPct);
+      const ersMode = data.ersDeployMode !== undefined ? data.ersDeployMode : (data.ers_deploy_mode || 1);
+      updateErs(ersPct, ersMode);
 
-      // 7. Tyres Thermal Readings
-      const tyres = data.tyresSurfaceTemperature || data.tyre_surface_temp;
-      if (tyres && tyres.length >= 4) {
+      // 8. Tyres & Brakes Thermal Readings
+      const rawTyres = data.tyresSurfaceTemperature || data.tyre_surface_temp;
+      const rawBrakes = data.brakesTemperature || data.brake_temperature;
+      let orderedTyres = null;
+      let orderedBrakes = null;
+
+      if (rawTyres && rawTyres.length >= 4) {
         if (data.tyresSurfaceTemperature) {
-          // Official F1 24 array order: 0=RL, 1=RR, 2=FL, 3=FR
-          updateTyres(
-            Math.round(tyres[2]),
-            Math.round(tyres[3]),
-            Math.round(tyres[0]),
-            Math.round(tyres[1])
-          );
+          // Official F1 24 array order: 0=RL, 1=RR, 2=FL, 3=FR -> Map to [FL, FR, RL, RR]
+          orderedTyres = [
+            Math.round(rawTyres[2]),
+            Math.round(rawTyres[3]),
+            Math.round(rawTyres[0]),
+            Math.round(rawTyres[1])
+          ];
         } else {
-          updateTyres(tyres[0], tyres[1], tyres[2], tyres[3]);
+          orderedTyres = rawTyres.map(t => Math.round(t));
         }
       }
+
+      if (rawBrakes && rawBrakes.length >= 4) {
+        if (data.brakesTemperature) {
+          orderedBrakes = [
+            Math.round(rawBrakes[2]),
+            Math.round(rawBrakes[3]),
+            Math.round(rawBrakes[0]),
+            Math.round(rawBrakes[1])
+          ];
+        } else {
+          orderedBrakes = rawBrakes.map(b => Math.round(b));
+        }
+      }
+
+      updateThermal(orderedTyres, orderedBrakes);
     }
 
     // THEME & COLOR PICKER
@@ -757,14 +989,22 @@
             maxRPM: 13500,
             throttle: sin > 0 ? sin : 0,
             brake: sin < 0 ? -sin : 0,
+            steer: Math.sin(mockAngle * 0.7),
             drs: sin > 0.7 ? 1 : 0,
             drsAllowed: sin > 0.3 ? 1 : 0,
             ersStoreEnergy: Math.floor(2000000 + Math.cos(mockAngle) * 2000000),
+            ersDeployMode: sin > 0.5 ? 3 : 1,
             tyresSurfaceTemperature: [
               Math.floor(92 + sin * 16),
               Math.floor(91 + sin * 15),
               Math.floor(88 + sin * 15),
               Math.floor(89 + sin * 14)
+            ],
+            brakesTemperature: [
+              Math.floor(380 + (sin < 0 ? -sin * 350 : 0)),
+              Math.floor(385 + (sin < 0 ? -sin * 340 : 0)),
+              Math.floor(290 + (sin < 0 ? -sin * 200 : 0)),
+              Math.floor(295 + (sin < 0 ? -sin * 190 : 0))
             ]
           });
         }, 33);
