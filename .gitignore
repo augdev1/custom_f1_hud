@@ -1,0 +1,22 @@
+# Virtual environment & Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Node & Frontend
+node_modules/
+dist/
+dist-ssr/
+*.local
+
+# Tauri & Rust
+src-tauri/target/
+
+# Local Dev Scratch & State
+scratch/
+hud_position.json
+
+# System
+Thumbs.db
+.DS_Store

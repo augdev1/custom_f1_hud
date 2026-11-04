@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: dark;
+}
+
+html, body, #root {
+  background-color: transparent !important;
+  background: transparent !important;
+  margin: 0;
+  padding: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* Glassmorphism Panel Utilities */
+.hud-glass {
+  background: rgba(10, 14, 20, 0.78);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.7);
+}
+
+.hud-glass-subtle {
+  background: rgba(18, 24, 34, 0.55);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* LED glow effects */
+.led-active-green {
+  background-color: #00E676;
+  box-shadow: 0 0 12px #00E676, 0 0 20px rgba(0, 230, 118, 0.6);
+}
+
+.led-active-red {
+  background-color: #E10600;
+  box-shadow: 0 0 12px #E10600, 0 0 20px rgba(225, 6, 0, 0.6);
+}
+
+.led-active-purple {
+  background-color: #9B51E0;
+  box-shadow: 0 0 14px #9B51E0, 0 0 24px rgba(155, 81, 224, 0.8);
+}
+
+.led-inactive {
+  background-color: rgba(255, 255, 255, 0.06);
+  box-shadow: none;
+}

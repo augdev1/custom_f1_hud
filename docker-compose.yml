@@ -1,0 +1,25 @@
+services:
+  f1-telemetry:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: f1-custom-hud-f1-telemetry:latest
+    container_name: f1-custom-hud
+    restart: unless-stopped
+    ports:
+      # Port 8000: FastAPI, WebSocket (/ws/telemetry), e HUD Studio Web (/ e /overlay)
+      - "8000:8000"
+      # Port 20777/udp: Recepção direta de pacotes de telemetria UDP do F1 24 (OBRIGATÓRIO /udp)
+      - "20777:20777/udp"
+    environment:
+      - F1_UDP_HOST=0.0.0.0
+      - F1_UDP_PORT=20777
+      - API_HOST=0.0.0.0
+      - API_PORT=8000
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/health"]
+      interval: 15s
+      timeout: 3s
+      retries: 3
+      start_period: 5s
+
