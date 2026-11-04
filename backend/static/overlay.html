@@ -1119,11 +1119,20 @@
           // 1. Config Updates
           if (raw.type === 'config_update') {
             const cfg = raw.config || raw.data || raw;
-            if (cfg && cfg.accentColor) applyAccentColor(cfg.accentColor);
+            if (cfg) {
+              if (cfg.accentColor) {
+                applyAccentColor(cfg.accentColor, cfg.accentGlow);
+                try { localStorage.setItem('f1_hud_accent', cfg.accentColor); } catch (e) {}
+              } else if (cfg.theme && THEMES[cfg.theme]) {
+                applyAccentColor(THEMES[cfg.theme].accent, THEMES[cfg.theme].glow);
+                try { localStorage.setItem('f1_hud_accent', THEMES[cfg.theme].accent); } catch (e) {}
+              }
+            }
             return;
           }
           if (raw.accentColor && raw.speed === undefined) {
             applyAccentColor(raw.accentColor);
+            try { localStorage.setItem('f1_hud_accent', raw.accentColor); } catch (e) {}
             return;
           }
 
@@ -1149,8 +1158,15 @@
       };
     }
 
-    // INITIAL LOAD
+    // INITIAL LOAD WITH INSTANT PERSISTENCE
     async function loadInitialConfig() {
+      // 1. Instant paint from local cache
+      try {
+        const localSaved = localStorage.getItem('f1_hud_accent');
+        if (localSaved) applyAccentColor(localSaved);
+      } catch (e) { }
+
+      // 2. Fetch latest synced config from server API
       try {
         const configUrl = window.location.protocol === 'file:'
           ? 'http://127.0.0.1:8000/api/config'
@@ -1160,6 +1176,7 @@
           const cfg = await res.json();
           if (cfg.accentColor) {
             applyAccentColor(cfg.accentColor);
+            try { localStorage.setItem('f1_hud_accent', cfg.accentColor); } catch (e) { }
           }
         }
       } catch (e) { }
