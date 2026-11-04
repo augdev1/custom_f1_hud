@@ -17,3 +17,4 @@ $Shortcut.IconLocation = "$env:SystemRoot\System32\shell32.dll,14"
 $Shortcut.Save()
 
 Write-Host "Atalho criado com sucesso em: $ShortcutPath"
+
