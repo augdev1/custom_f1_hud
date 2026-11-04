@@ -106,7 +106,7 @@ def get_overlay_hwnd():
 
 def configure_window_transparency(hwnd, clickthrough=False):
     """
-    Applies DWM Frame Extension, HWND_TOPMOST, and Layered Chroma Key + Alpha Blending.
+    Applies DWM Frame Extension and HWND_TOPMOST.
     Guarantees 100% transparent background outside the HUD chassis with ZERO white borders,
     renders 20px rounded corners with translucent glassmorphism,
     and forces the window to stay strictly superimposed on top of F1 24 in Borderless Windowed mode.
@@ -122,25 +122,22 @@ def configure_window_transparency(hwnd, clickthrough=False):
         pass
 
     try:
-        # 2. Window Extended Styles: TOPMOST + LAYERED + TOOLWINDOW + NOACTIVATE (+ TRANSPARENT when clickthrough)
+        # 2. Window Extended Styles: TOPMOST + TOOLWINDOW + NOACTIVATE (+ LAYERED / TRANSPARENT when clickthrough)
         initial = user32.GetWindowLongW(hwnd, GWL_EXSTYLE)
-        flags = initial | WS_EX_TOPMOST | WS_EX_LAYERED | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE
+        flags = initial | WS_EX_TOPMOST | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE
         if clickthrough:
-            flags |= WS_EX_TRANSPARENT
+            flags |= (WS_EX_LAYERED | WS_EX_TRANSPARENT)
         else:
             flags &= ~WS_EX_TRANSPARENT
 
         user32.SetWindowLongW(hwnd, GWL_EXSTYLE, flags)
 
-        # 3. Chroma Key (Black 0x00000000 is 100% transparent) + Alpha (235 for translucent glass)
-        user32.SetLayeredWindowAttributes(hwnd, 0x00000000, 235, LWA_COLORKEY | LWA_ALPHA)
-
-        # 4. Attach Ownership to F1 24 if running (Owned windows stay strictly above owner)
+        # 3. Attach Ownership to F1 24 if running (Owned windows stay strictly above owner)
         f1_hwnd = find_f1_game_hwnd()
         if f1_hwnd and user32.IsWindow(f1_hwnd):
             user32.SetWindowLongPtrW(hwnd, GWLP_HWNDPARENT, f1_hwnd)
 
-        # 5. Immediate Z-Order reinforcement to HWND_TOPMOST
+        # 4. Immediate Z-Order reinforcement to HWND_TOPMOST
         user32.SetWindowPos(
             hwnd,
             HWND_TOPMOST,
@@ -218,8 +215,20 @@ def startup_transparency_worker(window):
         time.sleep(0.1)
         hwnd = get_overlay_hwnd()
         if hwnd:
+            native = getattr(window, "native", None)
+            if native:
+                try:
+                    import clr
+                    clr.AddReference('System.Drawing')
+                    from System.Drawing import Color
+                    if native.Controls.Count > 0:
+                        ctrl = native.Controls[0]
+                        if hasattr(ctrl, "DefaultBackgroundColor"):
+                            ctrl.DefaultBackgroundColor = Color.Transparent
+                except Exception:
+                    pass
             configure_window_transparency(hwnd, clickthrough=is_clickthrough_active)
-            print(f"[HUD Overlay] Transparência nativa Win32 (Chroma Key + DWM) aplicada com sucesso! HWND={hwnd}")
+            print(f"[HUD Overlay] Transparência nativa DWM 32-bit aplicada com sucesso! HWND={hwnd}")
             break
 
 
@@ -359,7 +368,6 @@ def main():
         resizable=False,
         easy_drag=True,
         transparent=True,
-        background_color="#000000",
         js_api=api,
     )
 

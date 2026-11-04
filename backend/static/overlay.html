@@ -27,13 +27,13 @@
       box-sizing: border-box;
     }
 
-    /* True Transparent Canvas with Win32 Chroma Key Base */
+    /* 100% True Transparent Hardware Canvas (No Solid Black/White Box) */
     html,
     body {
-      background-color: #000000 !important;
-      background: #000000 !important;
+      background: transparent !important;
+      background-color: transparent !important;
       margin: 0 !important;
-      padding: 10px !important;
+      padding: 12px !important;
       border: none !important;
       outline: none !important;
       width: 100%;
@@ -54,16 +54,16 @@
       cursor: grabbing;
     }
 
-    /* AUTHENTIC AERODYNAMIC HALO CHASSIS - Identical to Studio Browser (Rounded 20px + Aero Glass) */
+    /* AUTHENTIC AERODYNAMIC HALO CHASSIS - Identical to Studio Browser (20px Rounded + Aero Frosted Glass) */
     .halo-chassis {
-      background: linear-gradient(135deg, rgba(14, 20, 34, 0.88) 0%, rgba(7, 10, 18, 0.94) 100%) !important;
+      background: linear-gradient(135deg, rgba(14, 20, 34, 0.75) 0%, rgba(7, 10, 18, 0.85) 100%) !important;
       backdrop-filter: blur(18px) saturate(160%);
       -webkit-backdrop-filter: blur(18px) saturate(160%);
       border-radius: 20px !important;
-      border: 1px solid rgba(255, 255, 255, 0.15) !important;
+      border: 1px solid rgba(255, 255, 255, 0.12) !important;
       outline: none !important;
       box-shadow: 
-        0 14px 34px -8px rgba(0, 0, 0, 0.70),
+        0 14px 34px -8px rgba(0, 0, 0, 0.55),
         inset 0 1px 0 0 rgba(255, 255, 255, 0.22),
         inset 0 -1px 0 0 rgba(0, 0, 0, 0.60) !important;
       overflow: hidden;
