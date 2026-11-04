@@ -37,8 +37,8 @@ dwmapi = ctypes.windll.dwmapi
 
 CONFIG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "hud_position.json")
 
-HUD_WIDTH = 916
-HUD_HEIGHT = 180
+HUD_WIDTH = 896
+HUD_HEIGHT = 160
 
 is_clickthrough_active = False
 app_window = None
@@ -106,23 +106,30 @@ def get_overlay_hwnd():
 
 def configure_window_transparency(hwnd, clickthrough=False):
     """
-    Applies DWM Frame Extension and HWND_TOPMOST.
-    Guarantees 100% transparent background outside the HUD chassis with ZERO white borders,
-    renders 20px rounded corners with translucent glassmorphism,
-    and forces the window to stay strictly superimposed on top of F1 24 in Borderless Windowed mode.
+    Applies Hardware Window Region Clipping (24px rounded corners),
+    DWM Frame Extension, and HWND_TOPMOST.
+    Eliminates 100% of any black/white bounding box in hardware,
+    and forces the window to stay strictly superimposed on top of F1 24.
     """
     if not hwnd:
         return
 
     try:
-        # 1. DWM Extended Frame for complete client-area transparency
+        # 1. Hardware Rounded Region: cuts the physical OS window to exact 24px rounded rectangle
+        rgn = gdi32.CreateRoundRectRgn(0, 0, HUD_WIDTH, HUD_HEIGHT, 24, 24)
+        user32.SetWindowRgn(hwnd, rgn, True)
+    except Exception:
+        pass
+
+    try:
+        # 2. DWM Extended Frame for true 32-bit per-pixel alpha glassmorphism
         margins = MARGINS(-1, -1, -1, -1)
         dwmapi.DwmExtendFrameIntoClientArea(hwnd, ctypes.byref(margins))
     except Exception:
         pass
 
     try:
-        # 2. Window Extended Styles: TOPMOST + LAYERED + TOOLWINDOW + NOACTIVATE (+ TRANSPARENT when clickthrough)
+        # 3. Window Extended Styles: TOPMOST + LAYERED + TOOLWINDOW + NOACTIVATE (+ TRANSPARENT when clickthrough)
         initial = user32.GetWindowLongW(hwnd, GWL_EXSTYLE)
         flags = initial | WS_EX_TOPMOST | WS_EX_LAYERED | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE
         if clickthrough:
@@ -132,10 +139,7 @@ def configure_window_transparency(hwnd, clickthrough=False):
 
         user32.SetWindowLongW(hwnd, GWL_EXSTYLE, flags)
 
-        # 3. Hardware Chroma Key: Pure Black (0x000000) is 100% Transparent
-        user32.SetLayeredWindowAttributes(hwnd, 0x00000000, 0, LWA_COLORKEY)
-
-        # 4. Attach Ownership to F1 24 if running (Owned windows stay strictly above owner)
+        # 4. Attach Ownership to F1 24 if running
         f1_hwnd = find_f1_game_hwnd()
         if f1_hwnd and user32.IsWindow(f1_hwnd):
             user32.SetWindowLongPtrW(hwnd, GWLP_HWNDPARENT, f1_hwnd)
@@ -342,8 +346,21 @@ def ensure_backend_running():
     return False
 
 
+def kill_previous_hud_instances():
+    """Closes any previously running HUD overlay window to avoid stale instances."""
+    try:
+        hwnd = user32.FindWindowW(None, "F1 24 Live HUD Overlay")
+        if hwnd and user32.IsWindow(hwnd):
+            user32.PostMessageW(hwnd, 0x0010, 0, 0)  # WM_CLOSE
+            time.sleep(0.2)
+    except Exception:
+        pass
+
+
 def main():
     global app_window
+    kill_previous_hud_instances()
+
     screen_w = user32.GetSystemMetrics(0)
     screen_h = user32.GetSystemMetrics(1)
 
@@ -353,9 +370,10 @@ def main():
     print("[HUD Overlay] DICA: Pressione F8 a qualquer momento para TRAVAR ou DESTRAVAR o movimento da HUD!")
 
     # Check / start backend server automatically
-    backend_up = ensure_backend_running()
+    ensure_backend_running()
     overlay_html_file = os.path.abspath(os.path.join(os.path.dirname(__file__), "backend", "static", "overlay.html"))
-    overlay_url = f"{BACKEND_BASE_URL}/overlay" if backend_up else f"file:///{overlay_html_file.replace(os.sep, '/')}"
+    # Carrega diretamente o arquivo local para refletir alterações em tempo real
+    overlay_url = f"file:///{overlay_html_file.replace(os.sep, '/')}"
 
     api = OverlayAPI()
 
@@ -371,7 +389,6 @@ def main():
         resizable=False,
         easy_drag=True,
         transparent=True,
-        background_color="#000000",
         js_api=api,
     )
 
