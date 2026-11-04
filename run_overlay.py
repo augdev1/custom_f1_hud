@@ -122,22 +122,25 @@ def configure_window_transparency(hwnd, clickthrough=False):
         pass
 
     try:
-        # 2. Window Extended Styles: TOPMOST + TOOLWINDOW + NOACTIVATE (+ LAYERED / TRANSPARENT when clickthrough)
+        # 2. Window Extended Styles: TOPMOST + LAYERED + TOOLWINDOW + NOACTIVATE (+ TRANSPARENT when clickthrough)
         initial = user32.GetWindowLongW(hwnd, GWL_EXSTYLE)
-        flags = initial | WS_EX_TOPMOST | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE
+        flags = initial | WS_EX_TOPMOST | WS_EX_LAYERED | WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE
         if clickthrough:
-            flags |= (WS_EX_LAYERED | WS_EX_TRANSPARENT)
+            flags |= WS_EX_TRANSPARENT
         else:
             flags &= ~WS_EX_TRANSPARENT
 
         user32.SetWindowLongW(hwnd, GWL_EXSTYLE, flags)
 
-        # 3. Attach Ownership to F1 24 if running (Owned windows stay strictly above owner)
+        # 3. Hardware Chroma Key: Pure Black (0x000000) is 100% Transparent
+        user32.SetLayeredWindowAttributes(hwnd, 0x00000000, 0, LWA_COLORKEY)
+
+        # 4. Attach Ownership to F1 24 if running (Owned windows stay strictly above owner)
         f1_hwnd = find_f1_game_hwnd()
         if f1_hwnd and user32.IsWindow(f1_hwnd):
             user32.SetWindowLongPtrW(hwnd, GWLP_HWNDPARENT, f1_hwnd)
 
-        # 4. Immediate Z-Order reinforcement to HWND_TOPMOST
+        # 5. Immediate Z-Order reinforcement to HWND_TOPMOST
         user32.SetWindowPos(
             hwnd,
             HWND_TOPMOST,
@@ -368,6 +371,7 @@ def main():
         resizable=False,
         easy_drag=True,
         transparent=True,
+        background_color="#000000",
         js_api=api,
     )
 
