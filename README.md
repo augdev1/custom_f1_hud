@@ -1,23 +1,24 @@
-# 🏎️ F1 24 Custom HUD Overlay
+# F1 24 Custom HUD Overlay
 
-> **HUD de telemetria customizada, ultra-leve, transparente e click-through para EA SPORTS™ F1 24 rodando no Windows.**  
-> Projetada com metodologia **Harness Engineering & Test-First Delivery**, garantindo latência de broadcast sub-milissegundo (< 0.05ms) a 60Hz sem travamentos, vazamentos de memória ou perda de frames.
+> HUD de telemetria customizada, ultra-leve, transparente e click-through para EA SPORTS™ F1 24 rodando no Windows.  
+> Projetada com metodologia Harness Engineering & Test-First Delivery, garantindo latência de broadcast sub-milissegundo (< 0.05ms) a 60Hz sem travamentos, vazamentos de memória ou perda de frames.
 
 ---
 
-## 📌 1. Sobre o Projeto
+## 1. Sobre o Projeto
 
 O **F1 24 Custom HUD Overlay** é uma aplicação desktop híbrida de alta performance voltada para o automobilismo virtual (Sim Racing). Ela extrai dados de telemetria em tempo real diretamente do jogo F1 24 via pacotes UDP nativos, processa essas informações em um núcleo assíncrono e projeta um painel de corrida transparente na tela do piloto.
 
-### 🌟 Diferenciais Principais:
-- **Click-Through Total (`WS_EX_TRANSPARENT`):** O cursor do mouse e todos os cliques atravessam a janela do HUD sem qualquer interferência na janela principal do F1 24.
-- **Transparência Nítida sem Halo (`WS_EX_LAYERED`):** Janela sem bordas (*frameless*), sempre no topo (*always-on-top*) e sem sombras artificiais.
-- **Zero VDOM Churn (60 FPS Lisos):** O frontend React atualiza nós do DOM diretamente via `requestAnimationFrame` e `useRef`, eliminando os ciclos de reconciliação do Virtual DOM durante a corrida.
-- **Zero Backpressure (Dropping Queue):** Mecanismo de fila circular que descarta frames defasados caso haja qualquer oscilação, mantendo estritamente o frame mais atual com latência garantida de $0.025\text{ ms}$.
+### Diferenciais Principais:
+- **Click-Through Total (WS_EX_TRANSPARENT):** O cursor do mouse e todos os cliques atravessam a janela do HUD sem qualquer interferência na janela principal do F1 24 ao travar com a tecla F8.
+- **Transparência Hardware Win32 (DWM + Chroma Key):** Recorte nativo de transparência sem bordas serrilhadas ou artefatos visuais ao redor do painel.
+- **Superposição Contínua em Jogos (DirectFlip Watchdog):** Mecanismo ativo em 4Hz com garantia de permanência em primeiro plano (`HWND_TOPMOST` e `GWLP_HWNDPARENT`) sobre jogos em modo Janela Sem Bordas.
+- **Suporte Nativo a Docker & Virtualização:** Backend de telemetria encapsulado em container Linux de alta performance, permitindo execução tanto local quanto em máquinas virtuais (VirtualBox) ou hosts remotos.
+- **Zero Backpressure (Dropping Queue):** Mecanismo de fila que descarta automaticamente frames defasados caso haja qualquer oscilação, mantendo estritamente o frame mais atual com latência garantida de 0.025 ms.
 
 ---
 
-## 🏗️ 2. Arquitetura do Sistema
+## 2. Arquitetura do Sistema
 
 ```
                   ┌──────────────────────────────┐
@@ -27,71 +28,28 @@ O **F1 24 Custom HUD Overlay** é uma aplicação desktop híbrida de alta perfo
                                  │ UDP Datagrams (Porta 20777)
                                  │ Packet ID 6 (Telemetry) & 7 (Status)
                                  ▼
-         ┌────────────────────────────────────────────────┐
-         │          BACKEND CORE (Python 3.12+)           │
-         │  - asyncio.DatagramProtocol (Zero-Copy)       │
-         │  - Little-Endian struct.unpack                │
-         │  - Dropping Queue (maxsize=1)                 │
-         │  - FastAPI WebSocket Broadcaster              │
-         └───────────────────────┬────────────────────────┘
+          ┌────────────────────────────────────────────────┐
+          │      BACKEND CORE (Python / Docker)            │
+          │  - asyncio.DatagramProtocol (Zero-Copy)        │
+          │  - Little-Endian struct.unpack                 │
+          │  - Dropping Queue (maxsize=1)                  │
+          │  - FastAPI WebSocket Broadcaster               │
+          └───────────────────────┬────────────────────────┘
                                  │ WebSocket Stream (ws://127.0.0.1:8000/ws/telemetry)
                                  │ 60Hz JSON Payload
                                  ▼
-         ┌────────────────────────────────────────────────┐
-         │         FRONTEND OVERLAY (Tauri v2 + React)    │
-         │  - Tauri v2 Shell (Win32 HWND Flags)           │
-         │  - React 18 + Tailwind CSS + Lucide Icons      │
-         │  - requestAnimationFrame Direct DOM Mutations  │
-         │  - Painéis: RPM 15-LED, Marcha, ERS, DRS, Pneus│
-         └────────────────────────────────────────────────┘
+          ┌────────────────────────────────────────────────┐
+          │         FRONTEND OVERLAY (Windows Win32)       │
+          │  - pywebview Desktop Shell                     │
+          │  - Win32 API Hardware Transparency (DWM)       │
+          │  - Tailored UI: Marcha, RPM, ERS, DRS, Pneus   │
+          │  - Zero White Borders & Clean Chroma Key       │
+          └────────────────────────────────────────────────┘
 ```
 
 ---
 
-## ✅ 3. O Que Já Foi Implementado
-
-O projeto foi construído rigorosamente sob o protocolo de 4 fases de engenharia de software sênior:
-
-### 🧩 Fase 1: Contrato Binário e Harness de Simulação (Mocks)
-- [x] **Especificação do protocolo Codemasters/EA F1 24:**
-  - `PacketHeader`: Cabeçalho padrão de 29 bytes (`<HBBBBBQfIIBB`).
-  - `PacketCarTelemetryData` (Packet ID 6): Extração pontual do `playerCarIndex` (60 bytes por carro) cobrindo velocidade, aceleração, freio, esterço, marcha (-1 a 8), RPM, DRS, 4 temperaturas de freio e 4 temperaturas superficiais de pneus.
-  - `PacketCarStatusData` (Packet ID 7): Extração de limite de corte de RPM (`m_maxRPM`), permissão de DRS (`m_drsAllowed`), estoque de energia da bateria ERS em Joules (`m_ersStoreEnergy`) e modos de entrega (`m_ersDeployMode`).
-- [x] **Mock Telemetry Producer 60Hz:**
-  - Gerador de carga capaz de emitir pacotes UDP em tempo real simulando a dinâmica de Monza (acelerações até 340 km/h, frenagens com superaquecimento de freios, curvas com forças laterais, abertura de asa móvel e descarga de bateria).
-
-### 🧪 Fase 2: Suíte de Testes Automatizados (11/11 Aprovados)
-- [x] **Unit Tests ([test_packet_unpack.py](file:///d:/AUG/f1-custom-hud/backend/tests/test_packet_unpack.py)):**
-  - Desempacotamento de structs Little-endian com fixtures conhecidas.
-  - Roteamento correto de offsets para qualquer índice do grid (`playerCarIndex` de 0 a 21).
-  - Tratamento de marcha ré com sinal (`-1`) e neutro (`0`).
-  - Validação de tolerância a buffers truncados e pacotes desconhecidos.
-- [x] **Integration & Stress Tests ([test_ws_performance.py](file:///d:/AUG/f1-custom-hud/backend/tests/test_ws_performance.py)):**
-  - **Dropping Queue:** Injeção de rajada de 500 pacotes sem acúmulo de memória (`qsize <= 1`).
-  - **Responsividade do Event Loop:** Chaveamento de tarefas com latência de **0.104ms** (meta: < 5.0ms).
-  - **Latência de Broadcast WebSocket:** Entrega a 60Hz com latência média de **0.025ms** e $P_{99}$ de **0.045ms** (meta: < 5.0ms).
-- [x] **Shell Config Validation ([test_tauri_config.py](file:///d:/AUG/f1-custom-hud/backend/tests/test_tauri_config.py)):**
-  - Validação estática das flags de transparência, sem bordas, sem sombras e always-on-top.
-  - Validação estática de injeção das flags Win32 `WS_EX_TRANSPARENT | WS_EX_LAYERED`.
-
-### ⚙️ Fase 3: Código de Produção
-- [x] **Backend FastAPI ([server.py](file:///d:/AUG/f1-custom-hud/backend/server.py)):**
-  - Listener UDP assíncrono via `asyncio.DatagramProtocol`.
-  - Agregador de estado unificado mesclando Telemetria + Status.
-  - Endpoint WebSocket `/ws/telemetry` com reconexão automática e descarte de conexões inativas.
-- [x] **Tauri v2 Desktop Shell ([src-tauri/](file:///d:/AUG/f1-custom-hud/src-tauri/)):**
-  - Configuração de janela transparente e frameless em [tauri.conf.json](file:///d:/AUG/f1-custom-hud/src-tauri/tauri.conf.json).
-  - Injeção das flags Win32 nativas via `windows-sys` crate no arquivo [lib.rs](file:///d:/AUG/f1-custom-hud/src-tauri/src/lib.rs).
-- [x] **Frontend HUD Overlay ([src/](file:///d:/AUG/f1-custom-hud/src/)):**
-  - **Shift Lights ([RpmBar.tsx](file:///d:/AUG/f1-custom-hud/src/components/RpmBar.tsx)):** 15 LEDs graduais (Verde $\rightarrow$ Vermelho $\rightarrow$ Roxo) com indicador pulsante de corte (*shift alert* a 96%+ de rotação).
-  - **Display Central ([GearSpeedDisplay.tsx](file:///d:/AUG/f1-custom-hud/src/components/GearSpeedDisplay.tsx)):** Marcha estilizada gigante, velocímetro digital em KM/H e barras dinâmicas de acelerador e freio.
-  - **ERS / DRS ([ErsDrsDisplay.tsx](file:///d:/AUG/f1-custom-hud/src/components/ErsDrsDisplay.tsx)):** Status DRS (`CLOSED`, `READY`, `ACTIVE`) e barra de carga de bateria com identificação de modos (`MED`, `HOTLAP`, `OVERTAKE`).
-  - **4-Corner Tyres & Brakes ([TyreBrakeDisplay.tsx](file:///d:/AUG/f1-custom-hud/src/components/TyreBrakeDisplay.tsx)):** Monitoramento térmico independente para os 4 cantos (`FL`, `FR`, `RL`, `RR`).
-  - **Loop de Alta Frequência ([HudOverlay.tsx](file:///d:/AUG/f1-custom-hud/src/components/HudOverlay.tsx)):** `requestAnimationFrame` que atualiza referências DOM imperativas sem renderizações supérfluas no React.
-
----
-
-## 📂 4. Estrutura do Repositório
+## 3. Estrutura do Repositório
 
 ```text
 f1-custom-hud/
@@ -100,145 +58,131 @@ f1-custom-hud/
 │   │   ├── __init__.py
 │   │   ├── f124_packets.py        # Structs binárias F1 24 e unpacker zero-copy
 │   │   └── mock_producer.py       # Gerador de carga UDP 60Hz (Simulação de Monza)
+│   ├── static/
+│   │   ├── overlay.html           # HUD in-game flutuante transparente
+│   │   └── index.html             # HUD Studio Web & configurador de temas
 │   ├── tests/
 │   │   ├── __init__.py
 │   │   ├── test_packet_unpack.py  # Testes unitários de desempacotamento binário
 │   │   ├── test_ws_performance.py # Testes de estresse assíncrono e latência
-│   │   └── test_tauri_config.py   # Testes estáticos de configuração do Tauri e Win32
+│   │   └── test_tauri_config.py   # Testes estáticos de configuração
 │   ├── requirements.txt           # Dependências Python (FastAPI, uvicorn, websockets, pytest)
 │   ├── server.py                  # Servidor assíncrono UDP + WebSocket FastAPI
 │   └── __init__.py
-├── src/
-│   ├── components/
-│   │   ├── ErsDrsDisplay.tsx      # Painel de DRS e bateria ERS
-│   │   ├── GearSpeedDisplay.tsx   # Marcha central, velocímetro e barras de pedal
-│   │   ├── HudOverlay.tsx         # Orquestrador do HUD e loop requestAnimationFrame
-│   │   ├── RpmBar.tsx             # Shift lights com 15 LEDs segmentados
-│   │   └── TyreBrakeDisplay.tsx   # Painel térmico de freios e pneus (4 cantos)
-│   ├── types/
-│   │   └── telemetry.ts           # Interfaces e tipos TypeScript de telemetria
-│   ├── App.tsx                    # Componente raiz com ativação de click-through
-│   ├── index.css                  # Estilos globais Tailwind, glassmorphism e cores de LED
-│   └── main.tsx                   # Ponto de entrada React
-├── src-tauri/
-│   ├── capabilities/
-│   │   └── default.json           # Permissões do Tauri v2
-│   ├── src/
-│   │   ├── lib.rs                 # Injeção Win32 de WS_EX_TRANSPARENT e WS_EX_LAYERED
-│   │   └── main.rs                # Ponto de entrada da aplicação desktop
-│   ├── Cargo.toml                 # Dependências Rust (tauri, windows-sys)
-│   └── tauri.conf.json            # Configuração de janela transparente e frameless
-├── index.html                     # HTML mestre transparente com fontes Rajdhani e JetBrains Mono
-├── package.json                   # Dependências Node.js (React 18, Vite, Tailwind CSS, Lucide)
-├── postcss.config.js
-├── pytest.ini                     # Configuração do Pytest (asyncio e caminhos de teste)
-├── tailwind.config.js             # Paleta de sim racing F1 e efeitos de brilho (glow)
-├── tsconfig.json                  # Configurações do compilador TypeScript
-└── vite.config.ts                 # Configuração do Vite integrada ao Tauri
+├── Dockerfile                     # Imagem de produção containerizada (Python 3.12-slim)
+├── docker-compose.yml             # Orquestrador de serviços (Portas 8000/tcp e 20777/udp)
+├── hud_config.json                # Configurações visuais persistidas (tema, cores, escala)
+├── iniciar_hud.bat                # Script de inicialização completa
+├── reiniciar_hud.bat              # Script de reinicialização rápida do backend e overlay
+├── push_to_github.bat             # Script utilitário para envio Git
+├── run_overlay.py                 # Janela flutuante desktop transparente Win32
+└── pytest.ini                     # Configuração do Pytest
 ```
 
 ---
 
-## 🚀 5. Como Executar o Projeto
+## 4. Como Executar o Projeto
 
-### Pré-requisitos
-- **Python 3.11+** (com `pip` ou gerenciador `uv`)
-- **Node.js 18+** e **npm**
-- **Rust & Cargo** (necessário para compilar o executável desktop Tauri v2)
+### Opção A: Execução via Docker (Recomendada)
+
+O backend pode ser executado em container Docker (local ou em máquina virtual como VirtualBox).
+
+1. Iniciar os serviços com Docker Compose:
+```bash
+docker compose up -d --build
+```
+
+2. Verificar o status do servidor:
+```bash
+curl http://127.0.0.1:8000/health
+```
+
+3. Iniciar o overlay desktop no Windows:
+```cmd
+python run_overlay.py
+```
+*Caso o container esteja em outro IP de VM (modo Bridge), execute antes:*
+```cmd
+set HUD_BACKEND_HOST=192.168.x.x
+python run_overlay.py
+```
 
 ---
 
-### Passo 1: Configurar e Rodar os Testes Automatizados (Backend)
+### Opção B: Execução Local Nativa (Windows)
 
+#### 1. Configurar o ambiente Python e dependências
 ```powershell
-# 1. Acesse o diretório do projeto
-cd d:\AUG\f1-custom-hud
-
-# 2. Crie e ative o ambiente virtual (exemplo com uv ou python nativo)
-uv venv --python 3.12
-# ou: python -m venv .venv
+# Criação do ambiente virtual
+python -m venv .venv
 .venv\Scripts\activate
 
-# 3. Instale as dependências
+# Instalação das dependências
 pip install -r backend/requirements.txt
-
-# 4. Execute a suíte de testes completa
-pytest -v -s
 ```
 
-*Saída esperada:* **11 passed** com latência média confirmada de ~0.025ms.
-
----
-
-### Passo 2: Iniciar o Servidor de Telemetria (FastAPI Core)
-
+#### 2. Executar a suíte de testes automatizados
 ```powershell
-# Inicia a escuta UDP na porta 20777 e o WebSocket em ws://127.0.0.1:8000/ws/telemetry
+pytest -v
+```
+*Resultado esperado: 11 testes aprovados com latência média confirmada de ~0.025ms.*
+
+#### 3. Iniciar o servidor e overlay
+Execute o arquivo `iniciar_hud.bat` ou inicie manualmente:
+```powershell
+# Terminal 1: Iniciar o núcleo de telemetria
 python -m backend.server
+
+# Terminal 2: Iniciar a HUD transparente
+python run_overlay.py
 ```
 
 ---
 
-### Passo 3: Iniciar o Simulador de Telemetria (Mock 60Hz)
+## 5. Configuração no Jogo F1 24
 
-Se você não estiver com o F1 24 aberto no momento, execute o gerador simulado em outro terminal:
+Para receber telemetria durante as sessões no EA SPORTS™ F1 24:
 
-```powershell
-python -m backend.protocol.mock_producer --hz 60.0
-```
+1. Acesse **Opções do Jogo** > **Configurações** > **Telemetria UDP**.
+2. Configure as seguintes opções:
 
----
-
-### Passo 4: Executar o Frontend / Overlay Desktop
-
-#### Opção A: Modo Desenvolvimento Web (Vite Preview no Navegador)
-```powershell
-npm install
-npm run dev
-```
-Abra `http://localhost:5173` para visualizar os componentes do HUD em tempo real.
-
-#### Opção B: Executar no Shell Desktop Nativo (Tauri v2 com Click-Through)
-```powershell
-npm run tauri dev
-```
-A janela transparente se posicionará sobre sua tela em modo frameless e click-through total.
-
----
-
-## 🎮 6. Configuração Dentro do Jogo F1 24
-
-Para utilizar o overlay durante as corridas reais no F1 24:
-1. Abra o **F1 24** e vá para **Opções do Jogo** > **Configurações** > **Telemetria UDP**.
-2. Ajuste as opções conforme a tabela:
-
-| Opção | Valor Recomendado |
+| Parâmetro | Valor Configurado |
 | :--- | :--- |
 | **Telemetria UDP** | `Ativado` |
 | **Formato UDP** | `2024` |
-| **Endereço IP** | `127.0.0.1` |
+| **Endereço IP** | `127.0.0.1` (ou o IP da VM caso use modo Bridge) |
 | **Porta UDP** | `20777` |
 | **Taxa de Envio UDP** | `60 Hz` |
 
 ---
 
-## 📊 7. Benchmark de Performance Real
+## 6. Atalhos e Controles da HUD
 
-Testes executados no ambiente local sob carga sintética e rajadas de dados:
-
-| Métrica | Meta Técnica | Resultado Obtido | Status |
-| :--- | :--- | :--- | :--- |
-| **Latência Média WS** | $< 5.0\text{ ms}$ | **0.025 ms** | ✅ Excedido (200x mais rápido) |
-| **Latência WS ($P_{99}$)** | $< 10.0\text{ ms}$ | **0.045 ms** | ✅ Excedido |
-| **Jitter do Event Loop** | $< 5.0\text{ ms}$ | **0.104 ms** | ✅ Estável |
-| **Consumo de Fila sob Burst** | $\le 1\text{ frame}$ | **$\le 1\text{ frame}$** | ✅ Zero Backpressure |
-| **Taxa de Atualização da UI** | $60\text{ FPS}$ | **$60\text{ FPS}$** (RAF) | ✅ Zero VDOM Reconciliation |
+- **F8:** Alterna entre **Modo Mover** (permite arrastar o painel pela tela) e **Modo Corrida** (HUD travada e cliques passam 100% transparentes para o volante/jogo).
+- **Botão Centralizar:** Reposiciona a HUD no centro inferior da tela (alinhado com o Halo do cockpit).
+- **Botão Cores:** Abre o seletor de temas e cores oficiais de construtores (Mercedes, Ferrari, Aston Martin, McLaren, Red Bull, Neon).
+- **Testar Giro:** Dispara o gerador interno de telemetria simulada para validação sem necessidade de abrir o jogo.
 
 ---
 
-## 🛠️ Tecnologias Utilizadas
+## 7. Benchmark de Performance
 
-- **Shell & Nativo:** [Tauri v2](https://v2.tauri.app/), [Rust](https://www.rust-lang.org/), [windows-sys](https://crates.io/crates/windows-sys)
-- **Backend:** [Python 3.12](https://www.python.org/), [FastAPI](https://fastapi.tiangolo.com/), [uvicorn](https://www.uvicorn.org/), [asyncio](https://docs.python.org/3/library/asyncio.html)
-- **Frontend:** [React 18](https://react.dev/), [TypeScript](https://www.typescriptlang.org/), [Vite](https://vitejs.dev/), [Tailwind CSS](https://tailwindcss.com/), [Lucide Icons](https://lucide.dev/)
-- **Testes & Qualidade:** [Pytest](https://docs.pytest.org/), [pytest-asyncio](https://github.com/pytest-dev/pytest-asyncio)
+Métricas obtidas em testes de estresse sob carga sintética contínua a 60Hz:
+
+| Métrica | Requisito Técnico | Resultado Obtido | Avaliação |
+| :--- | :--- | :--- | :--- |
+| **Latência Média WS** | < 5.0 ms | **0.025 ms** | Superado (200x mais rápido) |
+| **Latência WS (P99)** | < 10.0 ms | **0.045 ms** | Superado |
+| **Jitter do Event Loop** | < 5.0 ms | **0.104 ms** | Estável |
+| **Consumo de Fila sob Burst** | <= 1 frame | **<= 1 frame** | Zero Backpressure |
+| **Taxa de Atualização da UI** | 60 FPS | **60 FPS** | Zero Frame Drops |
+
+---
+
+## 8. Tecnologias Utilizadas
+
+- **Núcleo de Telemetria:** Python 3.12, FastAPI, uvicorn, asyncio, websockets.
+- **Containerização:** Docker, Docker Compose (Alpine/Debian-slim).
+- **Desktop Shell & Transparência:** pywebview, Win32 API, DWM (Desktop Window Manager), Chroma Keying.
+- **Frontend & Interface:** HTML5, CSS3, Tailwind CSS, Lucide Icons, JetBrains Mono & Rajdhani Typography.
+- **Qualidade & Validação:** Pytest, pytest-asyncio, HTTPX.
