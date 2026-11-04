@@ -74,7 +74,6 @@ f1-custom-hud/
 ├── hud_config.json                # Configurações visuais persistidas (tema, cores, escala)
 ├── iniciar_hud.bat                # Script de inicialização completa
 ├── reiniciar_hud.bat              # Script de reinicialização rápida do backend e overlay
-├── push_to_github.bat             # Script utilitário para envio Git
 ├── run_overlay.py                 # Janela flutuante desktop transparente Win32
 └── pytest.ini                     # Configuração do Pytest
 ```
