@@ -61,3 +61,4 @@ echo Ao abrir o projeto no VS Code, o ambiente (.venv) sera selecionado automati
 echo ========================================================
 echo.
 pause
+

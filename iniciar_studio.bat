@@ -17,3 +17,4 @@ if %ERRORLEVEL% NEQ 0 (
 :: Abre o navegador padrao no Studio
 start http://localhost:8000/
 exit
+

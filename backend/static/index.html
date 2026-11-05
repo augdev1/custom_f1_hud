@@ -3,11 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>F1 24 Custom HUD - Studio & Live Preview</title>
-  <!-- Google Fonts: Rajdhani & JetBrains Mono -->
+  <title>F1 24 // TELEMETRY STUDIO</title>
+  
+  <!-- Technical Typography: JetBrains Mono, Titillium Web, Chakra Petch -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800;900&family=Rajdhani:wght@600;700;800;900&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600;700;800&family=Titillium+Web:wght@600;700;900&display=swap" rel="stylesheet">
+  
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Lucide Icons -->
@@ -28,38 +30,118 @@
 
     * {
       box-sizing: border-box;
+      border-radius: 0;
     }
 
-    /* Full HD Cockpit Background */
+    /* Industrial Base Theme */
+    body {
+      background-color: #080A0F;
+      color: #E2E8F0;
+      font-family: 'Titillium Web', sans-serif;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    .font-mono-tech {
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .font-racing {
+      font-family: 'Chakra Petch', sans-serif;
+    }
+
+    /* Background Scenarios */
     .bg-cockpit {
       background-image: 
-        radial-gradient(circle at 50% 90%, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.75) 100%),
-        url('cockpit.jpg'), 
-        url('/static/cockpit.jpg');
+        radial-gradient(circle at 50% 85%, rgba(0, 0, 0, 0.25) 0%, rgba(8, 10, 15, 0.85) 100%),
+        url('/static/cockpit.jpg'),
+        url('cockpit.jpg');
       background-size: cover;
       background-position: center bottom;
       background-repeat: no-repeat;
-      background-color: #06090f;
+      background-color: #080A0F;
     }
 
     .bg-carbon {
-      background-color: #090B0E;
-      background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 0);
-      background-size: 24px 24px;
+      background-color: #090B10;
+      background-image: 
+        linear-gradient(45deg, #10141D 25%, transparent 25%),
+        linear-gradient(-45deg, #10141D 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #10141D 75%),
+        linear-gradient(-45deg, transparent 75%, #10141D 75%);
+      background-size: 8px 8px;
     }
 
     .bg-checker {
-      background-color: #111;
+      background-color: #06080C;
       background-image: 
-        linear-gradient(45deg, #181818 25%, transparent 25%), 
-        linear-gradient(-45deg, #181818 25%, transparent 25%), 
-        linear-gradient(45deg, transparent 75%, #181818 75%), 
-        linear-gradient(-45deg, transparent 75%, #181818 75%);
-      background-size: 20px 20px;
-      background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
+        linear-gradient(45deg, #121622 25%, transparent 25%), 
+        linear-gradient(-45deg, #121622 25%, transparent 25%), 
+        linear-gradient(45deg, transparent 75%, #121622 75%), 
+        linear-gradient(-45deg, transparent 75%, #121622 75%);
+      background-size: 16px 16px;
+      background-position: 0 0, 0 8px, 8px -8px, -8px 0px;
     }
 
-    /* AUTHENTIC AERODYNAMIC HALO CHASSIS - 20px Rounded Glassmorphism */
+    /* Millimeter Technical Sliders (Flat Track & Rectangular Thumb) */
+    input[type=range] {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 100%;
+      height: 3px;
+      background: rgba(255, 255, 255, 0.10);
+      outline: none;
+      border: none;
+      margin: 8px 0;
+    }
+
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 8px;
+      height: 14px;
+      background: #00F0FF;
+      border: 1px solid #FFFFFF;
+      cursor: pointer;
+      box-shadow: 0 0 4px rgba(0, 240, 255, 0.6);
+      transition: background 0.1s ease;
+    }
+
+    input[type=range]::-webkit-slider-thumb:hover {
+      background: #FFFFFF;
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+    }
+
+    input[type=range]::-moz-range-thumb {
+      width: 8px;
+      height: 14px;
+      background: #00F0FF;
+      border: 1px solid #FFFFFF;
+      cursor: pointer;
+      box-shadow: 0 0 4px rgba(0, 240, 255, 0.6);
+    }
+
+    /* Technical Scrollbar for Inspector Dock */
+    .tech-scroll::-webkit-scrollbar {
+      width: 4px;
+    }
+    .tech-scroll::-webkit-scrollbar-track {
+      background: #080A0F;
+    }
+    .tech-scroll::-webkit-scrollbar-thumb {
+      background: rgba(255, 255, 255, 0.15);
+    }
+    .tech-scroll::-webkit-scrollbar-thumb:hover {
+      background: #00F0FF;
+    }
+
+    /* ============================================================== */
+    /* INTERNAL HUD COMPONENT (PRESERVED 100% UNCHANGED AS REQUIRED) */
+    /* ============================================================== */
+
     .halo-chassis {
       background: linear-gradient(135deg, rgba(14, 20, 34, 0.75) 0%, rgba(7, 10, 18, 0.85) 100%) !important;
       backdrop-filter: blur(18px) saturate(160%);
@@ -75,7 +157,6 @@
       transition: background 0.2s ease, border-color 0.2s ease;
     }
 
-    /* CENTER SPEEDOMETER POD */
     .halo-speed-pod {
       background: radial-gradient(circle at 45% 35%, rgba(26, 38, 60, 0.68) 0%, rgba(8, 12, 22, 0.84) 100%) !important;
       backdrop-filter: blur(14px);
@@ -85,13 +166,12 @@
         0 0 22px var(--accent-glow, rgba(0, 210, 190, 0.35)),
         inset 0 1px 1px rgba(255, 255, 255, 0.25),
         inset 0 0 18px rgba(0, 0, 0, 0.85) !important;
-      border-radius: 50%;
+      border-radius: 50% !important;
       width: 108px;
       height: 108px;
       position: relative;
     }
 
-    /* RPM Circular Arc */
     .rpm-arc-svg {
       position: absolute;
       top: -6px;
@@ -121,7 +201,6 @@
       filter: drop-shadow(0 0 8px #FF1744) !important;
     }
 
-    /* VERTICAL SEGMENTED PEDAL GAUGES */
     .pedal-meter-container {
       display: flex;
       flex-direction: column-reverse;
@@ -132,14 +211,14 @@
       backdrop-filter: blur(8px);
       -webkit-backdrop-filter: blur(8px);
       padding: 3px;
-      border-radius: 6px;
+      border-radius: 6px !important;
       border: 1px solid rgba(255, 255, 255, 0.10);
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 0 0 12px rgba(0, 0, 0, 0.8);
     }
     .pedal-seg {
       width: 100%;
       height: 4px;
-      border-radius: 1px;
+      border-radius: 1px !important;
       background: rgba(255, 255, 255, 0.08);
       transition: background-color 0.04s ease, box-shadow 0.04s ease;
     }
@@ -152,7 +231,6 @@
       box-shadow: 0 0 6px var(--brake-color, #FF1744) !important;
     }
 
-    /* GEAR STRIP */
     .gear-item {
       font-family: 'JetBrains Mono', monospace;
       font-weight: 800;
@@ -163,7 +241,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      border-radius: 4px;
+      border-radius: 4px !important;
       transition: all 0.08s ease;
     }
     .gear-item.active {
@@ -181,11 +259,10 @@
       transform: scale(1.15);
     }
 
-    /* SHIFT LIGHTS */
     .led-shift {
       flex: 1;
       height: 6px;
-      border-radius: 1.5px;
+      border-radius: 1.5px !important;
       background-color: rgba(255, 255, 255, 0.08);
       transition: none;
     }
@@ -193,374 +270,376 @@
     .led-shift.active-red { background-color: #E10600; box-shadow: 0 0 8px #E10600; }
     .led-shift.active-purple { background-color: #9B51E0; box-shadow: 0 0 10px #9B51E0; }
 
-    /* WING BLOCKS */
     .wing-block {
       background: rgba(14, 20, 32, 0.55);
       backdrop-filter: blur(10px);
       -webkit-backdrop-filter: blur(10px);
       border: 1px solid rgba(255, 255, 255, 0.09);
-      border-radius: 8px;
+      border-radius: 8px !important;
       padding: 5px 8px;
       box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
-    }
-
-    /* Custom Scrollbar for Sidebar */
-    .sidebar-scroll::-webkit-scrollbar {
-      width: 5px;
-    }
-    .sidebar-scroll::-webkit-scrollbar-track {
-      background: rgba(0, 0, 0, 0.2);
-    }
-    .sidebar-scroll::-webkit-scrollbar-thumb {
-      background: rgba(255, 255, 255, 0.15);
-      border-radius: 9999px;
-    }
-    .sidebar-scroll::-webkit-scrollbar-thumb:hover {
-      background: rgba(0, 210, 190, 0.5);
     }
   </style>
 </head>
 
-<body class="w-screen h-screen m-0 p-0 overflow-hidden select-none font-['Rajdhani'] text-white bg-cockpit flex flex-col justify-between relative" id="mainBody">
+<body class="w-screen h-screen m-0 p-0 overflow-hidden select-none bg-cockpit flex flex-col justify-between relative" id="mainBody">
 
-  <!-- TOP BAR: Control Studio & Live Status -->
-  <header class="w-full z-40 flex items-center justify-between px-5 py-2.5 bg-slate-950/80 backdrop-blur-xl border-b border-white/10">
+  <!-- ============================================================== -->
+  <!-- A. SLIM MOTORSPORT STATUS BAR (Height: 44px, Deep Mechanical)  -->
+  <!-- ============================================================== -->
+  <header class="w-full h-11 z-50 flex items-center justify-between px-3 bg-[#080A0F] border-b border-white/[0.08] flex-shrink-0">
+    
+    <!-- Left Section: Title, Version, WS Connection -->
     <div class="flex items-center gap-3">
-      <button onclick="toggleSidebar()" class="p-1.5 rounded-lg bg-white/5 hover:bg-white/10 text-cyan-300 border border-white/10 transition" title="Alternar Painel Lateral">
-        <i data-lucide="menu" class="w-4 h-4"></i>
+      <!-- Toggle Dock Button -->
+      <button onclick="toggleSidebar()" class="w-7 h-7 flex items-center justify-center bg-white/[0.04] hover:bg-white/[0.08] text-white border border-white/[0.12] transition" title="Alternar Painel Lateral">
+        <i data-lucide="panel-left-close" class="w-3.5 h-3.5 text-[#00F0FF]"></i>
       </button>
 
+      <!-- Technical Logo / Title -->
       <div class="flex items-center gap-2">
-        <i data-lucide="gauge" class="w-5 h-5 text-cyan-400"></i>
-        <span class="font-extrabold tracking-wider text-base uppercase">F1 24 Custom HUD Studio</span>
-        <span class="text-[10px] font-mono uppercase bg-cyan-500/15 text-cyan-300 border border-cyan-400/30 px-2 py-0.5 rounded font-bold">Cockpit POV</span>
+        <span class="font-bold tracking-[0.14em] uppercase text-xs text-white">F1 24 // TELEMETRY STUDIO</span>
+        <span class="font-mono-tech text-[9px] uppercase px-1.5 py-0.5 bg-white/[0.06] text-[#00F0FF] border border-white/[0.12] font-semibold tracking-wider">v2.4</span>
       </div>
 
-      <!-- Telemetry Live Status Badge -->
-      <div class="flex items-center gap-2 ml-3 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-mono">
-        <span id="statusIndicator" class="w-2 h-2 rounded-full bg-yellow-400 animate-pulse"></span>
-        <span id="statusText" class="text-gray-300 text-[11px]">Conectando WebSocket...</span>
+      <div class="w-px h-4 bg-white/[0.10]"></div>
+
+      <!-- Live WebSocket Status -->
+      <div class="flex items-center gap-2 px-2 py-0.5 bg-white/[0.03] border border-white/[0.08]">
+        <div id="statusIndicator" class="w-1.5 h-1.5 bg-[#F59E0B]"></div>
+        <span id="statusText" class="font-mono-tech text-[10px] text-gray-300 uppercase tracking-widest">LIVE 60Hz</span>
       </div>
     </div>
 
-    <!-- Toolbar controls -->
-    <div class="flex items-center gap-3">
-      <!-- Background Presets -->
-      <div class="flex items-center gap-1 bg-white/5 p-1 rounded-lg border border-white/10 text-xs font-mono">
-        <span class="text-gray-400 px-2 text-[11px]">Cenário:</span>
-        <button onclick="setBg('cockpit')" id="btnBgCockpit" class="px-2.5 py-1 rounded bg-cyan-600 text-white font-bold transition text-[11px]">Cockpit Full HD</button>
-        <button onclick="setBg('carbon')" id="btnBgCarbon" class="px-2.5 py-1 rounded text-gray-400 hover:text-white transition text-[11px]">Carbon</button>
-        <button onclick="setBg('checker')" id="btnBgChecker" class="px-2.5 py-1 rounded text-gray-400 hover:text-white transition text-[11px]">Transparente</button>
+    <!-- Right Section: Scenarios, Mode, Crosshair -->
+    <div class="flex items-center gap-2.5">
+      
+      <!-- Alignment Grid Toggle -->
+      <button onclick="toggleCrosshair()" id="btnCrosshair" class="h-7 px-2.5 flex items-center gap-1.5 bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.10] text-[10px] font-mono-tech font-bold uppercase tracking-wider text-gray-300 transition" title="Calibrar alinhamento milimétrico do Halo">
+        <i data-lucide="crosshair" class="w-3 h-3 text-[#00F0FF]"></i>
+        <span>GRID CALIBRAÇÃO</span>
+      </button>
+
+      <!-- Scenario Radio Segment -->
+      <div class="flex items-center bg-black/60 border border-white/[0.10] p-0.5 h-7">
+        <button id="btnBgCockpit" onclick="setBg('cockpit')" class="px-2.5 h-full text-[10px] font-mono-tech font-bold uppercase tracking-wider bg-[#00F0FF] text-black transition">COCKPIT POV</button>
+        <button id="btnBgCarbon" onclick="setBg('carbon')" class="px-2.5 h-full text-[10px] font-mono-tech font-bold uppercase tracking-wider text-gray-400 hover:text-white transition">CARBON GRID</button>
+        <button id="btnBgChecker" onclick="setBg('checker')" class="px-2.5 h-full text-[10px] font-mono-tech font-bold uppercase tracking-wider text-gray-400 hover:text-white transition">TRANSPARENTE</button>
       </div>
 
-      <!-- Mode Selector -->
-      <div class="flex items-center gap-1 bg-white/5 p-1 rounded-lg border border-white/10 text-xs font-mono">
-        <button onclick="setMode('live')" id="btnModeLive" class="px-3 py-1 rounded bg-emerald-500 text-black font-bold flex items-center gap-1.5 transition text-[11px]">
-          <i data-lucide="radio" class="w-3.5 h-3.5"></i> Live 60Hz
+      <div class="w-px h-4 bg-white/[0.10]"></div>
+
+      <!-- Mode Selector: HARNESS MANUAL / LIVE UDP -->
+      <div class="flex items-center bg-black/60 border border-white/[0.10] p-0.5 h-7">
+        <button id="btnModeHarness" onclick="setMode('harness')" class="px-2.5 h-full text-[10px] font-mono-tech font-bold uppercase tracking-wider bg-[#F59E0B] text-black transition flex items-center gap-1">
+          <span>HARNESS MANUAL</span>
         </button>
-        <button onclick="setMode('harness')" id="btnModeHarness" class="px-3 py-1 rounded text-gray-400 hover:text-white flex items-center gap-1.5 transition text-[11px]">
-          <i data-lucide="sliders" class="w-3.5 h-3.5"></i> Harness Manual
+        <button id="btnModeLive" onclick="setMode('live')" class="px-2.5 h-full text-[10px] font-mono-tech font-bold uppercase tracking-wider text-gray-400 hover:text-white transition flex items-center gap-1">
+          <span>LIVE UDP</span>
         </button>
       </div>
+
     </div>
   </header>
 
-  <!-- BODY CONTENT: DOCKED SIDEBAR + PREVIEW STAGE -->
-  <div class="flex-1 w-full h-[calc(100vh-50px)] flex overflow-hidden relative">
+  <!-- ============================================================== -->
+  <!-- MAIN WORKSPACE: SIDEBAR DOCK + CENTRAL VIEWPORT STAGE          -->
+  <!-- ============================================================== -->
+  <div class="flex-1 w-full flex overflow-hidden relative">
 
-    <!-- ALIGNED & FORMATTED MODERN SIDEBAR -->
-    <aside id="sidebarPanel" class="w-[370px] h-full z-30 flex flex-col bg-slate-950/85 backdrop-blur-2xl border-r border-white/10 shadow-2xl transition-all duration-300 ease-in-out">
+    <!-- ============================================================== -->
+    <!-- B. TECHNICAL INSPECTOR / SETTINGS DOCK (Width: 320px)          -->
+    <!-- ============================================================== -->
+    <aside id="sidebarPanel" class="w-[320px] h-full bg-[#0A0D14] border-r border-white/[0.08] flex flex-col flex-shrink-0 z-40 transition-all duration-200 select-none">
       
-      <!-- SIDEBAR TABS -->
-      <div class="grid grid-cols-3 p-2 gap-1.5 border-b border-white/10 bg-black/40 font-mono text-[11px]">
-        <button onclick="switchTab('harness')" id="tabBtnHarness" class="py-2 px-1 rounded-lg font-bold flex items-center justify-center gap-1.5 bg-cyan-500/20 text-cyan-300 border border-cyan-400/40 transition">
-          <i data-lucide="sliders" class="w-3.5 h-3.5"></i> Harness
-        </button>
-        <button onclick="switchTab('colors')" id="tabBtnColors" class="py-2 px-1 rounded-lg font-bold flex items-center justify-center gap-1.5 text-gray-400 hover:text-white border border-transparent transition">
-          <i data-lucide="palette" class="w-3.5 h-3.5"></i> Cores
-        </button>
-        <button onclick="switchTab('network')" id="tabBtnNetwork" class="py-2 px-1 rounded-lg font-bold flex items-center justify-center gap-1.5 text-gray-400 hover:text-white border border-transparent transition">
-          <i data-lucide="wifi" class="w-3.5 h-3.5"></i> Rede
-        </button>
+      <!-- Dock Header -->
+      <div class="px-3.5 py-2 bg-[#07090E] border-b border-white/[0.08] flex items-center justify-between">
+        <div class="flex items-center gap-1.5">
+          <i data-lucide="cpu" class="w-3.5 h-3.5 text-[#00F0FF]"></i>
+          <span class="font-mono-tech text-[10px] uppercase font-bold tracking-[0.14em] text-white">ENGINEERING INSPECTOR</span>
+        </div>
+        <span class="font-mono-tech text-[8px] uppercase tracking-wider text-[#10B981] bg-[#10B981]/10 px-1.5 py-0.5 border border-[#10B981]/30 font-bold">ONLINE</span>
       </div>
 
-      <!-- TAB 1: TELEMETRY TEST HARNESS -->
-      <div id="tabContentHarness" class="flex-1 overflow-y-auto p-4 flex flex-col gap-4 font-mono text-xs sidebar-scroll">
-        <div class="flex items-center justify-between border-b border-white/10 pb-2">
-          <span class="font-bold text-white uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-            <i data-lucide="gauge" class="w-4 h-4 text-cyan-400"></i> Calibração Manual (Harness)
-          </span>
-          <span id="harnessModeBadge" class="px-2 py-0.5 rounded text-[9px] font-bold bg-amber-500/20 text-amber-300 border border-amber-400/30">SANDBOX</span>
-        </div>
-
-        <!-- Speed Slider -->
-        <div class="flex flex-col gap-1.5 bg-white/5 p-3 rounded-xl border border-white/10">
-          <div class="flex justify-between items-center text-gray-300">
-            <span class="font-bold">Velocidade:</span>
-            <div class="font-mono font-bold text-cyan-300 text-sm">
-              <span id="hSpeedVal">284</span> <span class="text-[10px] text-gray-400">KM/H</span> 
-              <span class="text-gray-500 mx-1">|</span> 
-              <span id="hMphVal">176</span> <span class="text-[10px] text-gray-400">MPH</span>
-            </div>
-          </div>
-          <input type="range" id="hSpeed" min="0" max="360" value="284" oninput="onHarnessInput()" class="accent-cyan-400 cursor-pointer w-full">
-        </div>
-
-        <!-- Gear Selector Grid -->
-        <div class="flex flex-col gap-1.5 bg-white/5 p-3 rounded-xl border border-white/10">
-          <span class="font-bold text-gray-300 text-[11px]">Marcha Engatada:</span>
-          <div class="grid grid-cols-10 gap-1 text-[11px] font-mono font-bold" id="harnessGears">
-            <button onclick="setHarnessGear(-1)" class="h-gear-btn p-1.5 rounded bg-white/5 border border-white/10 hover:bg-white/15" data-gear="-1">R</button>
-            <button onclick="setHarnessGear(0)" class="h-gear-btn p-1.5 rounded bg-white/5 border border-white/10 hover:bg-white/15" data-gear="0">N</button>
-            <button onclick="setHarnessGear(1)" class="h-gear-btn p-1.5 rounded bg-white/5 border border-white/10 hover:bg-white/15" data-gear="1">1</button>
-            <button onclick="setHarnessGear(2)" class="h-gear-btn p-1.5 rounded bg-white/5 border border-white/10 hover:bg-white/15" data-gear="2">2</button>
-            <button onclick="setHarnessGear(3)" class="h-gear-btn p-1.5 rounded bg-white/5 border border-white/10 hover:bg-white/15" data-gear="3">3</button>
-            <button onclick="setHarnessGear(4)" class="h-gear-btn p-1.5 rounded bg-white/5 border border-white/10 hover:bg-white/15" data-gear="4">4</button>
-            <button onclick="setHarnessGear(5)" class="h-gear-btn p-1.5 rounded bg-white/5 border border-white/10 hover:bg-white/15" data-gear="5">5</button>
-            <button onclick="setHarnessGear(6)" class="h-gear-btn p-1.5 rounded bg-white/5 border border-white/10 hover:bg-white/15" data-gear="6">6</button>
-            <button onclick="setHarnessGear(7)" class="h-gear-btn p-1.5 rounded bg-cyan-500 text-black border border-cyan-400 font-black shadow-lg" data-gear="7">7</button>
-            <button onclick="setHarnessGear(8)" class="h-gear-btn p-1.5 rounded bg-white/5 border border-white/10 hover:bg-white/15" data-gear="8">8</button>
-          </div>
-        </div>
-
-        <!-- Engine RPM Slider -->
-        <div class="flex flex-col gap-1.5 bg-white/5 p-3 rounded-xl border border-white/10">
-          <div class="flex justify-between items-center text-gray-300">
-            <span class="font-bold">RPM do Motor:</span>
-            <span id="hRpmVal" class="font-mono font-bold text-yellow-400 text-sm">11.450 RPM</span>
-          </div>
-          <input type="range" id="hRpm" min="3000" max="15000" value="11450" oninput="onHarnessInput()" class="accent-yellow-400 cursor-pointer w-full">
-        </div>
-
-        <!-- Throttle & Brake Pedals -->
-        <div class="grid grid-cols-2 gap-2.5">
-          <div class="flex flex-col gap-1 bg-white/5 p-2.5 rounded-xl border border-white/10">
-            <div class="flex justify-between items-center">
-              <span class="font-bold text-emerald-400 text-[11px]">Throttle:</span>
-              <span id="hThrVal" class="font-bold text-emerald-400">100%</span>
-            </div>
-            <input type="range" id="hThrottle" min="0" max="100" value="100" oninput="onHarnessInput()" class="accent-emerald-400 cursor-pointer w-full">
-          </div>
-
-          <div class="flex flex-col gap-1 bg-white/5 p-2.5 rounded-xl border border-white/10">
-            <div class="flex justify-between items-center">
-              <span class="font-bold text-red-400 text-[11px]">Brake:</span>
-              <span id="hBrkVal" class="font-bold text-red-400">0%</span>
-            </div>
-            <input type="range" id="hBrake" min="0" max="100" value="0" oninput="onHarnessInput()" class="accent-red-400 cursor-pointer w-full">
-          </div>
-        </div>
-
-        <!-- ERS Battery -->
-        <div class="flex flex-col gap-1.5 bg-white/5 p-3 rounded-xl border border-white/10">
-          <div class="flex justify-between items-center text-gray-300">
-            <span class="font-bold">Bateria ERS:</span>
-            <span id="hErsVal" class="font-mono font-bold text-cyan-300">82%</span>
-          </div>
-          <input type="range" id="hErs" min="0" max="100" value="82" oninput="onHarnessInput()" class="accent-cyan-400 cursor-pointer w-full">
-        </div>
-
-        <!-- DRS & Overtake Mode Toggles -->
-        <div class="grid grid-cols-2 gap-2.5 bg-white/5 p-3 rounded-xl border border-white/10">
-          <label class="flex items-center justify-between cursor-pointer">
-            <span class="text-gray-300 font-bold text-[11px]">DRS Ativo</span>
-            <input type="checkbox" id="hDrs" onchange="onHarnessInput()" class="accent-cyan-400 w-4 h-4 cursor-pointer">
-          </label>
-          <label class="flex items-center justify-between cursor-pointer">
-            <span class="text-rose-400 font-bold text-[11px]">Overtake</span>
-            <input type="checkbox" id="hOvertake" onchange="onHarnessInput()" class="accent-rose-500 w-4 h-4 cursor-pointer">
-          </label>
-        </div>
-
-        <!-- STRESS LOOP 60 FPS -->
-        <div class="pt-2 flex flex-col gap-1.5">
-          <button id="btnStressLoop" onclick="toggleStressLoop()" class="w-full py-2.5 rounded-xl font-bold text-xs bg-cyan-600 hover:bg-cyan-500 text-white flex items-center justify-center gap-2 transition active:scale-95 shadow-lg shadow-cyan-600/30">
-            <i data-lucide="play-circle" class="w-4 h-4"></i>
-            <span id="stressLoopText">Iniciar Stress Loop (60 FPS)</span>
-          </button>
-          <span class="text-[10px] text-gray-400 text-center">Simula volta rápida com aceleração contínua, trocas de marcha e frenagem extrema.</span>
-        </div>
-      </div>
-
-      <!-- TAB 2: CORES & PERSONALIZAÇÃO (DUAL COLOR & MÉTRICAS) -->
-      <div id="tabContentColors" class="hidden flex-1 overflow-y-auto p-4 flex flex-col gap-4 font-mono text-xs sidebar-scroll">
-        <div class="flex items-center justify-between border-b border-white/10 pb-2">
-          <span class="font-bold text-white uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-            <i data-lucide="palette" class="w-4 h-4 text-cyan-400"></i> Personalização Dual Color & Métricas
-          </span>
-          <span class="text-[9px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-0.5 rounded border border-emerald-400/30">SYNC LIVE</span>
-        </div>
-
-        <!-- Dual Color Scheme: Primária & Secundária -->
-        <div class="flex flex-col gap-3 bg-white/5 p-3.5 rounded-xl border border-white/10">
-          <span class="text-gray-300 font-bold text-[11px] uppercase tracking-wider text-cyan-300 flex items-center gap-1">
-            <i data-lucide="layers" class="w-3.5 h-3.5"></i> Esquema Dual Color da Carcaça
-          </span>
-
-          <!-- Cor Primária -->
-          <div class="flex items-center justify-between">
-            <div>
-              <span class="font-bold text-gray-200 block">Cor Primária (Acentos & Glow):</span>
-              <span class="text-[10px] text-gray-400">Velocímetro, aro e destaques da HUD</span>
-            </div>
-            <input type="color" id="primaryColorPicker" value="#00D2BE" onchange="updateColors()" class="w-9 h-9 rounded-lg bg-transparent border border-white/20 cursor-pointer">
-          </div>
-
-          <!-- Cor Secundária -->
-          <div class="flex items-center justify-between pt-2 border-t border-white/10">
-            <div>
-              <span class="font-bold text-gray-200 block">Cor Secundária (Fundo do Chassi):</span>
-              <span class="text-[10px] text-gray-400">Gradiente da carcaça com glassmorphism</span>
-            </div>
-            <input type="color" id="secondaryColorPicker" value="#0E1422" onchange="updateColors()" class="w-9 h-9 rounded-lg bg-transparent border border-white/20 cursor-pointer">
-          </div>
-        </div>
-
-        <!-- Cores das Métricas Individuais -->
-        <div class="flex flex-col gap-3 bg-white/5 p-3.5 rounded-xl border border-white/10">
-          <span class="text-gray-300 font-bold text-[11px] uppercase tracking-wider text-emerald-300 flex items-center gap-1">
-            <i data-lucide="sliders-horizontal" class="w-3.5 h-3.5"></i> Cores das Métricas em Pista
-          </span>
-
-          <div class="flex items-center justify-between">
-            <span class="font-bold text-gray-300">Bateria ERS:</span>
-            <input type="color" id="ersColorPicker" value="#00D2BE" onchange="updateColors()" class="w-8 h-8 rounded-lg bg-transparent border border-white/20 cursor-pointer">
-          </div>
-
-          <div class="flex items-center justify-between pt-1 border-t border-white/10">
-            <span class="font-bold text-gray-300">Acelerador (Throttle):</span>
-            <input type="color" id="throttleColorPicker" value="#00E676" onchange="updateColors()" class="w-8 h-8 rounded-lg bg-transparent border border-white/20 cursor-pointer">
-          </div>
-
-          <div class="flex items-center justify-between pt-1 border-t border-white/10">
-            <span class="font-bold text-gray-300">Freio (Brake):</span>
-            <input type="color" id="brakeColorPicker" value="#FF1744" onchange="updateColors()" class="w-8 h-8 rounded-lg bg-transparent border border-white/20 cursor-pointer">
-          </div>
-
-          <div class="flex items-center justify-between pt-1 border-t border-white/10">
-            <span class="font-bold text-gray-300">Marcha Ativa:</span>
-            <input type="color" id="gearColorPicker" value="#00D2BE" onchange="updateColors()" class="w-8 h-8 rounded-lg bg-transparent border border-white/20 cursor-pointer">
-          </div>
-        </div>
-
-        <!-- Presets Oficiais de Equipes de F1 (2 Cores) -->
-        <div class="flex flex-col gap-2 bg-white/5 p-3.5 rounded-xl border border-white/10">
-          <span class="text-gray-300 font-bold text-[11px] uppercase tracking-wider text-cyan-300">
-            Presets Rápidos de Equipe
-          </span>
-          <div class="grid grid-cols-2 gap-2 text-[10px]">
-            <button onclick="applyTeamPreset('#00D2BE', '#0B1724', '#00D2BE', '#00E676', '#FF1744')" class="p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 flex items-center gap-2 transition">
-              <span class="w-3 h-3 rounded-full bg-[#00D2BE] border border-white/20"></span>
-              <span class="font-bold text-gray-200">Mercedes-AMG</span>
-            </button>
-            <button onclick="applyTeamPreset('#E10600', '#1A0608', '#FFB800', '#00E676', '#E10600')" class="p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 flex items-center gap-2 transition">
-              <span class="w-3 h-3 rounded-full bg-[#E10600] border border-white/20"></span>
-              <span class="font-bold text-gray-200">Scuderia Ferrari</span>
-            </button>
-            <button onclick="applyTeamPreset('#FF8000', '#061325', '#FF8000', '#00E676', '#FF1744')" class="p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 flex items-center gap-2 transition">
-              <span class="w-3 h-3 rounded-full bg-[#FF8000] border border-white/20"></span>
-              <span class="font-bold text-gray-200">McLaren F1</span>
-            </button>
-            <button onclick="applyTeamPreset('#FFD100', '#040C1A', '#FFD100', '#00E676', '#E10600')" class="p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 flex items-center gap-2 transition">
-              <span class="w-3 h-3 rounded-full bg-[#FFD100] border border-white/20"></span>
-              <span class="font-bold text-gray-200">Red Bull Racing</span>
-            </button>
-            <button onclick="applyTeamPreset('#00E676', '#061611', '#00E676', '#00E676', '#FF1744')" class="p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 flex items-center gap-2 transition">
-              <span class="w-3 h-3 rounded-full bg-[#00E676] border border-white/20"></span>
-              <span class="font-bold text-gray-200">Aston Martin</span>
-            </button>
-            <button onclick="applyTeamPreset('#F72585', '#160824', '#4CC9F0', '#00F5D4', '#F72585')" class="p-2 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 flex items-center gap-2 transition">
-              <span class="w-3 h-3 rounded-full bg-[#F72585] border border-white/20"></span>
-              <span class="font-bold text-gray-200">Cyberpunk Neon</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- TAB 3: REDE & DIAGNÓSTICO DE PORTAS -->
-      <div id="tabContentNetwork" class="hidden flex-1 overflow-y-auto p-4 flex flex-col gap-4 font-mono text-xs sidebar-scroll">
-        <div class="flex items-center justify-between border-b border-white/10 pb-2">
-          <span class="font-bold text-white uppercase tracking-wider text-[11px] flex items-center gap-1.5">
-            <i data-lucide="network" class="w-4 h-4 text-cyan-400"></i> Portas e Comunicação F1
-          </span>
-          <button onclick="refreshNetworkDiagnostics()" class="px-2 py-0.5 rounded bg-white/10 hover:bg-white/20 text-[10px] text-gray-300 flex items-center gap-1 transition">
-            <i data-lucide="refresh-cw" class="w-3 h-3"></i> Atualizar
-          </button>
-        </div>
-
-        <!-- WebSocket Diagnostic Card -->
-        <div class="flex flex-col gap-2 bg-white/5 p-3.5 rounded-xl border border-white/10">
-          <div class="flex items-center justify-between">
-            <span class="font-bold text-cyan-300 flex items-center gap-1.5">
-              <i data-lucide="radio" class="w-3.5 h-3.5"></i> WebSocket API (Porta 8000)
+      <!-- Accordion Scroll Container -->
+      <div class="flex-1 overflow-y-auto tech-scroll flex flex-col text-xs font-mono-tech">
+        
+        <!-- ========================================================= -->
+        <!-- [01] // ENGENHARIA DE HARNESS & SIMULAÇÃO                 -->
+        <!-- ========================================================= -->
+        <div class="border-b border-white/[0.08]">
+          <div class="px-3.5 py-2 bg-white/[0.02] flex items-center justify-between cursor-pointer hover:bg-white/[0.04] transition" onclick="toggleAccordion('secHarness')">
+            <span class="text-[10px] uppercase font-bold tracking-[0.12em] text-[#00F0FF] flex items-center gap-1.5">
+              <span>[01] // HARNESS & SIMULAÇÃO</span>
             </span>
-            <span id="wsStatusBadge" class="px-2 py-0.5 rounded text-[9px] font-bold bg-green-500/20 text-green-300 border border-green-500/30">ONLINE</span>
+            <i id="icon-secHarness" data-lucide="chevron-down" class="w-3.5 h-3.5 text-gray-400"></i>
           </div>
-          <div class="text-[11px] text-gray-300 space-y-1">
-            <div class="flex justify-between">
-              <span class="text-gray-400">Endpoint:</span>
-              <span class="text-white font-bold" id="wsEndpointText">ws://127.0.0.1:8000/ws/telemetry</span>
+
+          <div id="secHarness" class="p-3.5 flex flex-col gap-3.5 bg-[#0A0D14]">
+            
+            <!-- Velocidade -->
+            <div class="flex flex-col gap-1">
+              <div class="flex justify-between items-center text-[10px]">
+                <span class="text-gray-400 uppercase font-semibold">VELOCIDADE</span>
+                <div class="flex items-center gap-1.5">
+                  <span id="hSpeedVal" class="text-white font-bold text-xs">284</span>
+                  <span class="text-gray-500 text-[9px]">KM/H</span>
+                  <span class="text-gray-600">|</span>
+                  <span id="hMphVal" class="text-gray-300 font-semibold text-[10px]">176</span>
+                  <span class="text-gray-500 text-[9px]">MPH</span>
+                </div>
+              </div>
+              <input type="range" id="hSpeed" min="0" max="360" value="284" oninput="onHarnessInput()">
             </div>
-            <div class="flex justify-between">
-              <span class="text-gray-400">Frequência:</span>
-              <span class="text-emerald-400 font-bold">60 Hz Cravados</span>
+
+            <!-- Marcha Grid Selector -->
+            <div class="flex flex-col gap-1.5">
+              <span class="text-[10px] text-gray-400 uppercase font-semibold">MARCHA ATIVA</span>
+              <div class="grid grid-cols-5 gap-1 text-[10px] text-center font-bold">
+                <button type="button" data-gear="-1" onclick="setHarnessGear(-1)" class="h-gear-btn py-1 bg-white/[0.04] hover:bg-white/[0.1] border border-white/[0.1] text-red-400">R</button>
+                <button type="button" data-gear="0" onclick="setHarnessGear(0)" class="h-gear-btn py-1 bg-white/[0.04] hover:bg-white/[0.1] border border-white/[0.1] text-amber-400">N</button>
+                <button type="button" data-gear="1" onclick="setHarnessGear(1)" class="h-gear-btn py-1 bg-white/[0.04] hover:bg-white/[0.1] border border-white/[0.1] text-gray-300">1</button>
+                <button type="button" data-gear="2" onclick="setHarnessGear(2)" class="h-gear-btn py-1 bg-white/[0.04] hover:bg-white/[0.1] border border-white/[0.1] text-gray-300">2</button>
+                <button type="button" data-gear="3" onclick="setHarnessGear(3)" class="h-gear-btn py-1 bg-white/[0.04] hover:bg-white/[0.1] border border-white/[0.1] text-gray-300">3</button>
+                <button type="button" data-gear="4" onclick="setHarnessGear(4)" class="h-gear-btn py-1 bg-white/[0.04] hover:bg-white/[0.1] border border-white/[0.1] text-gray-300">4</button>
+                <button type="button" data-gear="5" onclick="setHarnessGear(5)" class="h-gear-btn py-1 bg-white/[0.04] hover:bg-white/[0.1] border border-white/[0.1] text-gray-300">5</button>
+                <button type="button" data-gear="6" onclick="setHarnessGear(6)" class="h-gear-btn py-1 bg-white/[0.04] hover:bg-white/[0.1] border border-white/[0.1] text-gray-300">6</button>
+                <button type="button" data-gear="7" onclick="setHarnessGear(7)" class="h-gear-btn py-1 bg-[#00F0FF] text-black border border-[#00F0FF] font-black">7</button>
+                <button type="button" data-gear="8" onclick="setHarnessGear(8)" class="h-gear-btn py-1 bg-white/[0.04] hover:bg-white/[0.1] border border-white/[0.1] text-gray-300">8</button>
+              </div>
             </div>
+
+            <!-- RPM -->
+            <div class="flex flex-col gap-1">
+              <div class="flex justify-between items-center text-[10px]">
+                <span class="text-gray-400 uppercase font-semibold">ROTAÇÃO (RPM)</span>
+                <span id="hRpmVal" class="text-white font-bold text-xs">11.450 RPM</span>
+              </div>
+              <input type="range" id="hRpm" min="0" max="13500" value="11450" oninput="onHarnessInput()">
+            </div>
+
+            <!-- Pedais (Throttle / Brake) -->
+            <div class="grid grid-cols-2 gap-2.5">
+              <div class="flex flex-col gap-1">
+                <div class="flex justify-between text-[10px]">
+                  <span class="text-[#00E676] uppercase font-semibold">THROTTLE</span>
+                  <span id="hThrVal" class="text-white font-bold">100%</span>
+                </div>
+                <input type="range" id="hThrottle" min="0" max="100" value="100" oninput="onHarnessInput()">
+              </div>
+              <div class="flex flex-col gap-1">
+                <div class="flex justify-between text-[10px]">
+                  <span class="text-[#FF1744] uppercase font-semibold">BRAKE</span>
+                  <span id="hBrkVal" class="text-white font-bold">0%</span>
+                </div>
+                <input type="range" id="hBrake" min="0" max="100" value="0" oninput="onHarnessInput()">
+              </div>
+            </div>
+
+            <!-- ERS Battery -->
+            <div class="flex flex-col gap-1">
+              <div class="flex justify-between text-[10px]">
+                <span class="text-gray-400 uppercase font-semibold">BATERIA ERS</span>
+                <span id="hErsVal" class="text-[#00F0FF] font-bold">82%</span>
+              </div>
+              <input type="range" id="hErs" min="0" max="100" value="82" oninput="onHarnessInput()">
+            </div>
+
+            <!-- Toggles DRS / Overtake -->
+            <div class="grid grid-cols-2 gap-2">
+              <label class="flex items-center justify-between p-2 bg-white/[0.03] border border-white/[0.08] cursor-pointer hover:bg-white/[0.06] transition">
+                <span class="text-gray-300 text-[10px] font-bold uppercase tracking-wider">DRS ATIVO</span>
+                <input type="checkbox" id="hDrs" onchange="onHarnessInput()" class="accent-[#00F0FF] w-3.5 h-3.5 cursor-pointer">
+              </label>
+              <label class="flex items-center justify-between p-2 bg-white/[0.03] border border-white/[0.08] cursor-pointer hover:bg-white/[0.06] transition">
+                <span class="text-[#FF1744] text-[10px] font-bold uppercase tracking-wider">OVERTAKE</span>
+                <input type="checkbox" id="hOvertake" onchange="onHarnessInput()" class="accent-[#FF1744] w-3.5 h-3.5 cursor-pointer">
+              </label>
+            </div>
+
+            <!-- Stress Cycle Button -->
+            <button id="btnStressLoop" onclick="toggleStressLoop()" class="w-full py-2 bg-white/[0.05] hover:bg-white/[0.1] text-white border border-white/[0.15] text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 transition active:translate-y-px">
+              <div class="w-2 h-2 bg-[#00F0FF]"></div>
+              <span id="stressLoopText">INICIAR STRESS CYCLE (60 FPS)</span>
+            </button>
+
           </div>
         </div>
 
-        <!-- UDP Listener Diagnostic Card -->
-        <div class="flex flex-col gap-2 bg-white/5 p-3.5 rounded-xl border border-white/10">
-          <div class="flex items-center justify-between">
-            <span class="font-bold text-amber-300 flex items-center gap-1.5">
-              <i data-lucide="cpu" class="w-3.5 h-3.5"></i> Telemetria F1 24 (UDP 20777)
+        <!-- ========================================================= -->
+        <!-- [02] // ESQUEMA DE CORES & PRESETS DE EQUIPE             -->
+        <!-- ========================================================= -->
+        <div class="border-b border-white/[0.08]">
+          <div class="px-3.5 py-2 bg-white/[0.02] flex items-center justify-between cursor-pointer hover:bg-white/[0.04] transition" onclick="toggleAccordion('secColors')">
+            <span class="text-[10px] uppercase font-bold tracking-[0.12em] text-[#00F0FF] flex items-center gap-1.5">
+              <span>[02] // CORES & PRESETS F1</span>
             </span>
-            <span id="udpStatusBadge" class="px-2 py-0.5 rounded text-[9px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-400/30">ESCUTANDO</span>
+            <i id="icon-secColors" data-lucide="chevron-down" class="w-3.5 h-3.5 text-gray-400"></i>
           </div>
-          <div class="text-[11px] text-gray-300 space-y-1">
-            <div class="flex justify-between">
-              <span class="text-gray-400">Porta UDP do Jogo:</span>
-              <span class="text-white font-bold">20777 (0.0.0.0)</span>
+
+          <div id="secColors" class="p-3.5 flex flex-col gap-3.5 bg-[#0A0D14]">
+            
+            <!-- Presets Oficiais de Equipes -->
+            <div class="flex flex-col gap-1.5">
+              <span class="text-[9px] text-gray-400 uppercase font-bold tracking-wider">PRESETS OFICIAIS DE EQUIPES</span>
+              <div class="grid grid-cols-2 gap-1.5 text-[9px] font-bold">
+                <button onclick="applyTeamPreset('#00D2BE', '#0E1422', '#00D2BE', '#00E676', '#FF1744')" class="p-1.5 bg-white/[0.03] hover:bg-white/[0.08] border-l-2 border-[#00D2BE] border-t border-r border-b border-white/[0.08] text-left text-gray-200 uppercase transition">MERCEDES</button>
+                <button onclick="applyTeamPreset('#E10600', '#1A0808', '#E10600', '#00E676', '#FF1744')" class="p-1.5 bg-white/[0.03] hover:bg-white/[0.08] border-l-2 border-[#E10600] border-t border-r border-b border-white/[0.08] text-left text-gray-200 uppercase transition">FERRARI</button>
+                <button onclick="applyTeamPreset('#FF8000', '#1C1004', '#FF8000', '#00E676', '#FF1744')" class="p-1.5 bg-white/[0.03] hover:bg-white/[0.08] border-l-2 border-[#FF8000] border-t border-r border-b border-white/[0.08] text-left text-gray-200 uppercase transition">MCLAREN</button>
+                <button onclick="applyTeamPreset('#FFD700', '#0A1024', '#00F0FF', '#00E676', '#FF1744')" class="p-1.5 bg-white/[0.03] hover:bg-white/[0.08] border-l-2 border-[#FFD700] border-t border-r border-b border-white/[0.08] text-left text-gray-200 uppercase transition">RED BULL</button>
+                <button onclick="applyTeamPreset('#006F62', '#061614', '#006F62', '#00E676', '#FF1744')" class="p-1.5 bg-white/[0.03] hover:bg-white/[0.08] border-l-2 border-[#006F62] border-t border-r border-b border-white/[0.08] text-left text-gray-200 uppercase transition">ASTON MARTIN</button>
+                <button onclick="applyTeamPreset('#FF007F', '#150616', '#00F0FF', '#00E676', '#FF007F')" class="p-1.5 bg-white/[0.03] hover:bg-white/[0.08] border-l-2 border-[#FF007F] border-t border-r border-b border-white/[0.08] text-left text-gray-200 uppercase transition">CYBERPUNK</button>
+              </div>
             </div>
-            <div class="flex justify-between">
-              <span class="text-gray-400">Pacotes Recebidos:</span>
-              <span class="text-cyan-400 font-bold" id="diagPackets">0</span>
+
+            <div class="w-full h-px bg-white/[0.08]"></div>
+
+            <!-- Customização Dual Color & Métricas -->
+            <div class="flex flex-col gap-2">
+              <span class="text-[9px] text-gray-400 uppercase font-bold tracking-wider">PALETA DUAL COLOR & MÉTRICAS</span>
+              
+              <div class="flex items-center justify-between text-[10px]">
+                <span class="text-gray-300 uppercase">PRIMÁRIA // ACENTOS</span>
+                <input type="color" id="primaryColorPicker" value="#00D2BE" onchange="updateColors()" class="w-6 h-6 bg-transparent border border-white/[0.15] cursor-pointer">
+              </div>
+
+              <div class="flex items-center justify-between text-[10px]">
+                <span class="text-gray-300 uppercase">SECUNDÁRIA // CHASSI</span>
+                <input type="color" id="secondaryColorPicker" value="#0E1422" onchange="updateColors()" class="w-6 h-6 bg-transparent border border-white/[0.15] cursor-pointer">
+              </div>
+
+              <div class="flex items-center justify-between text-[10px]">
+                <span class="text-gray-300 uppercase">BATERIA ERS</span>
+                <input type="color" id="ersColorPicker" value="#00D2BE" onchange="updateColors()" class="w-6 h-6 bg-transparent border border-white/[0.15] cursor-pointer">
+              </div>
+
+              <div class="flex items-center justify-between text-[10px]">
+                <span class="text-gray-300 uppercase">ACELERADOR (THROTTLE)</span>
+                <input type="color" id="throttleColorPicker" value="#00E676" onchange="updateColors()" class="w-6 h-6 bg-transparent border border-white/[0.15] cursor-pointer">
+              </div>
+
+              <div class="flex items-center justify-between text-[10px]">
+                <span class="text-gray-300 uppercase">FREIO (BRAKE)</span>
+                <input type="color" id="brakeColorPicker" value="#FF1744" onchange="updateColors()" class="w-6 h-6 bg-transparent border border-white/[0.15] cursor-pointer">
+              </div>
+
+              <div class="flex items-center justify-between text-[10px]">
+                <span class="text-gray-300 uppercase">MARCHA ATIVA</span>
+                <input type="color" id="gearColorPicker" value="#00D2BE" onchange="updateColors()" class="w-6 h-6 bg-transparent border border-white/[0.15] cursor-pointer">
+              </div>
             </div>
-            <div class="flex justify-between">
-              <span class="text-gray-400">Último Remetente:</span>
-              <span class="text-gray-300 font-bold" id="diagSender">Nenhum</span>
-            </div>
-            <div class="flex justify-between">
-              <span class="text-gray-400">Jogo Conectado:</span>
-              <span class="text-amber-400 font-bold" id="diagGameConnected">Aguardando F1 24...</span>
-            </div>
+
           </div>
         </div>
 
-        <!-- Instructions for In-Game Config -->
-        <div class="bg-cyan-500/10 border border-cyan-400/20 p-3 rounded-xl flex flex-col gap-1.5 text-[11px] text-gray-300">
-          <span class="font-bold text-cyan-300 flex items-center gap-1">
-            <i data-lucide="info" class="w-3.5 h-3.5"></i> Como configurar no F1 24:
-          </span>
-          <p class="text-gray-400 text-[10px] leading-relaxed">
-            No jogo, acesse <strong>Opções &gt; Configurações de Telemetria</strong>:<br>
-            • Telemetria UDP: <strong>Ligado</strong><br>
-            • Endereço IP UDP: <strong>127.0.0.1</strong><br>
-            • Porta UDP: <strong>20777</strong><br>
-            • Taxa de Envio: <strong>60 Hz</strong>
-          </p>
+        <!-- ========================================================= -->
+        <!-- [03] // VIEWPORT & ESCALA                                 -->
+        <!-- ========================================================= -->
+        <div class="border-b border-white/[0.08]">
+          <div class="px-3.5 py-2 bg-white/[0.02] flex items-center justify-between cursor-pointer hover:bg-white/[0.04] transition" onclick="toggleAccordion('secViewport')">
+            <span class="text-[10px] uppercase font-bold tracking-[0.12em] text-[#00F0FF] flex items-center gap-1.5">
+              <span>[03] // VIEWPORT & ESCALA</span>
+            </span>
+            <i id="icon-secViewport" data-lucide="chevron-down" class="w-3.5 h-3.5 text-gray-400"></i>
+          </div>
+
+          <div id="secViewport" class="p-3.5 flex flex-col gap-3.5 bg-[#0A0D14]">
+            
+            <!-- Scale Slider -->
+            <div class="flex flex-col gap-1">
+              <div class="flex justify-between items-center text-[10px]">
+                <span class="text-gray-400 uppercase font-semibold">ESCALA DA HUD</span>
+                <span id="hudScaleVal" class="text-white font-bold">100%</span>
+              </div>
+              <input type="range" id="hudScaleSlider" min="50" max="150" value="100" oninput="setHudScale(this.value)">
+            </div>
+
+            <!-- Position Controls -->
+            <div class="grid grid-cols-2 gap-2 text-[10px] font-bold">
+              <button onclick="centerHud()" class="py-1.5 px-2 bg-white/[0.04] hover:bg-white/[0.1] border border-white/[0.12] text-white uppercase transition">CENTRALIZAR HUD</button>
+              <button onclick="resetHud()" class="py-1.5 px-2 bg-white/[0.04] hover:bg-white/[0.1] border border-white/[0.12] text-white uppercase transition">RESET POSIÇÃO</button>
+            </div>
+
+          </div>
         </div>
+
+        <!-- ========================================================= -->
+        <!-- [04] // REDE & TELEMETRIA UDP/WS                          -->
+        <!-- ========================================================= -->
+        <div class="border-b border-white/[0.08]">
+          <div class="px-3.5 py-2 bg-white/[0.02] flex items-center justify-between cursor-pointer hover:bg-white/[0.04] transition" onclick="toggleAccordion('secNetwork')">
+            <span class="text-[10px] uppercase font-bold tracking-[0.12em] text-[#00F0FF] flex items-center gap-1.5">
+              <span>[04] // REDE & TELEMETRIA</span>
+            </span>
+            <i id="icon-secNetwork" data-lucide="chevron-down" class="w-3.5 h-3.5 text-gray-400"></i>
+          </div>
+
+          <div id="secNetwork" class="p-3.5 flex flex-col gap-2.5 bg-[#0A0D14] text-[10px]">
+            
+            <div class="flex justify-between items-center border-b border-white/[0.06] pb-1.5">
+              <span class="text-gray-400 uppercase">WEBSOCKET SERVER:</span>
+              <span id="wsStatusBadge" class="text-[#10B981] font-bold bg-[#10B981]/10 px-1.5 py-0.2 border border-[#10B981]/30">CONECTADO</span>
+            </div>
+
+            <div class="flex justify-between items-center border-b border-white/[0.06] pb-1.5">
+              <span class="text-gray-400 uppercase">PORTA UDP F1:</span>
+              <span id="udpStatusBadge" class="text-gray-200 font-bold">20777 (0.0.0.0)</span>
+            </div>
+
+            <div class="flex justify-between items-center border-b border-white/[0.06] pb-1.5">
+              <span class="text-gray-400 uppercase">PACOTES RECEBIDOS:</span>
+              <span id="diagPackets" class="text-[#00F0FF] font-bold">0</span>
+            </div>
+
+            <div class="flex justify-between items-center border-b border-white/[0.06] pb-1.5">
+              <span class="text-gray-400 uppercase">REMETENTE DO JOGO:</span>
+              <span id="diagSender" class="text-gray-300 font-bold truncate max-w-[130px]">Aguardando F1 24...</span>
+            </div>
+
+            <div class="flex justify-between items-center">
+              <span class="text-gray-400 uppercase">STATUS EM PISTA:</span>
+              <span id="diagGameConnected" class="text-amber-400 font-bold">Aguardando telemetria...</span>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Dock Footer -->
+      <div class="px-3 py-2 bg-[#06080C] border-t border-white/[0.08] text-[9px] font-mono-tech text-gray-500 flex items-center justify-between">
+        <span>F1 24 TELEMETRY ARCHITECTURE</span>
+        <span class="text-[#00F0FF] font-bold">60 HZ REALTIME</span>
       </div>
 
     </aside>
 
-    <!-- MAIN PREVIEW STAGE WITH COCKPIT VIEW & DRAGGABLE HUD -->
-    <main class="flex-1 h-full flex flex-col justify-end items-center pb-8 px-6 relative pointer-events-none" id="previewStage">
+    <!-- ============================================================== -->
+    <!-- C. CENTRAL VIEWPORT: COCKPIT STAGE + ALIGNMENT GRID            -->
+    <!-- ============================================================== -->
+    <main class="flex-1 h-full flex flex-col justify-end items-center pb-8 px-6 relative overflow-hidden" id="previewStage">
       
-      <!-- Ambient Cockpit Vignette & Halo Perspective -->
-      <div class="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+      <!-- Subtle Millimeter Alignment Crosshair Grid (Toggleable) -->
+      <div id="alignmentGrid" class="absolute inset-0 pointer-events-none z-10 hidden">
+        <!-- Center vertical line -->
+        <div class="absolute left-1/2 top-0 bottom-0 w-px bg-[#00F0FF]/[0.15] border-r border-dashed border-[#00F0FF]/[0.25]"></div>
+        <!-- Center horizontal line -->
+        <div class="absolute top-1/2 left-0 right-0 h-px bg-[#00F0FF]/[0.15] border-b border-dashed border-[#00F0FF]/[0.25]"></div>
+        <!-- Halo arch benchmark line -->
+        <div class="absolute bottom-[200px] left-0 right-0 h-px bg-amber-400/[0.12] border-b border-dotted border-amber-400/[0.20]"></div>
+        <!-- Grid Tick Labels -->
+        <div class="absolute left-1/2 top-4 -translate-x-1/2 px-2 py-0.5 bg-black/80 border border-[#00F0FF]/30 text-[9px] font-mono-tech text-[#00F0FF]">
+          HALO CENTER AXIS (X: 0)
+        </div>
+      </div>
 
-      <!-- UNIFIED F1 24 REALISTIC HALO HUD (896x175) -->
-      <div id="hudCluster" class="w-full max-w-[896px] h-[175px] pointer-events-auto select-none transition-all duration-200">
+      <!-- Ambient Cockpit Vignette -->
+      <div class="absolute inset-0 pointer-events-none bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
+
+      <!-- ============================================================== -->
+      <!-- UNIFIED F1 24 REALISTIC HALO HUD (896x175) - PRESERVED 1:1      -->
+      <!-- ============================================================== -->
+      <div id="hudCluster" class="w-full max-w-[896px] h-[175px] pointer-events-auto select-none transition-all duration-150 z-20">
         
         <div id="hudRoot" class="halo-chassis w-full h-full p-2 flex flex-col justify-between relative select-none">
           
@@ -703,8 +782,12 @@
       </div>
 
     </main>
+
   </div>
 
+  <!-- ============================================================== -->
+  <!-- JAVASCRIPT: LOGIC, HARNESS, DUAL COLOR & TELEMETRY WEBSOCKET   -->
+  <!-- ============================================================== -->
   <script>
     lucide.createIcons();
 
@@ -898,33 +981,26 @@
       }
     }
 
-    // --- SIDEBAR TABS & TOGGLE ---
-    let currentTab = 'harness';
-    function switchTab(tabId) {
-      currentTab = tabId;
-      ['harness', 'colors', 'network'].forEach(t => {
-        const btn = document.getElementById(`tabBtn${capitalize(t)}`);
-        const content = document.getElementById(`tabContent${capitalize(t)}`);
-        if (t === tabId) {
-          btn.className = 'py-2 px-1 rounded-lg font-bold flex items-center justify-center gap-1.5 bg-cyan-500/20 text-cyan-300 border border-cyan-400/40 transition';
-          content.classList.remove('hidden');
-        } else {
-          btn.className = 'py-2 px-1 rounded-lg font-bold flex items-center justify-center gap-1.5 text-gray-400 hover:text-white border border-transparent transition';
-          content.classList.add('hidden');
-        }
-      });
-      if (tabId === 'network') refreshNetworkDiagnostics();
+    // --- ACCORDION TOGGLE IN SIDEBAR ---
+    function toggleAccordion(secId) {
+      const el = document.getElementById(secId);
+      const icon = document.getElementById(`icon-${secId}`);
+      if (!el) return;
+      if (el.classList.contains('hidden')) {
+        el.classList.remove('hidden');
+        if (icon) icon.style.transform = 'rotate(0deg)';
+      } else {
+        el.classList.add('hidden');
+        if (icon) icon.style.transform = 'rotate(-90deg)';
+      }
     }
 
-    function capitalize(s) {
-      return s.charAt(0).toUpperCase() + s.slice(1);
-    }
-
+    // --- SIDEBAR DOCK TOGGLE ---
     let isSidebarOpen = true;
     function toggleSidebar() {
       const sb = document.getElementById('sidebarPanel');
       if (isSidebarOpen) {
-        sb.style.marginLeft = '-370px';
+        sb.style.marginLeft = '-320px';
         isSidebarOpen = false;
       } else {
         sb.style.marginLeft = '0px';
@@ -933,19 +1009,19 @@
     }
 
     // --- MODES: LIVE vs HARNESS ---
-    let currentMode = 'harness'; // default to harness for interactive test
+    let currentMode = 'harness';
     function setMode(mode) {
       currentMode = mode;
       const btnLive = document.getElementById('btnModeLive');
       const btnHarness = document.getElementById('btnModeHarness');
 
       if (mode === 'live') {
-        btnLive.className = 'px-3 py-1 rounded bg-emerald-500 text-black font-bold flex items-center gap-1.5 transition text-[11px]';
-        btnHarness.className = 'px-3 py-1 rounded text-gray-400 hover:text-white flex items-center gap-1.5 transition text-[11px]';
+        btnLive.className = 'px-2.5 h-full text-[10px] font-mono-tech font-bold uppercase tracking-wider bg-[#10B981] text-black transition flex items-center gap-1';
+        btnHarness.className = 'px-2.5 h-full text-[10px] font-mono-tech font-bold uppercase tracking-wider text-gray-400 hover:text-white transition flex items-center gap-1';
         stopStressLoop();
       } else {
-        btnHarness.className = 'px-3 py-1 rounded bg-amber-500 text-black font-bold flex items-center gap-1.5 transition text-[11px]';
-        btnLive.className = 'px-3 py-1 rounded text-gray-400 hover:text-white flex items-center gap-1.5 transition text-[11px]';
+        btnHarness.className = 'px-2.5 h-full text-[10px] font-mono-tech font-bold uppercase tracking-wider bg-[#F59E0B] text-black transition flex items-center gap-1';
+        btnLive.className = 'px-2.5 h-full text-[10px] font-mono-tech font-bold uppercase tracking-wider text-gray-400 hover:text-white transition flex items-center gap-1';
         onHarnessInput();
       }
     }
@@ -957,9 +1033,9 @@
       document.querySelectorAll('.h-gear-btn').forEach(btn => {
         const bg = parseInt(btn.getAttribute('data-gear'), 10);
         if (bg === g) {
-          btn.className = 'h-gear-btn p-1.5 rounded bg-cyan-500 text-black border border-cyan-400 font-black shadow-lg';
+          btn.className = 'h-gear-btn py-1 bg-[#00F0FF] text-black border border-[#00F0FF] font-black';
         } else {
-          btn.className = 'h-gear-btn p-1.5 rounded bg-white/5 border border-white/10 hover:bg-white/15 text-gray-300';
+          btn.className = 'h-gear-btn py-1 bg-white/[0.04] hover:bg-white/[0.1] border border-white/[0.1] text-gray-300';
         }
       });
       onHarnessInput();
@@ -1020,8 +1096,8 @@
       stressRpm = 6800;
 
       const btn = document.getElementById('btnStressLoop');
-      btn.className = 'w-full py-2.5 rounded-xl font-bold text-xs bg-emerald-600 hover:bg-emerald-500 text-white flex items-center justify-center gap-2 transition active:scale-95 shadow-lg shadow-emerald-600/30';
-      document.getElementById('stressLoopText').textContent = 'Parar Stress Loop';
+      btn.className = 'w-full py-2 bg-[#10B981] text-black border border-[#10B981] text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 transition';
+      document.getElementById('stressLoopText').textContent = 'PARAR STRESS CYCLE';
 
       runStressFrame();
     }
@@ -1034,8 +1110,8 @@
       }
       const btn = document.getElementById('btnStressLoop');
       if (btn) {
-        btn.className = 'w-full py-2.5 rounded-xl font-bold text-xs bg-cyan-600 hover:bg-cyan-500 text-white flex items-center justify-center gap-2 transition active:scale-95 shadow-lg shadow-cyan-600/30';
-        document.getElementById('stressLoopText').textContent = 'Iniciar Stress Loop (60 FPS)';
+        btn.className = 'w-full py-2 bg-white/[0.05] hover:bg-white/[0.1] text-white border border-white/[0.15] text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-2 transition active:translate-y-px';
+        document.getElementById('stressLoopText').textContent = 'INICIAR STRESS CYCLE (60 FPS)';
       }
       onHarnessInput();
     }
@@ -1171,12 +1247,10 @@
     function broadcastConfig(cfg) {
       applyConfigLocally(cfg);
 
-      // Send via WebSocket (Immediate sub-millisecond broadcast)
       if (ws && ws.readyState === WebSocket.OPEN) {
         ws.send(JSON.stringify({ type: 'config_update', config: cfg }));
       }
 
-      // Persist via HTTP POST to FastAPI
       fetch('/api/config', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -1191,24 +1265,64 @@
         if (res.ok) {
           const data = await res.json();
           document.getElementById('diagPackets').textContent = data.packets_received || 0;
-          document.getElementById('diagSender').textContent = data.last_sender || 'Nenhum (Aguardando jogo)';
+          document.getElementById('diagSender').textContent = data.last_sender || 'Nenhum (Aguardando)';
           
           const isConn = Boolean(data.game_connected);
           const gcEl = document.getElementById('diagGameConnected');
           if (isConn) {
-            gcEl.textContent = 'F1 24 EM EXECUÇÃO (ONLINE)';
-            gcEl.className = 'text-emerald-400 font-bold';
-            document.getElementById('udpStatusBadge').className = 'px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30';
-            document.getElementById('udpStatusBadge').textContent = 'RECEBENDO DADOS';
+            gcEl.textContent = 'F1 24 EM PISTA (ONLINE)';
+            gcEl.className = 'text-[#10B981] font-bold';
+            document.getElementById('udpStatusBadge').className = 'text-[#10B981] font-bold';
+            document.getElementById('udpStatusBadge').textContent = 'RECEBENDO TELEMETRIA';
           } else {
             gcEl.textContent = 'Aguardando F1 24...';
-            gcEl.className = 'text-amber-400 font-bold';
-            document.getElementById('udpStatusBadge').className = 'px-2 py-0.5 rounded text-[9px] font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-400/30';
-            document.getElementById('udpStatusBadge').textContent = 'ESCUTANDO';
+            gcEl.className = 'text-[#F59E0B] font-bold';
+            document.getElementById('udpStatusBadge').className = 'text-gray-300 font-bold';
+            document.getElementById('udpStatusBadge').textContent = '20777 (0.0.0.0)';
           }
         }
       } catch (err) {
         document.getElementById('diagSender').textContent = 'Servidor local offline';
+      }
+    }
+
+    // --- VIEWPORT SCALE & CENTERING ---
+    let currentScale = 100;
+    function setHudScale(scaleVal) {
+      currentScale = parseInt(scaleVal, 10);
+      const cl = document.getElementById('hudCluster');
+      const disp = document.getElementById('hudScaleVal');
+      if (cl) {
+        cl.style.transform = `scale(${currentScale / 100})`;
+        cl.style.transformOrigin = 'center bottom';
+      }
+      if (disp) disp.textContent = `${currentScale}%`;
+    }
+
+    function centerHud() {
+      const cl = document.getElementById('hudCluster');
+      if (cl) {
+        cl.style.transform = `scale(${currentScale / 100})`;
+      }
+    }
+
+    function resetHud() {
+      const sl = document.getElementById('hudScaleSlider');
+      if (sl) sl.value = 100;
+      setHudScale(100);
+      centerHud();
+    }
+
+    function toggleCrosshair() {
+      const g = document.getElementById('alignmentGrid');
+      const btn = document.getElementById('btnCrosshair');
+      if (!g) return;
+      if (g.classList.contains('hidden')) {
+        g.classList.remove('hidden');
+        if (btn) btn.className = 'h-7 px-2.5 flex items-center gap-1.5 bg-[#00F0FF] text-black border border-[#00F0FF] text-[10px] font-mono-tech font-bold uppercase tracking-wider transition';
+      } else {
+        g.classList.add('hidden');
+        if (btn) btn.className = 'h-7 px-2.5 flex items-center gap-1.5 bg-white/[0.04] hover:bg-white/[0.08] border border-white/[0.10] text-[10px] font-mono-tech font-bold uppercase tracking-wider text-gray-300 transition';
       }
     }
 
@@ -1220,24 +1334,17 @@
       const bG = document.getElementById('btnBgChecker');
 
       b.classList.remove('bg-cockpit', 'bg-carbon', 'bg-checker');
-      [bC, bK, bG].forEach(btn => btn.className = 'px-2.5 py-1 rounded text-gray-400 hover:text-white transition text-[11px]');
+      [bC, bK, bG].forEach(btn => btn.className = 'px-2.5 h-full text-[10px] font-mono-tech font-bold uppercase tracking-wider text-gray-400 hover:text-white transition');
 
       if (preset === 'cockpit') {
         b.classList.add('bg-cockpit');
-        bC.className = 'px-2.5 py-1 rounded bg-cyan-600 text-white font-bold transition text-[11px]';
+        bC.className = 'px-2.5 h-full text-[10px] font-mono-tech font-bold uppercase tracking-wider bg-[#00F0FF] text-black transition';
       } else if (preset === 'carbon') {
         b.classList.add('bg-carbon');
-        bK.className = 'px-2.5 py-1 rounded bg-cyan-600 text-white font-bold transition text-[11px]';
+        bK.className = 'px-2.5 h-full text-[10px] font-mono-tech font-bold uppercase tracking-wider bg-[#00F0FF] text-black transition';
       } else {
         b.classList.add('bg-checker');
-        bG.className = 'px-2.5 py-1 rounded bg-cyan-600 text-white font-bold transition text-[11px]';
-      }
-    }
-
-    function centerHud() {
-      const cl = document.getElementById('hudCluster');
-      if (cl) {
-        cl.style.transform = 'none';
+        bG.className = 'px-2.5 h-full text-[10px] font-mono-tech font-bold uppercase tracking-wider bg-[#00F0FF] text-black transition';
       }
     }
 
@@ -1248,16 +1355,16 @@
       const host = window.location.host || '127.0.0.1:8000';
       const wsUrl = `${protocol}//${host}/ws/telemetry`;
 
-      statusIndicator.className = 'w-2 h-2 rounded-full bg-yellow-400 animate-pulse';
-      statusText.textContent = 'Conectando WebSocket...';
+      statusIndicator.className = 'w-1.5 h-1.5 bg-[#F59E0B] animate-pulse';
+      statusText.textContent = 'CONECTANDO WS...';
 
       ws = new WebSocket(wsUrl);
 
       ws.onopen = () => {
-        statusIndicator.className = 'w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#00E676]';
-        statusText.textContent = 'F1 24 Telemetria 60Hz (Online)';
+        statusIndicator.className = 'w-1.5 h-1.5 bg-[#10B981]';
+        statusText.textContent = 'LIVE 60Hz';
         document.getElementById('wsStatusBadge').textContent = 'CONECTADO';
-        document.getElementById('wsStatusBadge').className = 'px-2 py-0.5 rounded text-[9px] font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/30';
+        document.getElementById('wsStatusBadge').className = 'text-[#10B981] font-bold bg-[#10B981]/10 px-1.5 py-0.2 border border-[#10B981]/30';
       };
 
       ws.onmessage = (event) => {
@@ -1277,10 +1384,10 @@
       };
 
       ws.onclose = () => {
-        statusIndicator.className = 'w-2 h-2 rounded-full bg-red-500';
-        statusText.textContent = 'Aguardando Servidor...';
+        statusIndicator.className = 'w-1.5 h-1.5 bg-[#EF4444]';
+        statusText.textContent = 'OFFLINE';
         document.getElementById('wsStatusBadge').textContent = 'OFFLINE';
-        document.getElementById('wsStatusBadge').className = 'px-2 py-0.5 rounded text-[9px] font-bold bg-red-500/20 text-red-300 border border-red-500/30';
+        document.getElementById('wsStatusBadge').className = 'text-[#EF4444] font-bold bg-[#EF4444]/10 px-1.5 py-0.2 border border-[#EF4444]/30';
         setTimeout(connectWs, 2000);
       };
 

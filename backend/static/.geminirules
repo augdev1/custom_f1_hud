@@ -1,0 +1,51 @@
+Markdown
+# ==============================================================================
+# GEMINI & ANTIGRAVITY AGENT RULES: FRONTEND, UI/UX & MOTORSPORT ENGINEERING
+# ==============================================================================
+
+Você deve seguir rigorosamente as regras abaixo em qualquer tarefa que envolva 
+HTML, CSS, Tailwind CSS, SVG, JavaScript, React ou arquitetura de componentes.
+
+---
+
+### 1. "ANTI-AI PATTERNS" (TERMINANTEMENTE PROIBIDO)
+- NUNCA utilize a estética genérica de modelos de linguagem:
+  * Cartões ou blocos flutuantes isolados com cantos redondos infantis (`rounded-2xl`, `rounded-3xl`).
+  * Paletas cinzento-azuladas padrão (`slate-900`, `zinc-900`) com bordas finas azul-ciano esfumadas.
+  * Efeitos de "glow" exagerados com borrão difuso (`box-shadow` pesado com blur alto).
+  * Simetria artificial rasa (divisão repetitiva em 3 colunas iguais com ícones soltos no meio).
+  * Fontes padrão de sistema sem identidade ou propósito técnico (Inter, Roboto, Arial).
+
+---
+
+### 2. GEOMETRIA, ESTRUTURA E ACABAMENTO TÉCNICO
+- **Linguagem Mecânica / Industrial:**
+  * Prefira superfícies angulares, recortes chanfrados a 45 graus (utilizando `clip-path: polygon(...)`) ou cantos vivos (`rounded-none` a `rounded-sm`).
+  * O fundo de interfaces escuras deve ser preto profundo verdadeiro (`#05070A`, `#080C14`), nunca cinzento lavado.
+  * Separações estruturais devem ser funcionais: divisores milimétricos sólidos (`1px solid rgba(255,255,255,0.08)`) em vez de margens excessivas.
+  * Elementos de hardware reais: em réguas de LEDs, barras de rotação e tacómetros, os segmentos desligados NUNCA devem desaparecer; devem permanecer visíveis como ranhuras escuras inativas (`#1E293B` ou similar).
+
+---
+
+### 3. TIPOGRAFIA & NUMERAIS
+- **Controlo de Tipografia:**
+  * Dados dinâmicos, métricas e telemetria: OBRIGATÓRIO aplicar `font-variant-numeric: tabular-nums;` para evitar oscilações de largura e tremulação na tela em altas taxas de atualização.
+  * Numerais de destaque e leitura rápida: Utilize fontes pesadas e condensadas (ex.: `Titillium Web` 900 italic, `Chakra Petch` 700/800, `JetBrains Mono`).
+  * Rótulos técnicos (Labels): Utilize caixa alta (`uppercase`), tamanho micro (9px a 11px), peso negrito (`font-bold`) e tracking alargado (`letter-spacing: 0.15em` ou superior).
+  * Quando houver mostradores digitais numéricos (como velocímetros): utilize "ghost segments" (fundos fantasmas com '888' em opacidade sutil de 4%) para conferir o acabamento físico de painéis digitais de corrida.
+
+---
+
+### 4. REGRAS OBRIGATÓRIAS PARA ELEMENTOS VETORIAIS (SVG)
+- **Ancoragem Segura:** Em todos os nós `<text>` em SVG, declare explicitamente `dominant-baseline="central"` ou `dominant-baseline="middle"` juntamente com `text-anchor="middle"`, `"start"` ou `"end"`, evitando que os textos saiam da posição em redimensionamentos.
+- **Estrutura Proporcional:** Utilize um único container SVG com `viewBox` fixo e proporções controladas, calculando margens seguras de respiro para que nenhum elemento (como barras ou badges de alerta) ultrapasse a carcaça.
+- **Animações de Alta Frequência (60 Hz+):**
+  * Manipule exclusivamente atributos vetoriais diretos (`width`, `stroke-dashoffset`, `transform`, `textContent`).
+  * NUNCA force recriação do DOM ou reflows pesados durante o loop de telemetria/dados em tempo real.
+
+---
+
+### 5. ATIVAÇÃO E APLICAÇÃO
+Sempre que for solicitada a criação, modernização ou refatoração de qualquer tela, 
+priorize densidade de informação profissional, precisão matemática nos alinhamentos 
+e fidelidade imediata a interfaces industriais e de alta performance.
