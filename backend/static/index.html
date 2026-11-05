@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800;900&family=Rajdhani:wght@600;700;800;900&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700;800;900&family=JetBrains+Mono:wght@500;700;800;900&family=Rajdhani:wght@600;700;800;900&display=swap"
     rel="stylesheet">
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -302,36 +302,39 @@
         <text x="480" y="141" text-anchor="middle" fill="#64748B" font-size="8" font-weight="800" letter-spacing="0.5">MPH</text>
         <text id="gear-center" x="480" y="161" text-anchor="middle" fill="#00E5FF" font-size="14" font-weight="900" font-family="'JetBrains Mono'">7</text>
 
-        <!-- 4. ASA DIREITA: THROTTLE, MARCHAS & RPM -->
-        <text x="595" y="92" fill="#10B981" font-size="11" font-weight="800" letter-spacing="1">THROTTLE</text>
-        <rect x="665" y="83" width="160" height="9" rx="2.5" fill="rgba(255,255,255,0.08)" />
-        <rect id="throttle-bar" x="665" y="83" width="160" height="9" rx="2.5" fill="#10B981" />
+        <!-- 4. CONTEÚDO ASA DIREITA (100% CONTIDO NO CORPO) -->
+        <!-- Acelerador (Throttle) -->
+        <text x="645" y="86" fill="#10B981" font-size="10" font-weight="900" letter-spacing="1">THROTTLE</text>
+        <rect x="715" y="80" width="135" height="8" rx="2" fill="rgba(255, 255, 255, 0.08)" />
+        <rect id="throttle-bar" x="715" y="80" width="100" height="8" rx="2" fill="#10B981" />
 
-        <!-- Horizontal Gear Strip (R N 1 2 3 4 5 6 7 8) -->
-        <g id="gears-row" font-family="'JetBrains Mono'" font-size="13" font-weight="700">
-          <text x="597" y="116" id="gear-R" fill="#64748B">R</text>
-          <text x="620" y="116" id="gear-N" fill="#64748B">N</text>
-          <text x="643" y="116" id="gear-1" fill="#64748B">1</text>
-          <text x="666" y="116" id="gear-2" fill="#64748B">2</text>
-          <text x="689" y="116" id="gear-3" fill="#64748B">3</text>
-          <text x="712" y="116" id="gear-4" fill="#64748B">4</text>
-          <text x="735" y="116" id="gear-5" fill="#64748B">5</text>
-          <text x="758" y="116" id="gear-6" fill="#64748B">6</text>
-          <text x="781" y="116" id="gear-7" fill="#00E5FF" font-size="15" font-weight="900">7</text>
-          <text x="804" y="116" id="gear-8" fill="#64748B">8</text>
+        <!-- Rótulo e Linha de Marchas -->
+        <text x="645" y="106" fill="#94A3B8" font-size="9" font-weight="800" letter-spacing="1">GEARS</text>
+        <g id="gears-row" font-family="'Chakra Petch', 'JetBrains Mono'" font-size="13" font-weight="700" fill="#64748B" dominant-baseline="central">
+          <text x="626" y="122" id="gear-R">R</text>
+          <text x="650" y="122" id="gear-N">N</text>
+          <text x="674" y="122" id="gear-1">1</text>
+          <text x="698" y="122" id="gear-2">2</text>
+          <text x="722" y="122" id="gear-3">3</text>
+          <text x="746" y="122" id="gear-4">4</text>
+          <text x="770" y="122" id="gear-5">5</text>
+          <text x="794" y="122" id="gear-6">6</text>
+          <text x="818" y="122" id="gear-7" fill="#00F5D4" font-size="17" font-weight="900">7</text>
+          <text x="842" y="122" id="gear-8">8</text>
         </g>
 
-        <!-- RPM Tachometer Bar & Number -->
-        <text x="595" y="138" fill="#94A3B8" font-size="10" font-weight="800" letter-spacing="1">RPM x1000</text>
-        <text id="rpm-num" x="825" y="138" text-anchor="end" fill="#CBD5E1" font-size="12" font-weight="800" font-family="'JetBrains Mono'" class="tabular-nums">11800</text>
-        <rect x="595" y="146" width="230" height="10" rx="3" fill="rgba(255,255,255,0.08)" />
-        <rect id="rpm-bar" x="595" y="146" width="181" height="10" rx="3" fill="url(#rpmGradient)" />
-        
-        <!-- OVERTAKE Luminous Badge -->
-        <g id="overtake-badge" style="transition: opacity 0.15s ease;" opacity="0">
-          <rect x="745" y="162" width="80" height="16" rx="3" fill="#E11D48" />
-          <text x="785" y="174" text-anchor="middle" fill="#FFFFFF" font-size="9" font-weight="900" font-family="'JetBrains Mono'" letter-spacing="1">OVERTAKE</text>
+        <!-- Cabeçalho RPM e Badge OVERTAKE Integrado Lado a Lado -->
+        <text x="645" y="146" fill="#94A3B8" font-size="9" font-weight="700" letter-spacing="0.5">RPM x1000</text>
+
+        <!-- Badge OVERTAKE interno (alinhado à direita antes da barra) -->
+        <g id="overtake-badge" class="transition-opacity duration-150 opacity-0">
+          <rect x="780" y="137" width="70" height="13" rx="2" fill="#E11D48" />
+          <text x="815" y="144" text-anchor="middle" dominant-baseline="central" fill="#FFFFFF" font-size="8" font-weight="900" letter-spacing="1">OVERTAKE</text>
         </g>
+
+        <!-- Tacômetro RPM (Dentro da asa, margem inferior segura) -->
+        <rect x="645" y="154" width="205" height="10" rx="3" fill="rgba(255, 255, 255, 0.08)" />
+        <rect id="rpm-bar" x="645" y="154" width="150" height="10" rx="3" fill="url(#rpmGradient)" />
       </svg>
     </div>
 
@@ -403,7 +406,7 @@
       let thrPct = Number(t.throttle) || 0;
       if (thrPct > 0 && thrPct <= 1.0) thrPct *= 100;
       thrPct = Math.max(0, Math.min(100, thrPct));
-      throttleBarEl.setAttribute('width', (thrPct * 1.6).toFixed(1)); // 160px max
+      throttleBarEl.setAttribute('width', (thrPct * 1.35).toFixed(1)); // 135px max
 
       // 5. Gear
       const gRaw = t.gear !== undefined ? t.gear : 0;
@@ -415,14 +418,14 @@
       if (currentGear !== activeGearStr) {
         currentGear = activeGearStr;
         gearCenterEl.textContent = activeGearStr;
-        gearCenterEl.setAttribute('fill', activeGearStr === 'R' ? '#EF4444' : '#00E5FF');
+        gearCenterEl.setAttribute('fill', activeGearStr === 'R' ? '#EF4444' : '#00F5D4');
 
         gearList.forEach(g => {
           const el = gearEls[g];
           if (!el) return;
           if (g === activeGearStr) {
-            el.setAttribute('fill', g === 'R' ? '#EF4444' : '#00E5FF');
-            el.setAttribute('font-size', '15');
+            el.setAttribute('fill', g === 'R' ? '#EF4444' : '#00F5D4');
+            el.setAttribute('font-size', '16');
             el.setAttribute('font-weight', '900');
           } else {
             el.setAttribute('fill', '#64748B');
@@ -435,7 +438,7 @@
       // 6. RPM (0 to 15000)
       const rpm = Number(t.engineRPM !== undefined ? t.engineRPM : (t.engine_rpm || 0));
       const rpmRatio = Math.max(0, Math.min(1, rpm / 15000));
-      rpmBarEl.setAttribute('width', (rpmRatio * 230).toFixed(1)); // 230px max
+      rpmBarEl.setAttribute('width', (rpmRatio * 205).toFixed(1)); // 205px max
       if (rpmNumEl) rpmNumEl.textContent = Math.round(rpm);
 
       // 7. Overtake / DRS

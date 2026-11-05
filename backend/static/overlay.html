@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link
-    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800;900&family=Rajdhani:wght@600;700;800;900&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@600;700;800;900&family=JetBrains+Mono:wght@500;700;800;900&family=Rajdhani:wght@600;700;800;900&display=swap"
     rel="stylesheet">
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -94,8 +94,10 @@
   </div>
 
   <!-- MAIN UNIFIED VECTOR F1 HALO HUD (ViewBox: 0 0 960 210) -->
-  <main id="hud-container" class="relative w-full h-full select-none font-['Rajdhani'] flex items-center justify-center pywebview-drag-region">
-    <svg viewBox="0 0 960 210" class="w-full h-full drop-shadow-[0_10px_22px_rgba(0,0,0,0.75)] filter pointer-events-none">
+  <main id="hud-container"
+    class="relative w-full h-full select-none font-['Rajdhani'] flex items-center justify-center pywebview-drag-region">
+    <svg viewBox="0 0 960 210"
+      class="w-full h-full drop-shadow-[0_10px_22px_rgba(0,0,0,0.75)] filter pointer-events-none">
       <defs>
         <!-- ERS Battery Gradient -->
         <linearGradient id="ersGradient" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -159,12 +161,13 @@
 
       <!-- 2. ASA ESQUERDA: ERS BATTERY & BRAKE -->
       <text x="135" y="92" fill="#94A3B8" font-size="11" font-weight="800" letter-spacing="1.2">ERS BATTERY</text>
-      <text id="ers-percent" x="365" y="92" text-anchor="end" fill="#FFFFFF" font-size="20" font-weight="900" font-family="'JetBrains Mono'" class="tabular-nums">100%</text>
-      
+      <text id="ers-percent" x="365" y="92" text-anchor="end" fill="#FFFFFF" font-size="20" font-weight="900"
+        font-family="'JetBrains Mono'" class="tabular-nums">100%</text>
+
       <!-- ERS Progress Bar -->
       <rect x="135" y="102" width="230" height="10" rx="3" fill="rgba(255,255,255,0.08)" />
       <rect id="ers-bar" x="135" y="102" width="230" height="10" rx="3" fill="url(#ersGradient)" />
-      
+
       <!-- Brake Bar -->
       <text x="135" y="136" fill="#EF4444" font-size="11" font-weight="800" letter-spacing="1">BRAKE</text>
       <rect x="190" y="127" width="175" height="9" rx="2.5" fill="rgba(255,255,255,0.08)" />
@@ -172,58 +175,69 @@
 
       <!-- DRS Status Badge -->
       <g id="drs-badge">
-        <rect id="drs-box" x="135" y="150" width="65" height="18" rx="3" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1" />
-        <text id="drs-text" x="167" y="163" text-anchor="middle" fill="#94A3B8" font-size="9" font-weight="800" font-family="'JetBrains Mono'">DRS</text>
+        <rect id="drs-box" x="135" y="150" width="65" height="18" rx="3" fill="rgba(255,255,255,0.06)"
+          stroke="rgba(255,255,255,0.12)" stroke-width="1" />
+        <text id="drs-text" x="167" y="163" text-anchor="middle" fill="#94A3B8" font-size="9" font-weight="800"
+          font-family="'JetBrains Mono'">DRS</text>
       </g>
-      <text x="365" y="162" text-anchor="end" fill="rgba(255,255,255,0.25)" font-size="8" font-weight="700" letter-spacing="1.5">F1 BROADCAST</text>
+      <text x="365" y="162" text-anchor="end" fill="rgba(255,255,255,0.25)" font-size="8" font-weight="700"
+        letter-spacing="1.5">F1 BROADCAST</text>
 
       <!-- 3. DOMO CENTRAL: VELOCÍMETRO DUPLO COM TACÔMETRO ARREDONDADO -->
       <circle cx="480" cy="105" r="52" fill="url(#podRadial)" stroke="rgba(0, 229, 255, 0.3)" stroke-width="1.5" />
-      
+
       <!-- Speed Progress Arc (r=48, circumference=301.59) -->
       <circle cx="480" cy="105" r="48" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="4.5" />
       <circle id="speed-arc" cx="480" cy="105" r="48" fill="none" stroke="#00E5FF" stroke-width="4.5"
-        stroke-dasharray="301.59" stroke-dashoffset="301.59" stroke-linecap="round"
-        transform="rotate(-90 480 105)" filter="url(#accentGlow)" />
-      
+        stroke-dasharray="301.59" stroke-dashoffset="301.59" stroke-linecap="round" transform="rotate(-90 480 105)"
+        filter="url(#accentGlow)" />
+
       <!-- Speed Readouts -->
-      <text x="480" y="73" text-anchor="middle" fill="#94A3B8" font-size="9" font-weight="800" letter-spacing="1">KM/H</text>
-      <text id="speed-kmh" x="480" y="108" text-anchor="middle" fill="#FFFFFF" font-size="38" font-weight="900" font-family="'JetBrains Mono'" class="tabular-nums">0</text>
+      <text x="480" y="73" text-anchor="middle" fill="#94A3B8" font-size="9" font-weight="800"
+        letter-spacing="1">KM/H</text>
+      <text id="speed-kmh" x="480" y="108" text-anchor="middle" fill="#FFFFFF" font-size="38" font-weight="900"
+        font-family="'JetBrains Mono'" class="tabular-nums">0</text>
       <line x1="455" y1="114" x2="505" y2="114" stroke="rgba(255,255,255,0.2)" stroke-width="1" />
-      <text id="speed-mph" x="480" y="130" text-anchor="middle" fill="#CBD5E1" font-size="15" font-weight="700" font-family="'JetBrains Mono'" class="tabular-nums">0</text>
-      <text x="480" y="141" text-anchor="middle" fill="#64748B" font-size="8" font-weight="800" letter-spacing="0.5">MPH</text>
-      <text id="gear-center" x="480" y="161" text-anchor="middle" fill="#00E5FF" font-size="14" font-weight="900" font-family="'JetBrains Mono'">N</text>
+      <text id="speed-mph" x="480" y="130" text-anchor="middle" fill="#CBD5E1" font-size="15" font-weight="700"
+        font-family="'JetBrains Mono'" class="tabular-nums">0</text>
+      <text x="480" y="141" text-anchor="middle" fill="#64748B" font-size="8" font-weight="800"
+        letter-spacing="0.5">MPH</text>
+      <text id="gear-center" x="480" y="161" text-anchor="middle" fill="#00E5FF" font-size="14" font-weight="900"
+        font-family="'JetBrains Mono'">N</text>
 
-      <!-- 4. ASA DIREITA: THROTTLE, MARCHAS & RPM -->
-      <text x="595" y="92" fill="#10B981" font-size="11" font-weight="800" letter-spacing="1">THROTTLE</text>
-      <rect x="665" y="83" width="160" height="9" rx="2.5" fill="rgba(255,255,255,0.08)" />
-      <rect id="throttle-bar" x="665" y="83" width="0" height="9" rx="2.5" fill="#10B981" />
+      <!-- 4. CONTEÚDO ASA DIREITA (100% CONTIDO NO CORPO) -->
+      <!-- Acelerador (Throttle) -->
+      <text x="645" y="86" fill="#10B981" font-size="10" font-weight="900" letter-spacing="1">THROTTLE</text>
+      <rect x="715" y="80" width="135" height="8" rx="2" fill="rgba(255, 255, 255, 0.08)" />
+      <rect id="throttle-bar" x="715" y="80" width="0" height="8" rx="2" fill="#10B981" />
 
-      <!-- Horizontal Gear Strip (R N 1 2 3 4 5 6 7 8) -->
-      <g id="gears-row" font-family="'JetBrains Mono'" font-size="13" font-weight="700">
-        <text x="597" y="116" id="gear-R" fill="#64748B">R</text>
-        <text x="620" y="116" id="gear-N" fill="#00E5FF" font-size="15" font-weight="900">N</text>
-        <text x="643" y="116" id="gear-1" fill="#64748B">1</text>
-        <text x="666" y="116" id="gear-2" fill="#64748B">2</text>
-        <text x="689" y="116" id="gear-3" fill="#64748B">3</text>
-        <text x="712" y="116" id="gear-4" fill="#64748B">4</text>
-        <text x="735" y="116" id="gear-5" fill="#64748B">5</text>
-        <text x="758" y="116" id="gear-6" fill="#64748B">6</text>
-        <text x="781" y="116" id="gear-7" fill="#64748B">7</text>
-        <text x="804" y="116" id="gear-8" fill="#64748B">8</text>
+      <!-- Rótulo e Linha de Marchas -->
+      <text x="645" y="106" fill="#94A3B8" font-size="9" font-weight="800" letter-spacing="1">GEARS</text>
+      <g id="gears-row" font-family="'Chakra Petch', 'JetBrains Mono'" font-size="13" font-weight="700" fill="#64748B" dominant-baseline="central">
+        <text x="626" y="122" id="gear-R">R</text>
+        <text x="650" y="122" id="gear-N">N</text>
+        <text x="674" y="122" id="gear-1">1</text>
+        <text x="698" y="122" id="gear-2">2</text>
+        <text x="722" y="122" id="gear-3">3</text>
+        <text x="746" y="122" id="gear-4">4</text>
+        <text x="770" y="122" id="gear-5">5</text>
+        <text x="794" y="122" id="gear-6">6</text>
+        <text x="818" y="122" id="gear-7">7</text>
+        <text x="842" y="122" id="gear-8">8</text>
       </g>
 
-      <!-- RPM Tachometer Bar & Number -->
-      <text x="595" y="138" fill="#94A3B8" font-size="10" font-weight="800" letter-spacing="1">RPM x1000</text>
-      <text id="rpm-num" x="825" y="138" text-anchor="end" fill="#CBD5E1" font-size="12" font-weight="800" font-family="'JetBrains Mono'" class="tabular-nums">0</text>
-      <rect x="595" y="146" width="230" height="10" rx="3" fill="rgba(255,255,255,0.08)" />
-      <rect id="rpm-bar" x="595" y="146" width="0" height="10" rx="3" fill="url(#rpmGradient)" />
-      
-      <!-- OVERTAKE Luminous Badge -->
-      <g id="overtake-badge" style="transition: opacity 0.15s ease;" opacity="0">
-        <rect x="745" y="162" width="80" height="16" rx="3" fill="#E11D48" />
-        <text x="785" y="174" text-anchor="middle" fill="#FFFFFF" font-size="9" font-weight="900" font-family="'JetBrains Mono'" letter-spacing="1">OVERTAKE</text>
+      <!-- Cabeçalho RPM e Badge OVERTAKE Integrado Lado a Lado -->
+      <text x="645" y="146" fill="#94A3B8" font-size="9" font-weight="700" letter-spacing="0.5">RPM x1000</text>
+
+      <!-- Badge OVERTAKE interno (alinhado à direita antes da barra) -->
+      <g id="overtake-badge" class="transition-opacity duration-150 opacity-0">
+        <rect x="780" y="137" width="70" height="13" rx="2" fill="#E11D48" />
+        <text x="815" y="144" text-anchor="middle" dominant-baseline="central" fill="#FFFFFF" font-size="8" font-weight="900" letter-spacing="1">OVERTAKE</text>
       </g>
+
+      <!-- Tacômetro RPM (Dentro da asa, margem inferior segura) -->
+      <rect x="645" y="154" width="205" height="10" rx="3" fill="rgba(255, 255, 255, 0.08)" />
+      <rect id="rpm-bar" x="645" y="154" width="0" height="10" rx="3" fill="url(#rpmGradient)" />
     </svg>
   </main>
 
@@ -278,7 +292,7 @@
       else if (t.ers_store !== undefined) ersPct = Number(t.ers_store);
       else if (t.ersStoreEnergy !== undefined) ersPct = (Number(t.ersStoreEnergy) / 4000000) * 100;
       ersPct = Math.max(0, Math.min(100, ersPct));
-      
+
       ersPercentEl.textContent = `${Math.round(ersPct)}%`;
       ersBarEl.setAttribute('width', (ersPct * 2.3).toFixed(1)); // 230px max
 
@@ -292,7 +306,7 @@
       let thrPct = Number(t.throttle) || 0;
       if (thrPct > 0 && thrPct <= 1.0) thrPct *= 100;
       thrPct = Math.max(0, Math.min(100, thrPct));
-      throttleBarEl.setAttribute('width', (thrPct * 1.6).toFixed(1)); // 160px max
+      throttleBarEl.setAttribute('width', (thrPct * 1.35).toFixed(1)); // 135px max
 
       // 5. Gear
       const gRaw = t.gear !== undefined ? t.gear : 0;
@@ -304,14 +318,14 @@
       if (currentGear !== activeGearStr) {
         currentGear = activeGearStr;
         gearCenterEl.textContent = activeGearStr;
-        gearCenterEl.setAttribute('fill', activeGearStr === 'R' ? '#EF4444' : '#00E5FF');
+        gearCenterEl.setAttribute('fill', activeGearStr === 'R' ? '#EF4444' : '#00F5D4');
 
         gearList.forEach(g => {
           const el = gearEls[g];
           if (!el) return;
           if (g === activeGearStr) {
-            el.setAttribute('fill', g === 'R' ? '#EF4444' : '#00E5FF');
-            el.setAttribute('font-size', '15');
+            el.setAttribute('fill', g === 'R' ? '#EF4444' : '#00F5D4');
+            el.setAttribute('font-size', '16');
             el.setAttribute('font-weight', '900');
           } else {
             el.setAttribute('fill', '#64748B');
@@ -324,7 +338,7 @@
       // 6. RPM (0 to 15000)
       const rpm = Number(t.engineRPM !== undefined ? t.engineRPM : (t.engine_rpm || 0));
       const rpmRatio = Math.max(0, Math.min(1, rpm / 15000));
-      rpmBarEl.setAttribute('width', (rpmRatio * 230).toFixed(1)); // 230px max
+      rpmBarEl.setAttribute('width', (rpmRatio * 205).toFixed(1)); // 205px max
       if (rpmNumEl) rpmNumEl.textContent = Math.round(rpm);
 
       // 7. Overtake / DRS
@@ -502,14 +516,14 @@
     });
 
     // PYWEBVIEW CONTROLS
-    window.centerHud = function(e) {
+    window.centerHud = function (e) {
       if (e) e.stopPropagation();
       if (window.pywebview && window.pywebview.api && window.pywebview.api.center_hud) {
         window.pywebview.api.center_hud();
       }
     };
 
-    window.closeHud = function(e) {
+    window.closeHud = function (e) {
       if (e) e.stopPropagation();
       if (window.pywebview && window.pywebview.api && window.pywebview.api.close_hud) {
         window.pywebview.api.close_hud();
