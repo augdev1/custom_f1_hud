@@ -75,6 +75,15 @@ def find_f1_game_hwnd():
     return res[0] if res else None
 
 
+class RECT(ctypes.Structure):
+    _fields_ = [
+        ("left", ctypes.c_long),
+        ("top", ctypes.c_long),
+        ("right", ctypes.c_long),
+        ("bottom", ctypes.c_long),
+    ]
+
+
 class MARGINS(ctypes.Structure):
     _fields_ = [
         ("cxLeftWidth", ctypes.c_int),
@@ -108,15 +117,24 @@ def configure_window_transparency(hwnd, clickthrough=False):
     """
     Applies Hardware Window Region Clipping (24px rounded corners),
     DWM Frame Extension, and HWND_TOPMOST.
-    Eliminates 100% of any black/white bounding box in hardware,
+    Eliminates 100% of any black/white bounding box in hardware across any monitor/DPI scaling,
     and forces the window to stay strictly superimposed on top of F1 24.
     """
     if not hwnd:
         return
 
     try:
-        # 1. Hardware Rounded Region: cuts the physical OS window to exact 24px rounded rectangle
-        rgn = gdi32.CreateRoundRectRgn(0, 0, HUD_WIDTH, HUD_HEIGHT, 24, 24)
+        # 1. Hardware Rounded Region: calculates exact physical bounds (DPI-aware for any monitor)
+        rect = RECT()
+        if user32.GetWindowRect(hwnd, ctypes.byref(rect)):
+            w = rect.right - rect.left
+            h = rect.bottom - rect.top
+        else:
+            w, h = HUD_WIDTH, HUD_HEIGHT
+
+        radius_x = max(16, int(24 * (w / 896)))
+        radius_y = max(16, int(24 * (h / 175)))
+        rgn = gdi32.CreateRoundRectRgn(0, 0, w, h, radius_x, radius_y)
         user32.SetWindowRgn(hwnd, rgn, True)
     except Exception:
         pass
