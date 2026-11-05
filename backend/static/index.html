@@ -203,9 +203,9 @@
   <main class="w-screen h-screen m-0 p-0 pointer-events-none flex flex-col justify-end items-center pb-12 relative" id="hudContainer">
     
     <div id="hud-container" class="relative w-full max-w-[960px] mx-auto select-none font-['Rajdhani'] pointer-events-auto">
-      <svg viewBox="0 0 960 220" class="w-full h-auto drop-shadow-[0_10px_20px_rgba(0,0,0,0.7)] filter">
+      <svg viewBox="0 0 960 210" class="w-full h-auto drop-shadow-[0_10px_22px_rgba(0,0,0,0.75)] filter">
         <defs>
-          <!-- Battery Gradient -->
+          <!-- ERS Battery Gradient -->
           <linearGradient id="ersGradient" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stop-color="#00E5FF" />
             <stop offset="100%" stop-color="#0077B6" />
@@ -218,20 +218,20 @@
             <stop offset="92%" stop-color="#FF0055" />
           </linearGradient>
 
-          <!-- Master Halo Chassis Background Gradient -->
+          <!-- Master Halo Chassis Gradient -->
           <linearGradient id="chassisGrad" x1="0%" y1="0%" x2="100%" y2="100%">
             <stop offset="0%" stop-color="rgba(14, 24, 42, 0.88)" />
-            <stop offset="50%" stop-color="rgba(8, 14, 26, 0.94)" />
+            <stop offset="50%" stop-color="rgba(8, 14, 26, 0.95)" />
             <stop offset="100%" stop-color="rgba(14, 24, 42, 0.88)" />
           </linearGradient>
 
           <!-- Center Pod Radial Depth -->
           <radialGradient id="podRadial" cx="50%" cy="50%" r="50%">
             <stop offset="0%" stop-color="rgba(20, 36, 60, 0.90)" />
-            <stop offset="85%" stop-color="rgba(6, 12, 22, 0.95)" />
+            <stop offset="85%" stop-color="rgba(6, 12, 22, 0.96)" />
           </radialGradient>
 
-          <!-- Dynamic Accent Glow Filter -->
+          <!-- Accent Glow -->
           <filter id="accentGlow" x="-20%" y="-20%" width="140%" height="140%">
             <feGaussianBlur stdDeviation="3" result="blur" />
             <feMerge>
@@ -241,95 +241,96 @@
           </filter>
         </defs>
 
-        <!-- 1. UNIFIED AERODYNAMIC HALO CHASSIS CONTOUR (Continuous Curved Silhouette) -->
+        <!-- 1. MASTER CONTINUOUS CURVED HALO CHASSIS -->
         <path d="
-          M 125,82
-          Q 110,88 110,105
-          L 110,165
-          Q 110,182 125,185
-          L 365,160
-          Q 410,188 480,188
-          Q 550,188 595,160
-          L 835,185
-          Q 850,182 850,165
-          L 850,105
-          Q 850,88 835,82
-          L 595,58
-          Q 550,30 480,30
-          Q 410,30 365,58
+          M 115,75
+          L 385,52
+          Q 430,22 480,22
+          Q 530,22 575,52
+          L 845,75
+          Q 860,82 860,98
+          L 860,152
+          Q 860,168 845,175
+          L 575,155
+          Q 530,190 480,190
+          Q 430,190 385,155
+          L 115,175
+          Q 100,168 100,152
+          L 100,98
+          Q 100,82 115,75
           Z
-        " fill="url(#chassisGrad)" stroke="rgba(0, 229, 255, 0.35)" stroke-width="1.5" />
+        " fill="url(#chassisGrad)" stroke="rgba(0, 229, 255, 0.40)" stroke-width="1.5" />
 
-        <!-- Top Halo Structural Ribs -->
-        <path d="M 130,86 L 360,63" stroke="rgba(255, 255, 255, 0.15)" stroke-width="1" />
-        <path d="M 600,63 L 830,86" stroke="rgba(255, 255, 255, 0.15)" stroke-width="1" />
+        <!-- Aero Accents on Halo Wings -->
+        <path d="M 120,79 L 380,56" stroke="rgba(255, 255, 255, 0.15)" stroke-width="1" />
+        <path d="M 580,56 L 840,79" stroke="rgba(255, 255, 255, 0.15)" stroke-width="1" />
 
-        <!-- 2. ASA ESQUERDA: ERS BATTERY & FREIO -->
-        <text x="145" y="98" fill="#94A3B8" font-size="11" font-weight="800" letter-spacing="1.2">ERS BATTERY</text>
-        <text id="ers-percent" x="370" y="98" text-anchor="end" fill="#FFFFFF" font-size="20" font-weight="900" font-family="'JetBrains Mono'" class="tabular-nums">85%</text>
+        <!-- 2. ASA ESQUERDA: ERS BATTERY & BRAKE -->
+        <text x="135" y="92" fill="#94A3B8" font-size="11" font-weight="800" letter-spacing="1.2">ERS BATTERY</text>
+        <text id="ers-percent" x="365" y="92" text-anchor="end" fill="#FFFFFF" font-size="20" font-weight="900" font-family="'JetBrains Mono'" class="tabular-nums">85%</text>
         
         <!-- ERS Progress Bar -->
-        <rect x="145" y="108" width="225" height="10" rx="3" fill="rgba(255,255,255,0.08)" />
-        <rect id="ers-bar" x="145" y="108" width="191" height="10" rx="3" fill="url(#ersGradient)" />
+        <rect x="135" y="102" width="230" height="10" rx="3" fill="rgba(255,255,255,0.08)" />
+        <rect id="ers-bar" x="135" y="102" width="195" height="10" rx="3" fill="url(#ersGradient)" />
         
         <!-- Brake Bar -->
-        <text x="145" y="142" fill="#EF4444" font-size="11" font-weight="800" letter-spacing="1">BRAKE</text>
-        <rect x="200" y="133" width="170" height="9" rx="2.5" fill="rgba(255,255,255,0.08)" />
-        <rect id="brake-bar" x="200" y="133" width="0" height="9" rx="2.5" fill="#EF4444" />
+        <text x="135" y="136" fill="#EF4444" font-size="11" font-weight="800" letter-spacing="1">BRAKE</text>
+        <rect x="190" y="127" width="175" height="9" rx="2.5" fill="rgba(255,255,255,0.08)" />
+        <rect id="brake-bar" x="190" y="127" width="0" height="9" rx="2.5" fill="#EF4444" />
 
         <!-- DRS Status Badge -->
         <g id="drs-badge">
-          <rect id="drs-box" x="145" y="156" width="65" height="18" rx="3" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1" />
-          <text id="drs-text" x="177" y="169" text-anchor="middle" fill="#94A3B8" font-size="9" font-weight="800" font-family="'JetBrains Mono'">DRS</text>
+          <rect id="drs-box" x="135" y="150" width="65" height="18" rx="3" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1" />
+          <text id="drs-text" x="167" y="163" text-anchor="middle" fill="#94A3B8" font-size="9" font-weight="800" font-family="'JetBrains Mono'">DRS</text>
         </g>
-        <text x="370" y="168" text-anchor="end" fill="rgba(255,255,255,0.25)" font-size="8" font-weight="700" letter-spacing="1.5">F1 BROADCAST</text>
+        <text x="365" y="162" text-anchor="end" fill="rgba(255,255,255,0.25)" font-size="8" font-weight="700" letter-spacing="1.5">F1 BROADCAST</text>
 
         <!-- 3. DOMO CENTRAL: VELOCÍMETRO DUPLO COM TACÔMETRO ARREDONDADO -->
-        <circle cx="480" cy="109" r="54" fill="url(#podRadial)" stroke="rgba(0, 229, 255, 0.3)" stroke-width="1.5" />
+        <circle cx="480" cy="105" r="52" fill="url(#podRadial)" stroke="rgba(0, 229, 255, 0.3)" stroke-width="1.5" />
         
-        <!-- Speed Progress Arc (r=50, circumference=314.16) -->
-        <circle cx="480" cy="109" r="50" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="4.5" />
-        <circle id="speed-arc" cx="480" cy="109" r="50" fill="none" stroke="#00E5FF" stroke-width="4.5"
-          stroke-dasharray="314.16" stroke-dashoffset="56.5" stroke-linecap="round"
-          transform="rotate(-90 480 109)" filter="url(#accentGlow)" />
+        <!-- Speed Progress Arc (r=48, circumference=301.59) -->
+        <circle cx="480" cy="105" r="48" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="4.5" />
+        <circle id="speed-arc" cx="480" cy="105" r="48" fill="none" stroke="#00E5FF" stroke-width="4.5"
+          stroke-dasharray="301.59" stroke-dashoffset="54.2" stroke-linecap="round"
+          transform="rotate(-90 480 105)" filter="url(#accentGlow)" />
         
         <!-- Speed Readouts -->
-        <text x="480" y="76" text-anchor="middle" fill="#94A3B8" font-size="9" font-weight="800" letter-spacing="1">KM/H</text>
-        <text id="speed-kmh" x="480" y="112" text-anchor="middle" fill="#FFFFFF" font-size="38" font-weight="900" font-family="'JetBrains Mono'" class="tabular-nums">295</text>
-        <line x1="455" y1="118" x2="505" y2="118" stroke="rgba(255,255,255,0.2)" stroke-width="1" />
-        <text id="speed-mph" x="480" y="135" text-anchor="middle" fill="#CBD5E1" font-size="16" font-weight="700" font-family="'JetBrains Mono'" class="tabular-nums">183</text>
-        <text x="480" y="146" text-anchor="middle" fill="#64748B" font-size="8" font-weight="800" letter-spacing="0.5">MPH</text>
-        <text id="gear-center" x="480" y="166" text-anchor="middle" fill="#00E5FF" font-size="14" font-weight="900" font-family="'JetBrains Mono'">7</text>
+        <text x="480" y="73" text-anchor="middle" fill="#94A3B8" font-size="9" font-weight="800" letter-spacing="1">KM/H</text>
+        <text id="speed-kmh" x="480" y="108" text-anchor="middle" fill="#FFFFFF" font-size="38" font-weight="900" font-family="'JetBrains Mono'" class="tabular-nums">295</text>
+        <line x1="455" y1="114" x2="505" y2="114" stroke="rgba(255,255,255,0.2)" stroke-width="1" />
+        <text id="speed-mph" x="480" y="130" text-anchor="middle" fill="#CBD5E1" font-size="15" font-weight="700" font-family="'JetBrains Mono'" class="tabular-nums">183</text>
+        <text x="480" y="141" text-anchor="middle" fill="#64748B" font-size="8" font-weight="800" letter-spacing="0.5">MPH</text>
+        <text id="gear-center" x="480" y="161" text-anchor="middle" fill="#00E5FF" font-size="14" font-weight="900" font-family="'JetBrains Mono'">7</text>
 
         <!-- 4. ASA DIREITA: THROTTLE, MARCHAS & RPM -->
-        <text x="590" y="98" fill="#10B981" font-size="11" font-weight="800" letter-spacing="1">THROTTLE</text>
-        <rect x="660" y="89" width="155" height="9" rx="2.5" fill="rgba(255,255,255,0.08)" />
-        <rect id="throttle-bar" x="660" y="89" width="155" height="9" rx="2.5" fill="#10B981" />
+        <text x="595" y="92" fill="#10B981" font-size="11" font-weight="800" letter-spacing="1">THROTTLE</text>
+        <rect x="665" y="83" width="160" height="9" rx="2.5" fill="rgba(255,255,255,0.08)" />
+        <rect id="throttle-bar" x="665" y="83" width="160" height="9" rx="2.5" fill="#10B981" />
 
         <!-- Horizontal Gear Strip (R N 1 2 3 4 5 6 7 8) -->
         <g id="gears-row" font-family="'JetBrains Mono'" font-size="13" font-weight="700">
-          <text x="592" y="122" id="gear-R" fill="#64748B">R</text>
-          <text x="615" y="122" id="gear-N" fill="#64748B">N</text>
-          <text x="638" y="122" id="gear-1" fill="#64748B">1</text>
-          <text x="661" y="122" id="gear-2" fill="#64748B">2</text>
-          <text x="684" y="122" id="gear-3" fill="#64748B">3</text>
-          <text x="707" y="122" id="gear-4" fill="#64748B">4</text>
-          <text x="730" y="122" id="gear-5" fill="#64748B">5</text>
-          <text x="753" y="122" id="gear-6" fill="#64748B">6</text>
-          <text x="776" y="122" id="gear-7" fill="#00E5FF" font-size="15" font-weight="900">7</text>
-          <text x="799" y="122" id="gear-8" fill="#64748B">8</text>
+          <text x="597" y="116" id="gear-R" fill="#64748B">R</text>
+          <text x="620" y="116" id="gear-N" fill="#64748B">N</text>
+          <text x="643" y="116" id="gear-1" fill="#64748B">1</text>
+          <text x="666" y="116" id="gear-2" fill="#64748B">2</text>
+          <text x="689" y="116" id="gear-3" fill="#64748B">3</text>
+          <text x="712" y="116" id="gear-4" fill="#64748B">4</text>
+          <text x="735" y="116" id="gear-5" fill="#64748B">5</text>
+          <text x="758" y="116" id="gear-6" fill="#64748B">6</text>
+          <text x="781" y="116" id="gear-7" fill="#00E5FF" font-size="15" font-weight="900">7</text>
+          <text x="804" y="116" id="gear-8" fill="#64748B">8</text>
         </g>
 
         <!-- RPM Tachometer Bar & Number -->
-        <text x="590" y="144" fill="#94A3B8" font-size="10" font-weight="800" letter-spacing="1">RPM x1000</text>
-        <text id="rpm-num" x="815" y="144" text-anchor="end" fill="#CBD5E1" font-size="12" font-weight="800" font-family="'JetBrains Mono'" class="tabular-nums">11800</text>
-        <rect x="590" y="152" width="225" height="10" rx="3" fill="rgba(255,255,255,0.08)" />
-        <rect id="rpm-bar" x="590" y="152" width="177" height="10" rx="3" fill="url(#rpmGradient)" />
+        <text x="595" y="138" fill="#94A3B8" font-size="10" font-weight="800" letter-spacing="1">RPM x1000</text>
+        <text id="rpm-num" x="825" y="138" text-anchor="end" fill="#CBD5E1" font-size="12" font-weight="800" font-family="'JetBrains Mono'" class="tabular-nums">11800</text>
+        <rect x="595" y="146" width="230" height="10" rx="3" fill="rgba(255,255,255,0.08)" />
+        <rect id="rpm-bar" x="595" y="146" width="181" height="10" rx="3" fill="url(#rpmGradient)" />
         
         <!-- OVERTAKE Luminous Badge -->
         <g id="overtake-badge" style="transition: opacity 0.15s ease;" opacity="0">
-          <rect x="735" y="167" width="80" height="16" rx="3" fill="#E11D48" />
-          <text x="775" y="179" text-anchor="middle" fill="#FFFFFF" font-size="9" font-weight="900" font-family="'JetBrains Mono'" letter-spacing="1">OVERTAKE</text>
+          <rect x="745" y="162" width="80" height="16" rx="3" fill="#E11D48" />
+          <text x="785" y="174" text-anchor="middle" fill="#FFFFFF" font-size="9" font-weight="900" font-family="'JetBrains Mono'" letter-spacing="1">OVERTAKE</text>
         </g>
       </svg>
     </div>
@@ -363,7 +364,7 @@
       gearEls[g] = document.getElementById(`gear-${g}`);
     });
 
-    const SPEED_CIRCUMFERENCE = 314.16; // 2 * Math.PI * 50
+    const SPEED_CIRCUMFERENCE = 301.59; // 2 * Math.PI * 48
     let currentGear = '7';
     let currentMode = 'live';
     let isStressLoopActive = false;
@@ -390,19 +391,19 @@
       ersPct = Math.max(0, Math.min(100, ersPct));
       
       ersPercentEl.textContent = `${Math.round(ersPct)}%`;
-      ersBarEl.setAttribute('width', (ersPct * 2.25).toFixed(1)); // 225px max
+      ersBarEl.setAttribute('width', (ersPct * 2.3).toFixed(1)); // 230px max
 
       // 3. Brake (0 to 100%)
       let brkPct = Number(t.brake) || 0;
       if (brkPct > 0 && brkPct <= 1.0) brkPct *= 100;
       brkPct = Math.max(0, Math.min(100, brkPct));
-      brakeBarEl.setAttribute('width', (brkPct * 1.7).toFixed(1)); // 170px max
+      brakeBarEl.setAttribute('width', (brkPct * 1.75).toFixed(1)); // 175px max
 
       // 4. Throttle (0 to 100%)
       let thrPct = Number(t.throttle) || 0;
       if (thrPct > 0 && thrPct <= 1.0) thrPct *= 100;
       thrPct = Math.max(0, Math.min(100, thrPct));
-      throttleBarEl.setAttribute('width', (thrPct * 1.55).toFixed(1)); // 155px max
+      throttleBarEl.setAttribute('width', (thrPct * 1.6).toFixed(1)); // 160px max
 
       // 5. Gear
       const gRaw = t.gear !== undefined ? t.gear : 0;
@@ -434,7 +435,7 @@
       // 6. RPM (0 to 15000)
       const rpm = Number(t.engineRPM !== undefined ? t.engineRPM : (t.engine_rpm || 0));
       const rpmRatio = Math.max(0, Math.min(1, rpm / 15000));
-      rpmBarEl.setAttribute('width', (rpmRatio * 225).toFixed(1)); // 225px max
+      rpmBarEl.setAttribute('width', (rpmRatio * 230).toFixed(1)); // 230px max
       if (rpmNumEl) rpmNumEl.textContent = Math.round(rpm);
 
       // 7. Overtake / DRS
