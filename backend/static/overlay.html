@@ -3,10 +3,10 @@
 <head>
   <meta charset="UTF-8">
   <title>F1 24 Official Halo HUD Overlay</title>
-  <!-- Fontes Oficiais Automotivas -->
+  <!-- Fontes Oficiais Automotivas de Transmissão F1 -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,600;0,700;1,700&family=Titillium+Web:ital,wght@0,700;0,900;1,700&family=JetBrains+Mono:wght@700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,600;0,700;1,700&family=Titillium+Web:ital,wght@0,700;0,900;1,700;1,900&family=JetBrains+Mono:wght@700;800&display=swap" rel="stylesheet">
   
   <style>
     * {
@@ -30,9 +30,9 @@
 
     .hud-wrapper {
       position: relative;
-      width: 940px;
-      height: 206px;
-      filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.85));
+      width: 960px;
+      height: 230px;
+      filter: drop-shadow(0 14px 28px rgba(0, 0, 0, 0.90));
     }
 
     svg {
@@ -45,7 +45,6 @@
       font-variant-numeric: tabular-nums;
     }
 
-    /* Animação e transições suaves nos arcos */
     .telemetry-bar {
       transition: width 0.05s linear;
     }
@@ -53,21 +52,48 @@
     .speed-stroke {
       transition: stroke-dashoffset 0.05s linear;
     }
+
+    /* Controles discretos no topo */
+    .hud-control-btn {
+      opacity: 0.3;
+      transition: opacity 0.15s ease, transform 0.1s ease;
+    }
+
+    .hud-control-btn:hover {
+      opacity: 1;
+      transform: scale(1.05);
+    }
   </style>
 </head>
 <body>
 
+<!-- BARRINHA DISCRETA DE TESTE / FECHAR (Hover) -->
+<div style="position: absolute; top: 4px; left: 50%; transform: translateX(-50%); z-index: 99; display: flex; gap: 6px; font-family: 'JetBrains Mono', monospace; font-size: 9px;" class="hud-control-btn">
+  <span id="telemetry-badge" style="padding: 2px 8px; border-radius: 9999px; font-weight: bold; background: rgba(0, 240, 255, 0.2); color: #00f0ff; border: 1px solid rgba(0, 240, 255, 0.3);">
+    LIVE 60Hz
+  </span>
+  <button id="btnStress" onclick="toggleStressLoop()" style="padding: 2px 8px; border-radius: 9999px; background: rgba(15, 23, 42, 0.85); color: #cbd5e1; border: 1px solid rgba(255, 255, 255, 0.2); cursor: pointer;" title="Atalho: Tecla H">
+    [H] Teste
+  </button>
+  <button onclick="centerHud()" style="padding: 2px 8px; border-radius: 9999px; background: rgba(15, 23, 42, 0.85); color: #cbd5e1; border: 1px solid rgba(255, 255, 255, 0.2); cursor: pointer;">
+    Centralizar
+  </button>
+  <button onclick="closeHud()" style="width: 18px; height: 18px; border-radius: 9999px; background: rgba(239, 68, 68, 0.3); color: #fca5a5; border: 1px solid rgba(239, 68, 68, 0.4); cursor: pointer; font-weight: bold;">
+    &times;
+  </button>
+</div>
+
 <div class="hud-wrapper" id="hud-root">
-  <svg viewBox="0 0 1000 220">
+  <svg viewBox="0 0 1000 240">
     <defs>
-      <!-- Gradiente do Fundo da Carcaça Halo Oficial -->
+      <!-- Gradiente Chassi Halo Oficial Automotivo -->
       <linearGradient id="haloBase" x1="0%" y1="0%" x2="0%" y2="100%">
-        <stop offset="0%" stop-color="#0f192b" stop-opacity="0.94" />
-        <stop offset="60%" stop-color="#090f1a" stop-opacity="0.97" />
-        <stop offset="100%" stop-color="#05080f" stop-opacity="0.99" />
+        <stop offset="0%" stop-color="#0b1728" stop-opacity="0.88" />
+        <stop offset="60%" stop-color="#060c16" stop-opacity="0.94" />
+        <stop offset="100%" stop-color="#03060c" stop-opacity="0.98" />
       </linearGradient>
 
-      <!-- Gradiente ERS Ciano/Azul -->
+      <!-- Gradiente ERS Ciano/Azul Elétrico -->
       <linearGradient id="ersFill" x1="0%" y1="0%" x2="100%" y2="0%">
         <stop offset="0%" stop-color="#00f0ff" />
         <stop offset="100%" stop-color="#0077b6" />
@@ -76,100 +102,126 @@
       <!-- Gradiente Tacômetro RPM Oficial -->
       <linearGradient id="rpmFill" x1="0%" y1="0%" x2="100%" y2="0%">
         <stop offset="0%" stop-color="#10b981" />
-        <stop offset="65%" stop-color="#eab308" />
-        <stop offset="88%" stop-color="#ef4444" />
+        <stop offset="62%" stop-color="#eab308" />
+        <stop offset="85%" stop-color="#ef4444" />
         <stop offset="100%" stop-color="#d946ef" />
       </linearGradient>
+
+      <!-- Brilho Neon para o Arco Central -->
+      <filter id="cyanGlow" x="-20%" y="-20%" width="140%" height="140%">
+        <feGaussianBlur stdDeviation="3" result="blur" />
+        <feMerge>
+          <feMergeNode in="blur" />
+          <feMergeNode in="SourceGraphic" />
+        </feMerge>
+      </filter>
     </defs>
 
-    <!-- ==================== CARCAÇA EXTERIOR (HALO MOLD) ==================== -->
-    <!-- Contorno único com a curvatura oficial do Halo: Asas abertas e domo abaulado -->
-    <path d="M 60,182 
-             L 370,146 
-             C 390,72 610,72 630,146 
-             L 940,182 
-             L 915,62 
-             C 770,52 630,52 500,52 
-             C 370,52 230,52 85,62 
-             Z" 
-          fill="url(#haloBase)" 
-          stroke="rgba(0, 229, 255, 0.35)" 
-          stroke-width="1.8" 
-          stroke-linejoin="round" />
+    <!-- ==================== CARCAÇA ANGULADA EM V (CURVATURA HALO F1) ==================== -->
+    <!-- Contorno perfeitamente curvado acompanhando o pilar central e as asas inclinadas do Halo -->
+    <path d="
+      M 500,32
+      C 545,32 585,54 615,74
+      L 890,166
+      C 910,174 912,194 896,206
+      C 882,216 864,214 848,206
+      L 585,168
+      C 555,182 530,188 500,188
+      C 470,188 445,182 415,168
+      L 152,206
+      C 136,214 118,216 104,206
+      C 88,194 90,174 110,166
+      L 385,74
+      C 415,54 455,32 500,32
+      Z
+    " fill="url(#haloBase)" stroke="rgba(0, 229, 255, 0.42)" stroke-width="2" stroke-linejoin="round" />
 
-    <!-- Aro Interno de destaque no Domo do Velocímetro -->
-    <circle cx="500" cy="120" r="72" fill="#060b13" stroke="rgba(255, 255, 255, 0.12)" stroke-width="1.5" />
+    <!-- ==================== ASA ESQUERDA INCLINADA (ERS & BRAKE) ==================== -->
+    <!-- Inclinada em -19.5° acompanhando a barra esquerda do Halo -->
+    <g transform="translate(425, 115) rotate(-19.5)">
+      <!-- Rótulo ERS BATTERY e Percentual -->
+      <text x="-295" y="-18" fill="#94a3b8" font-size="12" font-weight="800" letter-spacing="1.5">ERS BATTERY</text>
+      <text id="ers-percent" x="-25" y="-18" text-anchor="end" fill="#ffffff" font-size="22" font-weight="900" font-style="italic" font-family="'Titillium Web','Chakra Petch'" class="tabular-num">99%</text>
 
+      <!-- Barra de Bateria ERS -->
+      <rect x="-295" y="-6" width="270" height="13" rx="3.5" fill="rgba(255, 255, 255, 0.08)" />
+      <rect id="ers-bar" class="telemetry-bar" x="-295" y="-6" width="267" height="13" rx="3.5" fill="url(#ersFill)" />
 
-    <!-- ==================== ASA ESQUERDA: ERS & TRAVÃO ==================== -->
-    <!-- Rótulo ERS BATTERY e Percentual -->
-    <text x="120" y="86" fill="#94a3b8" font-size="12" font-weight="800" letter-spacing="1.2">ERS BATTERY</text>
-    <text id="ers-percent" x="350" y="86" text-anchor="end" fill="#ffffff" font-size="19" font-weight="900" font-family="'Chakra Petch'" class="tabular-num">99%</text>
+      <!-- Barra de Freio (Brake) -->
+      <text x="-295" y="26" fill="#ef4444" font-size="11" font-weight="900" letter-spacing="1">BRAKE</text>
+      <rect x="-235" y="16" width="210" height="11" rx="3" fill="rgba(255, 255, 255, 0.08)" />
+      <rect id="brake-bar" class="telemetry-bar" x="-235" y="16" width="0" height="11" rx="3" fill="#ef4444" />
 
-    <!-- Barra de Bateria ERS -->
-    <rect x="120" y="98" width="230" height="12" rx="3" fill="rgba(255, 255, 255, 0.08)" />
-    <rect id="ers-bar" class="telemetry-bar" x="120" y="98" width="225" height="12" rx="3" fill="url(#ersFill)" />
-
-    <!-- Barra de Freio (Brake) -->
-    <text x="120" y="138" fill="#ef4444" font-size="11" font-weight="900" letter-spacing="1">BRAKE</text>
-    <rect x="175" y="130" width="175" height="10" rx="3" fill="rgba(255, 255, 255, 0.08)" />
-    <rect id="brake-bar" class="telemetry-bar" x="175" y="130" width="0" height="10" rx="3" fill="#ef4444" />
-
-    <!-- Badge DRS -->
-    <rect id="drs-box" x="120" y="152" width="56" height="18" rx="3" fill="rgba(255, 255, 255, 0.06)" stroke="rgba(255, 255, 255, 0.18)" stroke-width="1" />
-    <text id="drs-text" x="148" y="161" text-anchor="middle" dominant-baseline="central" fill="#64748b" font-size="10" font-weight="900" letter-spacing="0.5">DRS</text>
+      <!-- Badge DRS -->
+      <g id="drs-group">
+        <rect id="drs-box" x="-295" y="38" width="56" height="16" rx="3" fill="rgba(255, 255, 255, 0.06)" stroke="rgba(255, 255, 255, 0.18)" stroke-width="1" />
+        <text id="drs-text" x="-267" y="47" text-anchor="middle" dominant-baseline="central" fill="#64748b" font-size="9" font-weight="900" letter-spacing="0.5">DRS</text>
+      </g>
+      <text x="-25" y="48" text-anchor="end" fill="rgba(255, 255, 255, 0.25)" font-size="8.5" font-weight="800" letter-spacing="1.5">F1 BROADCAST</text>
+    </g>
 
 
     <!-- ==================== DOMO CENTRAL: VELOCÍMETRO ==================== -->
-    <!-- Arco de Velocidade Dinâmico (Perímetro ~ 408) -->
-    <circle cx="500" cy="120" r="65" fill="none" stroke="rgba(255, 255, 255, 0.06)" stroke-width="6" />
-    <circle id="speed-arc" class="speed-stroke" cx="500" cy="120" r="65" fill="none" stroke="#00f0ff" stroke-width="6"
-            stroke-dasharray="408" stroke-dashoffset="120" stroke-linecap="round" transform="rotate(-90 500 120)" />
+    <g id="center-pod">
+      <!-- Fundo do Domo -->
+      <circle cx="500" cy="115" r="66" fill="#050a12" stroke="rgba(0, 229, 255, 0.35)" stroke-width="1.8" />
+      
+      <!-- Arco Exterior de Velocidade Dinâmico (Perímetro = 364.4) -->
+      <circle cx="500" cy="115" r="58" fill="none" stroke="rgba(255, 255, 255, 0.07)" stroke-width="5.5" />
+      <circle id="speed-arc" class="speed-stroke" cx="500" cy="115" r="58" fill="none" stroke="#00f0ff" stroke-width="5.5"
+              stroke-dasharray="364.4" stroke-dashoffset="108" stroke-linecap="round" transform="rotate(-90 500 115)" filter="url(#cyanGlow)" />
 
-    <!-- Numerais Centrais Harmoniosos -->
-    <text x="500" y="78" text-anchor="middle" dominant-baseline="central" fill="#94a3b8" font-size="10" font-weight="800" letter-spacing="1">KM/H</text>
-    <text id="speed-kmh" x="500" y="112" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-size="38" font-weight="900" font-family="'Chakra Petch'" class="tabular-num">187</text>
-    <text id="speed-mph" x="500" y="144" text-anchor="middle" dominant-baseline="central" fill="#cbd5e1" font-size="17" font-weight="700" font-family="'Chakra Petch'" class="tabular-num">116</text>
-    <text x="500" y="160" text-anchor="middle" dominant-baseline="central" fill="#64748b" font-size="9" font-weight="800" letter-spacing="0.5">MPH</text>
-
-
-    <!-- ==================== ASA DIREITA: THROTTLE, MARCHAS & RPM ==================== -->
-    <!-- Barra de Acelerador (Throttle) -->
-    <text x="650" y="80" fill="#10b981" font-size="11" font-weight="900" letter-spacing="1">THROTTLE</text>
-    <rect x="730" y="72" width="150" height="10" rx="3" fill="rgba(255, 255, 255, 0.08)" />
-    <rect id="throttle-bar" class="telemetry-bar" x="730" y="72" width="110" height="10" rx="3" fill="#10b981" />
-
-    <!-- Linha de Marchas com Espaçamento Amplo -->
-    <text x="650" y="103" fill="#94a3b8" font-size="10" font-weight="800" letter-spacing="1">GEARS</text>
-    <g id="gears-group" font-family="'Chakra Petch'" font-size="14" font-weight="800" fill="#64748b" dominant-baseline="central">
-      <text x="654" y="120" id="gear-N">N</text>
-      <text x="682" y="120" id="gear-1">1</text>
-      <text x="710" y="120" id="gear-2">2</text>
-      <text x="738" y="120" id="gear-3">3</text>
-      <text x="766" y="120" id="gear-4">4</text>
-      <text x="794" y="120" id="gear-5">5</text>
-      <text x="822" y="120" id="gear-6" fill="#00f0ff" font-size="20" font-weight="900">6</text>
-      <text x="850" y="120" id="gear-7">7</text>
-      <text x="878" y="120" id="gear-8">8</text>
+      <!-- Rótulos e Numerais Centrais (Idênticos à TV Oficial) -->
+      <text x="500" y="74" text-anchor="middle" dominant-baseline="central" fill="#94a3b8" font-size="11" font-weight="800" letter-spacing="1.2">KM/H</text>
+      <text id="speed-kmh" x="500" y="108" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-size="44" font-weight="900" font-style="italic" font-family="'Titillium Web','Chakra Petch'" class="tabular-num">187</text>
+      
+      <line x1="470" y1="126" x2="530" y2="126" stroke="rgba(255, 255, 255, 0.2)" stroke-width="1" />
+      
+      <text id="speed-mph" x="500" y="141" text-anchor="middle" dominant-baseline="central" fill="#cbd5e1" font-size="18" font-weight="800" font-family="'Titillium Web','Chakra Petch'" class="tabular-num">116</text>
+      <text x="500" y="156" text-anchor="middle" dominant-baseline="central" fill="#64748b" font-size="9" font-weight="800" letter-spacing="0.8">MPH</text>
     </g>
 
-    <!-- Tacômetro RPM e Alerta OVERTAKE Lado a Lado (100% Dentro da Asa) -->
-    <text x="650" y="145" fill="#94a3b8" font-size="10" font-weight="700" letter-spacing="0.5">RPM x1000</text>
-    
-    <!-- Badge OVERTAKE interno -->
-    <g id="overtake-badge" style="opacity: 0; transition: opacity 0.15s ease;">
-      <rect x="798" y="136" width="82" height="15" rx="3" fill="#e11d48" />
-      <text x="839" y="144" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-size="9" font-weight="900" letter-spacing="0.8">OVERTAKE</text>
-    </g>
 
-    <!-- Barra de Tacômetro RPM -->
-    <rect x="650" y="155" width="230" height="12" rx="3" fill="rgba(255, 255, 255, 0.08)" />
-    <rect id="rpm-bar" class="telemetry-bar" x="650" y="155" width="160" height="12" rx="3" fill="url(#rpmFill)" />
+    <!-- ==================== ASA DIREITA INCLINADA (THROTTLE, MARCHAS & RPM) ==================== -->
+    <!-- Inclinada em +19.5° acompanhando a barra direita do Halo -->
+    <g transform="translate(575, 115) rotate(19.5)">
+      <!-- Barra de Acelerador (Throttle) -->
+      <text x="25" y="-20" fill="#10b981" font-size="11" font-weight="900" letter-spacing="1.2">THROTTLE</text>
+      <rect x="110" y="-28" width="185" height="11" rx="3" fill="rgba(255, 255, 255, 0.08)" />
+      <rect id="throttle-bar" class="telemetry-bar" x="110" y="-28" width="135" height="11" rx="3" fill="#10b981" />
+
+      <!-- Linha de Marchas com Destaque na Marcha Ativa -->
+      <text x="25" y="4" fill="#94a3b8" font-size="10" font-weight="800" letter-spacing="1.2">GEARS</text>
+      <g id="gears-group" font-family="'Chakra Petch', sans-serif" font-size="14" font-weight="800" fill="#64748b" dominant-baseline="central">
+        <text x="25" y="22" id="gear-N">N</text>
+        <text x="58" y="22" id="gear-1">1</text>
+        <text x="91" y="22" id="gear-2">2</text>
+        <text x="124" y="22" id="gear-3">3</text>
+        <text x="157" y="22" id="gear-4">4</text>
+        <text x="190" y="22" id="gear-5">5</text>
+        <text x="223" y="22" id="gear-6" fill="#00f0ff" font-size="22" font-weight="900">6</text>
+        <text x="256" y="22" id="gear-7">7</text>
+        <text x="289" y="22" id="gear-8">8</text>
+      </g>
+
+      <!-- Tacômetro RPM e Alerta OVERTAKE Lado a Lado -->
+      <text x="25" y="44" fill="#94a3b8" font-size="10" font-weight="800" letter-spacing="0.8">RPM x1000</text>
+      
+      <!-- Badge OVERTAKE interno com transição suave -->
+      <g id="overtake-badge" style="opacity: 0; transition: opacity 0.15s ease;">
+        <rect x="205" y="36" width="90" height="16" rx="3" fill="#e11d48" />
+        <text x="250" y="44" text-anchor="middle" dominant-baseline="central" fill="#ffffff" font-size="9.5" font-weight="900" letter-spacing="1">OVERTAKE</text>
+      </g>
+
+      <!-- Barra de Tacômetro RPM -->
+      <rect x="25" y="54" width="270" height="13" rx="3.5" fill="rgba(255, 255, 255, 0.08)" />
+      <rect id="rpm-bar" class="telemetry-bar" x="25" y="54" width="180" height="13" rx="3.5" fill="url(#rpmFill)" />
+    </g>
   </svg>
 </div>
 
 <script>
-  // Handlers diretos da HUD para 60 FPS estáveis
+  // Elementos do DOM mantidos em cache para 60 FPS estáveis sem reflow
   const elSpeedKmh = document.getElementById('speed-kmh');
   const elSpeedMph = document.getElementById('speed-mph');
   const elSpeedArc = document.getElementById('speed-arc');
@@ -181,8 +233,14 @@
   const elDrsBox = document.getElementById('drs-box');
   const elDrsText = document.getElementById('drs-text');
   const elOvertake = document.getElementById('overtake-badge');
+  const telemetryBadgeEl = document.getElementById('telemetry-badge');
+  const btnStressEl = document.getElementById('btnStress');
 
   const gears = ['N', '1', '2', '3', '4', '5', '6', '7', '8'];
+  const SPEED_CIRCUMFERENCE = 364.4;
+
+  let isStressLoopActive = false;
+  let stressReqId = null;
 
   function updateTelemetry(data) {
     if (!data) return;
@@ -194,48 +252,49 @@
     elSpeedKmh.textContent = kmh;
     elSpeedMph.textContent = mph;
 
-    // Arco de Velocidade (Mapeado de 0 a 360 km/h num perímetro de 408)
+    // Arco Dinâmico de Velocidade (0 a 360 km/h)
     const arcFill = Math.min(kmh, 360) / 360;
-    elSpeedArc.setAttribute('stroke-dashoffset', (408 - (arcFill * 270)).toFixed(1));
+    elSpeedArc.setAttribute('stroke-dashoffset', (SPEED_CIRCUMFERENCE - (arcFill * (SPEED_CIRCUMFERENCE * 0.75))).toFixed(1));
 
-    // 2. Bateria ERS (Largura Máxima: 230px)
+    // 2. Bateria ERS (Largura Máxima: 270px)
     let ers = 99;
     if (payload.ersPercent !== undefined) ers = payload.ersPercent;
     else if (payload.ers_store !== undefined) ers = payload.ers_store;
     else if (payload.ersStoreEnergy !== undefined) ers = (payload.ersStoreEnergy / 4000000) * 100;
     ers = Math.max(0, Math.min(100, ers));
     elErsPercent.textContent = `${Math.round(ers)}%`;
-    elErsBar.setAttribute('width', ((ers / 100) * 230).toFixed(1));
+    elErsBar.setAttribute('width', ((ers / 100) * 270).toFixed(1));
 
-    // 3. Freio (Largura Máxima: 175px) - normaliza 0.0-1.0 vs 0-100
+    // 3. Freio (Largura Máxima: 210px) - normaliza 0.0-1.0 vs 0-100
     let brake = Number(payload.brake) || 0;
     if (brake > 1.0) brake = brake / 100.0;
     brake = Math.max(0, Math.min(1, brake));
-    elBrakeBar.setAttribute('width', (brake * 175).toFixed(1));
+    elBrakeBar.setAttribute('width', (brake * 210).toFixed(1));
 
-    // 4. Acelerador (Largura Máxima: 150px) - normaliza 0.0-1.0 vs 0-100
+    // 4. Acelerador (Largura Máxima: 185px) - normaliza 0.0-1.0 vs 0-100
     let throttle = Number(payload.throttle) || 0;
     if (throttle > 1.0) throttle = throttle / 100.0;
     throttle = Math.max(0, Math.min(1, throttle));
-    elThrottleBar.setAttribute('width', (throttle * 150).toFixed(1));
+    elThrottleBar.setAttribute('width', (throttle * 185).toFixed(1));
 
     // 5. Marchas (Gears)
     const rawGear = payload.gear;
-    const currentGear = (rawGear === 0 || rawGear === '0') ? 'N' : String(rawGear);
+    const currentGear = (rawGear === 0 || rawGear === '0' || rawGear === -1 || rawGear === 'R') ? 'N' : String(rawGear);
     gears.forEach(g => {
       const gNode = document.getElementById(`gear-${g}`);
       if (gNode) {
         const isActive = (g === currentGear);
         gNode.setAttribute('fill', isActive ? '#00f0ff' : '#64748b');
-        gNode.setAttribute('font-size', isActive ? '20' : '14');
+        gNode.setAttribute('font-size', isActive ? '22' : '14');
+        gNode.setAttribute('font-weight', isActive ? '900' : '800');
       }
     });
 
-    // 6. Tacômetro RPM (Largura Máxima: 230px)
+    // 6. Tacômetro RPM (Largura Máxima: 270px)
     const rpmMax = payload.maxRPM || payload.max_rpm || 15000;
     const rpmVal = payload.engineRPM !== undefined ? payload.engineRPM : (payload.engine_rpm || 0);
     const rpmNorm = Math.max(0, Math.min(1, rpmVal / rpmMax));
-    elRpmBar.setAttribute('width', (rpmNorm * 230).toFixed(1));
+    elRpmBar.setAttribute('width', (rpmNorm * 270).toFixed(1));
 
     // 7. DRS e Overtake
     const isDrs = Boolean(payload.drs || payload.drsAllowed);
@@ -253,12 +312,141 @@
     elOvertake.style.opacity = isOvt ? '1' : '0';
   }
 
-  // Conexão WebSocket de Produção com Reconnect
+  // SIMULADOR DE TESTE REALISTA (F1 PHYSICS)
+  const GEAR_SPEED_RATIOS = { 1: 0.0072, 2: 0.0105, 3: 0.0138, 4: 0.0172, 5: 0.0205, 6: 0.0232, 7: 0.0252, 8: 0.0268 };
+  let stressState = 'accel';
+  let stressGear = 2;
+  let stressRpm = 6800;
+
+  function toggleStressLoop() {
+    if (isStressLoopActive) stopStressLoop();
+    else startStressLoop();
+  }
+
+  function startStressLoop() {
+    isStressLoopActive = true;
+    stressState = 'accel';
+    stressGear = 2;
+    stressRpm = 6800;
+
+    if (btnStressEl) {
+      btnStressEl.textContent = 'Parar Teste';
+      btnStressEl.style.background = '#059669';
+    }
+    telemetryBadgeEl.textContent = 'TESTE F1';
+    telemetryBadgeEl.style.color = '#34d399';
+
+    runStressFrame();
+  }
+
+  function stopStressLoop() {
+    isStressLoopActive = false;
+    if (stressReqId) {
+      cancelAnimationFrame(stressReqId);
+      stressReqId = null;
+    }
+    if (btnStressEl) {
+      btnStressEl.textContent = '[H] Teste';
+      btnStressEl.style.background = 'rgba(15, 23, 42, 0.85)';
+    }
+    telemetryBadgeEl.textContent = 'LIVE 60Hz';
+    telemetryBadgeEl.style.color = '#00f0ff';
+
+    updateTelemetry({ speed: 0, gear: 'N', engineRPM: 0, throttle: 0, brake: 0, ersPercent: 100, overtake: false, drs: 0 });
+  }
+
+  function runStressFrame() {
+    if (!isStressLoopActive) return;
+
+    let thr = 1.0, brk = 0, ovt = false;
+    if (stressState === 'accel') {
+      thr = 1.0; brk = 0;
+      stressRpm += 135;
+      if (stressGear >= 6) ovt = true;
+
+      if (stressRpm >= 13400) {
+        if (stressGear < 8) {
+          stressGear++;
+          stressRpm = 9400;
+        } else {
+          stressState = 'braking';
+          ovt = false;
+        }
+      }
+    } else if (stressState === 'braking') {
+      thr = 0; brk = 1.0;
+      stressRpm -= 240;
+
+      if (stressRpm <= 8800) {
+        if (stressGear > 2) {
+          stressGear--;
+          stressRpm = 11800;
+        } else {
+          stressState = 'accel';
+          stressGear = 2;
+          stressRpm = 6800;
+        }
+      }
+    }
+
+    const ratio = GEAR_SPEED_RATIOS[stressGear] || 0.02;
+    const speed = Math.min(355, Math.max(0, Math.round(stressRpm * ratio)));
+
+    updateTelemetry({
+      speed: speed,
+      gear: stressGear,
+      engineRPM: Math.round(stressRpm),
+      throttle: thr,
+      brake: brk,
+      ersPercent: Math.max(15, 100 - (speed * 0.2)),
+      overtake: ovt,
+      drs: (stressGear >= 7 && ovt) ? 1 : 0
+    });
+
+    stressReqId = requestAnimationFrame(runStressFrame);
+  }
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'h' || e.key === 'H') {
+      toggleStressLoop();
+    }
+  });
+
+  // Integração com PyWebView
+  function centerHud() {
+    if (window.pywebview && window.pywebview.api && window.pywebview.api.center_hud) {
+      window.pywebview.api.center_hud();
+    }
+  }
+
+  function closeHud() {
+    if (window.pywebview && window.pywebview.api && window.pywebview.api.close_hud) {
+      window.pywebview.api.close_hud();
+    } else {
+      window.close();
+    }
+  }
+
+  // Conexão WebSocket de Produção com Reconnect Automático
   function connectWS() {
     const wsUrl = `ws://${window.location.hostname || '127.0.0.1'}:8000/ws/telemetry`;
-    const socket = new WebSocket(wsUrl);
+    let socket;
+    try {
+      socket = new WebSocket(wsUrl);
+    } catch (e) {
+      setTimeout(connectWS, 2000);
+      return;
+    }
+
+    socket.onopen = () => {
+      if (!isStressLoopActive) {
+        telemetryBadgeEl.textContent = 'LIVE 60Hz';
+        telemetryBadgeEl.style.color = '#00f0ff';
+      }
+    };
 
     socket.onmessage = (event) => {
+      if (isStressLoopActive) return;
       try {
         const payload = JSON.parse(event.data);
         updateTelemetry(payload);
@@ -266,7 +454,15 @@
     };
 
     socket.onclose = () => {
-      setTimeout(connectWS, 1000);
+      if (!isStressLoopActive) {
+        telemetryBadgeEl.textContent = 'AGUARDANDO F1...';
+        telemetryBadgeEl.style.color = '#f59e0b';
+      }
+      setTimeout(connectWS, 2000);
+    };
+
+    socket.onerror = () => {
+      try { socket.close(); } catch(e) {}
     };
   }
 
