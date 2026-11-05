@@ -80,9 +80,28 @@ f1-custom-hud/
 
 ---
 
-## 4. Como Executar o Projeto
+## 4. Como Executar e Instalar (Pronto para o Jogo em 1 Clique)
 
-### Opção A: Execução via Docker (Recomendada)
+### Instalação no PC (Para você ou seu irmão após clonar o repositório):
+
+1. **Clone o repositório:**
+   ```cmd
+   git clone https://github.com/augdev1/custom_f1_hud.git
+   cd custom_f1_hud
+   ```
+
+2. **Dê 2 cliques em `instalar_no_pc.bat`:**
+   - Detecta o Python automaticamente (ou instala via `winget` se não houver).
+   - Cria o ambiente virtual isolado `.venv`.
+   - Instala todas as dependências do `requirements.txt`.
+   - Instala as extensões recomendadas do VS Code caso utilize o editor (`instalar_extensoes.bat`).
+   - Cria o atalho oficial **F1 24 Custom HUD** diretamente na sua Área de Trabalho.
+
+3. **Iniciar a HUD:**
+   - Abra o atalho **F1 24 Custom HUD** na Área de Trabalho ou execute `iniciar_hud.bat`.
+   - Para abrir o Studio no navegador com simulador e personalização de cores, execute `iniciar_studio.bat`.
+
+---
 
 O backend pode ser executado em container Docker (local ou em máquina virtual como VirtualBox).
 

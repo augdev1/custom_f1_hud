@@ -1,5 +1,5 @@
 {
-  "accentColor": "#00D2BE",
+  "accentColor": "#00e676",
   "panelBg": "#9427aa",
   "opacity": 88,
   "borderRadius": 0,
@@ -9,5 +9,11 @@
   "ledHeight": 12,
   "gearSize": "text-7xl",
   "scale": 99,
-  "theme": "mercedes"
+  "theme": "mercedes",
+  "primaryColor": "#00e676",
+  "secondaryColor": "#061611",
+  "ersColor": "#00e676",
+  "throttleColor": "#00e676",
+  "brakeColor": "#ff1744",
+  "gearColor": "#00e676"
 }
