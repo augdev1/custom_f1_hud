@@ -315,6 +315,14 @@ async def preview_studio():
     return {"message": "F1 24 Custom HUD Core API is running. Open /health for status."}
 
 
+@app.get("/cockpit.jpg")
+async def cockpit_image():
+    img_path = STATIC_DIR / "cockpit.jpg"
+    if img_path.exists():
+        return FileResponse(str(img_path))
+    return {"message": "cockpit.jpg not found"}
+
+
 @app.get("/overlay")
 async def in_game_overlay():
     overlay_path = STATIC_DIR / "overlay.html"

@@ -21,6 +21,10 @@
       --accent-color: #00D2BE;
       --accent-glow: rgba(0, 210, 190, 0.45);
       --halo-rail: #00D2BE;
+      --throttle-color: #00E676;
+      --brake-color: #FF1744;
+      --ers-color: #00D2BE;
+      --gear-color: #00D2BE;
     }
 
     * {
@@ -143,13 +147,13 @@
     }
 
     .pedal-seg.active-thr {
-      background: #00E676 !important;
-      box-shadow: 0 0 6px rgba(0, 230, 118, 0.9) !important;
+      background: var(--throttle-color, #00E676) !important;
+      box-shadow: 0 0 6px var(--throttle-color, #00E676) !important;
     }
 
     .pedal-seg.active-brk {
-      background: #FF1744 !important;
-      box-shadow: 0 0 6px rgba(255, 23, 68, 0.9) !important;
+      background: var(--brake-color, #FF1744) !important;
+      box-shadow: 0 0 6px var(--brake-color, #FF1744) !important;
     }
 
     /* GEAR STRIP (R N 1 2 3 4 5 6 7 8) */
@@ -169,8 +173,8 @@
 
     .gear-item.active {
       color: #000000 !important;
-      background-color: var(--accent-color, #00D2BE) !important;
-      box-shadow: 0 0 12px var(--accent-color, #00D2BE) !important;
+      background-color: var(--gear-color, var(--accent-color, #00D2BE)) !important;
+      box-shadow: 0 0 12px var(--gear-color, var(--accent-color, #00D2BE)) !important;
       font-weight: 900 !important;
       transform: scale(1.15);
     }
@@ -572,12 +576,44 @@
       }
     }
 
-    // Accent Color Application
+    // Dynamic Config and Multi-Color Application
+    function applyConfig(cfg) {
+      if (!cfg) return;
+      const primary = cfg.primaryColor || cfg.accentColor;
+      if (primary) {
+        document.documentElement.style.setProperty('--accent-color', primary);
+        document.documentElement.style.setProperty('--accent-glow', `${primary}55`);
+        document.documentElement.style.setProperty('--halo-rail', primary);
+        document.documentElement.style.setProperty('--gear-color', primary);
+      }
+      if (cfg.secondaryColor || cfg.panelBg) {
+        const sec = cfg.secondaryColor || cfg.panelBg;
+        document.documentElement.style.setProperty('--secondary-color', sec);
+        const root = document.getElementById('hudRoot');
+        if (root) {
+          root.style.background = `linear-gradient(135deg, ${sec}cc 0%, rgba(7, 10, 18, 0.90) 100%)`;
+        }
+      }
+      if (cfg.throttleColor) {
+        document.documentElement.style.setProperty('--throttle-color', cfg.throttleColor);
+      }
+      if (cfg.brakeColor) {
+        document.documentElement.style.setProperty('--brake-color', cfg.brakeColor);
+      }
+      if (cfg.gearColor) {
+        document.documentElement.style.setProperty('--gear-color', cfg.gearColor);
+      }
+      if (cfg.ersColor) {
+        document.documentElement.style.setProperty('--ers-color', cfg.ersColor);
+        const ersBar = document.getElementById('ersBar');
+        if (ersBar) {
+          ersBar.style.background = `linear-gradient(to right, ${cfg.ersColor}, #0077b6)`;
+        }
+      }
+    }
+
     function applyAccentColor(colorHex) {
-      if (!colorHex) return;
-      document.documentElement.style.setProperty('--accent-color', colorHex);
-      document.documentElement.style.setProperty('--accent-glow', `${colorHex}55`);
-      document.documentElement.style.setProperty('--halo-rail', colorHex);
+      applyConfig({ primaryColor: colorHex });
     }
 
     // Window Centering via PyWebview API
@@ -623,11 +659,11 @@
           const raw = JSON.parse(evt.data);
           if (raw.type === 'config_update') {
             const cfg = raw.config || raw.data || raw;
-            if (cfg && cfg.accentColor) applyAccentColor(cfg.accentColor);
+            applyConfig(cfg);
             return;
           }
           if (raw.accentColor && raw.speed === undefined) {
-            applyAccentColor(raw.accentColor);
+            applyConfig(raw);
             return;
           }
 
@@ -669,7 +705,7 @@
         const res = await fetch(configUrl);
         if (res.ok) {
           const cfg = await res.json();
-          if (cfg.accentColor) applyAccentColor(cfg.accentColor);
+          applyConfig(cfg);
         }
       } catch (e) { }
     }
