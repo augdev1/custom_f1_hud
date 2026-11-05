@@ -28,3 +28,4 @@ echo O atalho 'F1 24 Custom HUD' foi criado na sua Area de Trabalho.
 echo ========================================================
 echo.
 pause
+

@@ -3,15 +3,20 @@ $WshShell = New-Object -ComObject WScript.Shell
 $DesktopPath = [System.Environment]::GetFolderPath('Desktop')
 $ShortcutPath = Join-Path -Path $DesktopPath -ChildPath "F1 24 Custom HUD.lnk"
 
-$BaseDir = Resolve-Path (Join-Path $PSScriptRoot "..")
-$VbsLauncher = Join-Path $BaseDir "iniciar_hud.vbs"
-$WorkingDir = $BaseDir.Path
+$BaseDir = (Resolve-Path (Join-Path $PSScriptRoot "..")).Path
+$VenvPythonw = Join-Path $BaseDir ".venv\Scripts\pythonw.exe"
+if (-not (Test-Path $VenvPythonw)) {
+    $VenvPythonw = "pythonw.exe"
+}
+$WorkingDir = $BaseDir
+$ScriptFile = Join-Path $BaseDir "run_overlay.py"
+$ScriptArgs = "`"$ScriptFile`""
 
 $Shortcut = $WshShell.CreateShortcut($ShortcutPath)
-$Shortcut.TargetPath = "wscript.exe"
-$Shortcut.Arguments = "`"$VbsLauncher`""
+$Shortcut.TargetPath = $VenvPythonw
+$Shortcut.Arguments = $ScriptArgs
 $Shortcut.WorkingDirectory = $WorkingDir
-$Shortcut.Description = "Iniciar F1 24 Custom HUD Overlay (1 Clique sem janela preta)"
+$Shortcut.Description = "F1 24 Custom HUD - Painel de Telemetria Flutuante"
 $Shortcut.IconLocation = "$env:SystemRoot\System32\shell32.dll,14"
 $Shortcut.Save()
 

@@ -7,6 +7,13 @@ Press F8 or click Travar to lock into Race Mode (click-through).
 
 import os
 import sys
+
+# Guarantee stdout and stderr exist when running headless under pythonw on Windows
+if sys.stdout is None:
+    sys.stdout = open(os.devnull, "w", encoding="utf-8")
+if sys.stderr is None:
+    sys.stderr = open(os.devnull, "w", encoding="utf-8")
+
 import json
 import time
 import ctypes
