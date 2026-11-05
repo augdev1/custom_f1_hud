@@ -425,9 +425,7 @@ def main():
     # Check / start backend server automatically
     ensure_backend_running()
     overlay_html_file = os.path.abspath(os.path.join(os.path.dirname(__file__), "backend", "static", "overlay.html"))
-    # Carrega diretamente o arquivo local com cache buster para refletir alteracoes imediatamente no WebView2
-    cache_buster = int(time.time())
-    overlay_url = f"file:///{overlay_html_file.replace(os.sep, '/')}?v={cache_buster}"
+    overlay_url = f"file:///{overlay_html_file.replace(os.sep, '/')}"
 
     api = OverlayAPI()
 
