@@ -122,7 +122,7 @@ def get_overlay_hwnd():
 
 def configure_window_transparency(hwnd, clickthrough=False):
     """
-    Applies Hardware Window Region Clipping (24px rounded corners),
+    Applies Hardware Window Region Clipping (20px rounded corners),
     DWM Frame Extension, and HWND_TOPMOST.
     Eliminates 100% of any black/white bounding box in hardware across any monitor/DPI scaling,
     and forces the window to stay strictly superimposed on top of F1 24.
@@ -131,16 +131,18 @@ def configure_window_transparency(hwnd, clickthrough=False):
         return
 
     try:
-        # 1. Hardware Rounded Region: calculates exact physical bounds (DPI-aware for any monitor)
+        # 1. Hardware Rounded Region: always ensures at least HUD_WIDTH x HUD_HEIGHT
         rect = RECT()
         if user32.GetWindowRect(hwnd, ctypes.byref(rect)):
-            w = rect.right - rect.left
-            h = rect.bottom - rect.top
+            measured_w = rect.right - rect.left
+            measured_h = rect.bottom - rect.top
+            w = measured_w if measured_w >= 700 else HUD_WIDTH
+            h = measured_h if measured_h >= 100 else HUD_HEIGHT
         else:
             w, h = HUD_WIDTH, HUD_HEIGHT
 
-        radius_x = max(16, int(24 * (w / 896)))
-        radius_y = max(16, int(24 * (h / 175)))
+        radius_x = max(16, int(20 * (w / HUD_WIDTH)))
+        radius_y = max(16, int(20 * (h / HUD_HEIGHT)))
         rgn = gdi32.CreateRoundRectRgn(0, 0, w, h, radius_x, radius_y)
         user32.SetWindowRgn(hwnd, rgn, True)
     except Exception:
@@ -250,12 +252,20 @@ class OverlayAPI:
 
 
 def startup_transparency_worker(window):
-    """Monitors window initialization and applies Win32 hardware transparency immediately."""
+    """Monitors window initialization and applies Win32 hardware transparency immediately once fully sized."""
     print("[HUD Overlay] Aguardando inicialização da janela para aplicar transparência...")
     for _ in range(60):
         time.sleep(0.1)
         hwnd = get_overlay_hwnd()
         if hwnd:
+            rect = RECT()
+            if user32.GetWindowRect(hwnd, ctypes.byref(rect)):
+                w = rect.right - rect.left
+                # Pywebview WinForms starts at ~280px before expanding to HUD_WIDTH (896px).
+                # Wait until window has expanded to prevent premature clipping!
+                if w < 700:
+                    continue
+
             native = getattr(window, "native", None)
             if native:
                 try:
