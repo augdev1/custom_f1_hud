@@ -44,8 +44,8 @@ dwmapi = ctypes.windll.dwmapi
 
 CONFIG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "hud_position.json")
 
-HUD_WIDTH = 980
-HUD_HEIGHT = 240
+HUD_WIDTH = 896
+HUD_HEIGHT = 175
 
 is_clickthrough_active = False
 app_window = None
@@ -405,7 +405,7 @@ def kill_previous_hud_instances():
         hwnd = user32.FindWindowW(None, "F1 24 Live HUD Overlay")
         if hwnd and user32.IsWindow(hwnd):
             user32.PostMessageW(hwnd, 0x0010, 0, 0)  # WM_CLOSE
-            time.sleep(0.3)
+            time.sleep(0.2)
     except Exception:
         pass
 
@@ -425,6 +425,7 @@ def main():
     # Check / start backend server automatically
     ensure_backend_running()
     overlay_html_file = os.path.abspath(os.path.join(os.path.dirname(__file__), "backend", "static", "overlay.html"))
+    # Carrega diretamente o arquivo local para refletir alterações em tempo real
     overlay_url = f"file:///{overlay_html_file.replace(os.sep, '/')}"
 
     api = OverlayAPI()
