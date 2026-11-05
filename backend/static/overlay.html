@@ -70,8 +70,8 @@
 
 <body class="w-full h-full p-0 m-0 select-none flex flex-col justify-center items-center overflow-hidden relative">
 
-  <!-- DISCREET QUICK CONTROLS (Positioned at top right of the chassis) -->
-  <div class="absolute top-1 right-14 z-50 flex items-center gap-1.5 no-drag font-mono text-[9px]">
+  <!-- DISCREET QUICK CONTROLS (Positioned horizontally centered above the chassis) -->
+  <div class="absolute top-2 left-1/2 -translate-x-1/2 z-50 flex items-center gap-1.5 no-drag font-mono text-[9px] opacity-40 hover:opacity-100 transition-opacity duration-200">
     <span id="telemetry-badge"
       class="px-2 py-0.5 rounded-full font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-400/30 shadow-sm">
       LIVE 60Hz
@@ -143,13 +143,13 @@
         Q 530,22 575,52
         L 845,75
         Q 860,82 860,98
-        L 860,152
-        Q 860,168 845,175
-        L 575,155
-        Q 530,190 480,190
-        Q 430,190 385,155
-        L 115,175
-        Q 100,168 100,152
+        L 860,154
+        Q 860,170 845,178
+        L 575,168
+        Q 530,196 480,196
+        Q 430,196 385,168
+        L 115,178
+        Q 100,170 100,154
         L 100,98
         Q 100,82 115,75
         Z
@@ -160,27 +160,27 @@
       <path d="M 580,56 L 840,79" stroke="rgba(255, 255, 255, 0.15)" stroke-width="1" />
 
       <!-- 2. ASA ESQUERDA: ERS BATTERY & BRAKE -->
-      <text x="135" y="92" fill="#94A3B8" font-size="11" font-weight="800" letter-spacing="1.2">ERS BATTERY</text>
-      <text id="ers-percent" x="365" y="92" text-anchor="end" fill="#FFFFFF" font-size="20" font-weight="900"
+      <text x="135" y="88" fill="#94A3B8" font-size="11" font-weight="800" letter-spacing="1.2">ERS BATTERY</text>
+      <text id="ers-percent" x="365" y="88" text-anchor="end" fill="#FFFFFF" font-size="19" font-weight="900"
         font-family="'JetBrains Mono'" class="tabular-nums">100%</text>
 
       <!-- ERS Progress Bar -->
-      <rect x="135" y="102" width="230" height="10" rx="3" fill="rgba(255,255,255,0.08)" />
-      <rect id="ers-bar" x="135" y="102" width="230" height="10" rx="3" fill="url(#ersGradient)" />
+      <rect x="135" y="96" width="230" height="9" rx="2.5" fill="rgba(255,255,255,0.08)" />
+      <rect id="ers-bar" x="135" y="96" width="230" height="9" rx="2.5" fill="url(#ersGradient)" />
 
       <!-- Brake Bar -->
-      <text x="135" y="136" fill="#EF4444" font-size="11" font-weight="800" letter-spacing="1">BRAKE</text>
-      <rect x="190" y="127" width="175" height="9" rx="2.5" fill="rgba(255,255,255,0.08)" />
-      <rect id="brake-bar" x="190" y="127" width="0" height="9" rx="2.5" fill="#EF4444" />
+      <text x="135" y="124" fill="#EF4444" font-size="11" font-weight="800" letter-spacing="1">BRAKE</text>
+      <rect x="190" y="116" width="175" height="8" rx="2" fill="rgba(255,255,255,0.08)" />
+      <rect id="brake-bar" x="190" y="116" width="0" height="8" rx="2" fill="#EF4444" />
 
       <!-- DRS Status Badge -->
       <g id="drs-badge">
-        <rect id="drs-box" x="135" y="150" width="65" height="18" rx="3" fill="rgba(255,255,255,0.06)"
+        <rect id="drs-box" x="135" y="136" width="60" height="16" rx="3" fill="rgba(255,255,255,0.06)"
           stroke="rgba(255,255,255,0.12)" stroke-width="1" />
-        <text id="drs-text" x="167" y="163" text-anchor="middle" fill="#94A3B8" font-size="9" font-weight="800"
+        <text id="drs-text" x="165" y="148" text-anchor="middle" fill="#94A3B8" font-size="8.5" font-weight="800"
           font-family="'JetBrains Mono'">DRS</text>
       </g>
-      <text x="365" y="162" text-anchor="end" fill="rgba(255,255,255,0.25)" font-size="8" font-weight="700"
+      <text x="365" y="148" text-anchor="end" fill="rgba(255,255,255,0.25)" font-size="8" font-weight="700"
         letter-spacing="1.5">F1 BROADCAST</text>
 
       <!-- 3. DOMO CENTRAL: VELOCÍMETRO DUPLO COM TACÔMETRO ARREDONDADO -->
@@ -207,37 +207,37 @@
 
       <!-- 4. CONTEÚDO ASA DIREITA (100% CONTIDO NO CORPO) -->
       <!-- Acelerador (Throttle) -->
-      <text x="645" y="86" fill="#10B981" font-size="10" font-weight="900" letter-spacing="1">THROTTLE</text>
-      <rect x="715" y="80" width="135" height="8" rx="2" fill="rgba(255, 255, 255, 0.08)" />
-      <rect id="throttle-bar" x="715" y="80" width="0" height="8" rx="2" fill="#10B981" />
+      <text x="645" y="88" fill="#10B981" font-size="10" font-weight="900" letter-spacing="1">THROTTLE</text>
+      <rect x="715" y="81" width="135" height="8" rx="2" fill="rgba(255, 255, 255, 0.08)" />
+      <rect id="throttle-bar" x="715" y="81" width="0" height="8" rx="2" fill="#10B981" />
 
       <!-- Rótulo e Linha de Marchas -->
-      <text x="645" y="106" fill="#94A3B8" font-size="9" font-weight="800" letter-spacing="1">GEARS</text>
-      <g id="gears-row" font-family="'Chakra Petch', 'JetBrains Mono'" font-size="13" font-weight="700" fill="#64748B" dominant-baseline="central">
-        <text x="626" y="122" id="gear-R">R</text>
-        <text x="650" y="122" id="gear-N">N</text>
-        <text x="674" y="122" id="gear-1">1</text>
-        <text x="698" y="122" id="gear-2">2</text>
-        <text x="722" y="122" id="gear-3">3</text>
-        <text x="746" y="122" id="gear-4">4</text>
-        <text x="770" y="122" id="gear-5">5</text>
-        <text x="794" y="122" id="gear-6">6</text>
-        <text x="818" y="122" id="gear-7">7</text>
-        <text x="842" y="122" id="gear-8">8</text>
+      <text x="645" y="105" fill="#94A3B8" font-size="9" font-weight="800" letter-spacing="1">GEARS</text>
+      <g id="gears-row" font-family="'Chakra Petch', 'JetBrains Mono'" font-size="12.5" font-weight="700" fill="#64748B" dominant-baseline="central">
+        <text x="626" y="120" id="gear-R">R</text>
+        <text x="650" y="120" id="gear-N">N</text>
+        <text x="674" y="120" id="gear-1">1</text>
+        <text x="698" y="120" id="gear-2">2</text>
+        <text x="722" y="120" id="gear-3">3</text>
+        <text x="746" y="120" id="gear-4">4</text>
+        <text x="770" y="120" id="gear-5">5</text>
+        <text x="794" y="120" id="gear-6">6</text>
+        <text x="818" y="120" id="gear-7">7</text>
+        <text x="842" y="120" id="gear-8">8</text>
       </g>
 
       <!-- Cabeçalho RPM e Badge OVERTAKE Integrado Lado a Lado -->
-      <text x="645" y="146" fill="#94A3B8" font-size="9" font-weight="700" letter-spacing="0.5">RPM x1000</text>
+      <text x="645" y="138" fill="#94A3B8" font-size="9" font-weight="700" letter-spacing="0.5">RPM x1000</text>
 
       <!-- Badge OVERTAKE interno (alinhado à direita antes da barra) -->
       <g id="overtake-badge" class="transition-opacity duration-150 opacity-0">
-        <rect x="780" y="137" width="70" height="13" rx="2" fill="#E11D48" />
-        <text x="815" y="144" text-anchor="middle" dominant-baseline="central" fill="#FFFFFF" font-size="8" font-weight="900" letter-spacing="1">OVERTAKE</text>
+        <rect x="780" y="129" width="70" height="14" rx="2" fill="#E11D48" />
+        <text x="815" y="136" text-anchor="middle" dominant-baseline="central" fill="#FFFFFF" font-size="8" font-weight="900" letter-spacing="1">OVERTAKE</text>
       </g>
 
       <!-- Tacômetro RPM (Dentro da asa, margem inferior segura) -->
-      <rect x="645" y="154" width="205" height="10" rx="3" fill="rgba(255, 255, 255, 0.08)" />
-      <rect id="rpm-bar" x="645" y="154" width="0" height="10" rx="3" fill="url(#rpmGradient)" />
+      <rect x="645" y="146" width="205" height="10" rx="3" fill="rgba(255, 255, 255, 0.08)" />
+      <rect id="rpm-bar" x="645" y="146" width="0" height="10" rx="3" fill="url(#rpmGradient)" />
     </svg>
   </main>
 
@@ -453,7 +453,21 @@
       }
       telemetryBadgeEl.textContent = (ws && ws.readyState === WebSocket.OPEN) ? 'LIVE 60Hz' : 'AGUARDANDO F1...';
       telemetryBadgeEl.className = 'px-2 py-0.5 rounded-full font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-400/30 shadow-sm';
+
+      // Reset telemetry readouts back to neutral/idle when stopped
+      applyTelemetryDirect({
+        speed: 0,
+        gear: 'N',
+        engineRPM: 0,
+        throttle: 0,
+        brake: 0,
+        ersPercent: 100,
+        overtake: false,
+        drs: 0
+      });
     }
+
+    const GEAR_SPEED_RATIOS = { 1: 0.0072, 2: 0.0105, 3: 0.0138, 4: 0.0172, 5: 0.0205, 6: 0.0232, 7: 0.0252, 8: 0.0268 };
 
     function runStressFrame() {
       if (!isStressLoopActive) return;
@@ -461,48 +475,48 @@
       if (stressState === 'accel') {
         stressThr = 100;
         stressBrk = 0;
-        stressRpm += 125 + (stressGear * 10);
-        stressSpeed += 0.85 * (9 - stressGear);
+        stressRpm += 135;
+        if (stressGear >= 6) stressOvt = true;
 
-        if (stressGear >= 7) stressOvt = true;
-
-        if (stressRpm >= 13500) {
+        if (stressRpm >= 13400) {
           if (stressGear < 8) {
             stressGear++;
-            stressRpm = 9200;
+            stressRpm = 9400;
           } else {
             stressState = 'braking';
+            stressOvt = false;
           }
         }
       } else if (stressState === 'braking') {
         stressThr = 0;
         stressBrk = 100;
         stressOvt = false;
-        stressSpeed -= 3.8;
-        stressRpm -= 210;
+        stressRpm -= 240;
 
-        if (stressSpeed < 280 && stressGear === 8) { stressGear = 7; stressRpm = 11000; }
-        else if (stressSpeed < 235 && stressGear === 7) { stressGear = 6; stressRpm = 11000; }
-        else if (stressSpeed < 195 && stressGear === 6) { stressGear = 5; stressRpm = 11000; }
-        else if (stressSpeed < 155 && stressGear === 5) { stressGear = 4; stressRpm = 11000; }
-        else if (stressSpeed < 120 && stressGear === 4) { stressGear = 3; stressRpm = 11000; }
-        else if (stressSpeed < 85 && stressGear === 3) { stressGear = 2; stressRpm = 10000; }
-        else if (stressSpeed <= 65) {
-          stressState = 'accel';
-          stressGear = 2;
-          stressRpm = 6500;
+        if (stressRpm <= 8800) {
+          if (stressGear > 2) {
+            stressGear--;
+            stressRpm = 11800;
+          } else {
+            stressState = 'accel';
+            stressGear = 2;
+            stressRpm = 6800;
+          }
         }
       }
 
+      const ratio = GEAR_SPEED_RATIOS[stressGear] || 0.02;
+      stressSpeed = Math.min(355, Math.max(0, Math.round(stressRpm * ratio)));
+
       applyTelemetryDirect({
-        speed: Math.round(stressSpeed),
+        speed: stressSpeed,
         gear: stressGear,
         engineRPM: Math.round(stressRpm),
         throttle: stressThr,
         brake: stressBrk,
         ersPercent: Math.max(10, 100 - (stressSpeed * 0.2)),
         overtake: stressOvt,
-        drs: stressOvt ? 1 : 0
+        drs: (stressGear >= 7 && stressOvt) ? 1 : 0
       });
 
       stressReqId = requestAnimationFrame(runStressFrame);
