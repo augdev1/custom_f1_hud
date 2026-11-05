@@ -45,7 +45,7 @@ dwmapi = ctypes.windll.dwmapi
 CONFIG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "hud_position.json")
 
 HUD_WIDTH = 960
-HUD_HEIGHT = 245
+HUD_HEIGHT = 230
 
 is_clickthrough_active = False
 app_window = None

@@ -51,39 +51,37 @@
       cursor: grabbing;
     }
 
-    /* Glassmorphism blur container */
-    .halo-glass {
-      backdrop-filter: blur(12px) saturate(160%);
-      -webkit-backdrop-filter: blur(12px) saturate(160%);
-    }
-
-    /* Range slider custom styling */
+    /* Custom Range Sliders */
     input[type=range] {
       accent-color: #00E5FF;
     }
   </style>
 </head>
 
-<body class="w-full h-full p-0 m-0 select-none flex flex-col justify-between overflow-hidden">
+<body class="w-full h-full p-0 m-0 select-none flex flex-col justify-start items-center overflow-hidden">
 
-  <!-- TOP SLIM CONTROL & DRAG HEADER -->
-  <header id="dragHeader"
-    class="pywebview-drag-region w-full h-6 px-3 flex items-center justify-between text-xs font-mono select-none bg-black/40 border-b border-white/5">
+  <!-- TOP MINIMAL FLOATING CONTROLS PILL -->
+  <div id="hudControls"
+    class="pywebview-drag-region w-[640px] max-w-[95%] h-6 px-3 mt-1 rounded-full bg-slate-950/80 backdrop-blur-md border border-cyan-500/25 shadow-lg flex items-center justify-between text-xs font-mono select-none z-50">
     <div class="flex items-center gap-2">
       <i data-lucide="grip-horizontal" class="w-3.5 h-3.5 text-cyan-400"></i>
-      <span class="font-black tracking-widest uppercase text-[10px] text-gray-200">F1 HALO COCKPIT</span>
+      <span class="font-black tracking-widest uppercase text-[10px] text-gray-200">F1 HALO HUD</span>
       <span id="telemetry-badge"
         class="px-2 py-0.2 rounded text-[8px] font-mono font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-400/30">
         LIVE 60Hz
       </span>
-      <span class="text-[8px] text-gray-400 font-mono hidden sm:inline">[H] Test Harness</span>
     </div>
 
     <div class="flex items-center gap-1.5" style="-webkit-app-region: no-drag;">
-      <button onclick="toggleHarness()"
-        class="px-2 py-0.5 rounded bg-white/10 hover:bg-white/20 text-cyan-300 hover:text-white text-[9px] font-semibold transition active:scale-95 border border-cyan-500/30"
-        title="Alternar Sandbox de Testes (Tecla H)">
-        Harness
+      <button id="btnStressQuick" onclick="toggleStressLoop()"
+        class="px-2 py-0.5 rounded bg-cyan-500/20 hover:bg-cyan-500/40 text-cyan-300 hover:text-white text-[9px] font-bold transition active:scale-95 border border-cyan-400/30"
+        title="Alternar Simulação Stress Loop (Atalho: Tecla H)">
+        [H] Stress Loop
+      </button>
+      <button onclick="toggleHarnessModal()"
+        class="px-2 py-0.5 rounded bg-white/10 hover:bg-white/20 text-gray-300 hover:text-white text-[9px] font-semibold transition active:scale-95 border border-white/10"
+        title="Abrir sliders manuais">
+        Sliders
       </button>
       <button onclick="centerHud(event)"
         class="px-2 py-0.5 rounded bg-white/10 hover:bg-white/20 text-gray-300 hover:text-white text-[9px] font-semibold transition active:scale-95 border border-white/10"
@@ -96,33 +94,37 @@
         &times;
       </button>
     </div>
-  </header>
+  </div>
 
-  <!-- MAIN VECTOR HALO HUD PROFILE (SVG ViewBox 0 0 960 220) -->
-  <main id="hud-container" class="relative w-full max-w-[960px] mx-auto select-none font-['Rajdhani'] flex-1 flex items-center justify-center">
-    <svg viewBox="0 0 960 220" class="w-full h-auto drop-shadow-[0_8px_16px_rgba(0,0,0,0.65)] filter">
+  <!-- MAIN UNIFIED VECTOR F1 HALO HUD (ViewBox: 0 0 960 220) -->
+  <main id="hud-container" class="relative w-full max-w-[960px] mx-auto select-none font-['Rajdhani'] flex-1 flex items-center justify-center -mt-1">
+    <svg viewBox="0 0 960 220" class="w-full h-auto drop-shadow-[0_10px_20px_rgba(0,0,0,0.7)] filter">
       <defs>
-        <!-- Gradients -->
+        <!-- Battery Gradient -->
         <linearGradient id="ersGradient" x1="0%" y1="0%" x2="100%" y2="0%">
           <stop offset="0%" stop-color="#00E5FF" />
           <stop offset="100%" stop-color="#0077B6" />
         </linearGradient>
-        
+
+        <!-- Tachometer RPM Gradient -->
         <linearGradient id="rpmGradient" x1="0%" y1="0%" x2="100%" y2="0%">
           <stop offset="0%" stop-color="#00FF66" />
           <stop offset="68%" stop-color="#FFDD00" />
           <stop offset="92%" stop-color="#FF0055" />
         </linearGradient>
 
-        <linearGradient id="haloWingLeftGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stop-color="rgba(12, 22, 38, 0.72)" />
-          <stop offset="100%" stop-color="rgba(8, 14, 26, 0.85)" />
+        <!-- Master Halo Chassis Background Gradient -->
+        <linearGradient id="chassisGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stop-color="rgba(14, 24, 42, 0.88)" />
+          <stop offset="50%" stop-color="rgba(8, 14, 26, 0.94)" />
+          <stop offset="100%" stop-color="rgba(14, 24, 42, 0.88)" />
         </linearGradient>
 
-        <linearGradient id="haloWingRightGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stop-color="rgba(8, 14, 26, 0.85)" />
-          <stop offset="100%" stop-color="rgba(12, 22, 38, 0.72)" />
-        </linearGradient>
+        <!-- Center Pod Radial Depth -->
+        <radialGradient id="podRadial" cx="50%" cy="50%" r="50%">
+          <stop offset="0%" stop-color="rgba(20, 36, 60, 0.90)" />
+          <stop offset="85%" stop-color="rgba(6, 12, 22, 0.95)" />
+        </radialGradient>
 
         <!-- Dynamic Accent Glow Filter -->
         <filter id="accentGlow" x="-20%" y="-20%" width="140%" height="140%">
@@ -134,173 +136,159 @@
         </filter>
       </defs>
 
-      <!-- Asa Esquerda (Perfil Halo Inclinado) -->
-      <path d="M 120 170 L 360 145 L 360 65 L 140 85 Z" fill="rgba(10, 20, 35, 0.78)" stroke="rgba(0, 229, 255, 0.28)" stroke-width="1.5" />
-      <path d="M 140 85 L 360 65" stroke="rgba(255, 255, 255, 0.15)" stroke-width="1" />
-      
-      <!-- Domo Central (Speedometer Semicircular Pod) -->
-      <path d="M 370 145 C 370 70, 590 70, 590 145 Z" fill="rgba(8, 16, 28, 0.90)" stroke="rgba(0, 229, 255, 0.40)" stroke-width="2" />
-      <path d="M 370 145 C 410 168, 550 168, 590 145" fill="none" stroke="rgba(0, 229, 255, 0.25)" stroke-width="1" />
+      <!-- 1. UNIFIED AERODYNAMIC HALO CHASSIS CONTOUR (Continuous Curved Silhouette) -->
+      <path d="
+        M 125,82
+        Q 110,88 110,105
+        L 110,165
+        Q 110,182 125,185
+        L 365,160
+        Q 410,188 480,188
+        Q 550,188 595,160
+        L 835,185
+        Q 850,182 850,165
+        L 850,105
+        Q 850,88 835,82
+        L 595,58
+        Q 550,30 480,30
+        Q 410,30 365,58
+        Z
+      " fill="url(#chassisGrad)" stroke="rgba(0, 229, 255, 0.35)" stroke-width="1.5" />
 
-      <!-- Asa Direita (Perfil Halo Inclinado) -->
-      <path d="M 600 145 L 840 170 L 820 85 L 600 65 Z" fill="rgba(10, 20, 35, 0.78)" stroke="rgba(0, 229, 255, 0.28)" stroke-width="1.5" />
-      <path d="M 600 65 L 820 85" stroke="rgba(255, 255, 255, 0.15)" stroke-width="1" />
+      <!-- Top Halo Structural Ribs -->
+      <path d="M 130,86 L 360,63" stroke="rgba(255, 255, 255, 0.15)" stroke-width="1" />
+      <path d="M 600,63 L 830,86" stroke="rgba(255, 255, 255, 0.15)" stroke-width="1" />
 
-      <!-- 1. ASA ESQUERDA: ERS & BRAKE -->
-      <text x="160" y="105" fill="#94A3B8" font-size="11" font-weight="700" letter-spacing="1">ERS BATTERY</text>
-      <text id="ers-percent" x="340" y="105" text-anchor="end" fill="#FFFFFF" font-size="18" font-weight="900" font-family="'JetBrains Mono'" class="tabular-nums">100%</text>
+      <!-- 2. ASA ESQUERDA: ERS BATTERY & FREIO -->
+      <text x="145" y="98" fill="#94A3B8" font-size="11" font-weight="800" letter-spacing="1.2">ERS BATTERY</text>
+      <text id="ers-percent" x="370" y="98" text-anchor="end" fill="#FFFFFF" font-size="20" font-weight="900" font-family="'JetBrains Mono'" class="tabular-nums">100%</text>
       
-      <!-- ERS Battery Progress Bar -->
-      <rect x="160" y="115" width="180" height="8" rx="2" fill="rgba(255,255,255,0.08)" />
-      <rect id="ers-bar" x="160" y="115" width="180" height="8" rx="2" fill="url(#ersGradient)" />
+      <!-- ERS Progress Bar -->
+      <rect x="145" y="108" width="225" height="10" rx="3" fill="rgba(255,255,255,0.08)" />
+      <rect id="ers-bar" x="145" y="108" width="225" height="10" rx="3" fill="url(#ersGradient)" />
       
       <!-- Brake Bar -->
-      <text x="160" y="145" fill="#EF4444" font-size="10" font-weight="800" letter-spacing="0.5">BRAKE</text>
-      <rect x="210" y="137" width="130" height="6" rx="1.5" fill="rgba(255,255,255,0.08)" />
-      <rect id="brake-bar" x="210" y="137" width="0" height="6" rx="1.5" fill="#EF4444" />
+      <text x="145" y="142" fill="#EF4444" font-size="11" font-weight="800" letter-spacing="1">BRAKE</text>
+      <rect x="200" y="133" width="170" height="9" rx="2.5" fill="rgba(255,255,255,0.08)" />
+      <rect id="brake-bar" x="200" y="133" width="0" height="9" rx="2.5" fill="#EF4444" />
 
-      <!-- 2. DOMO CENTRAL: VELOCÍMETRO DUPLO (KM/H + MPH) -->
-      <circle cx="480" cy="115" r="48" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="4" />
-      <circle id="speed-arc" cx="480" cy="115" r="48" fill="none" stroke="#00E5FF" stroke-width="4.5"
-        stroke-dasharray="301.59" stroke-dashoffset="301.59" stroke-linecap="round"
-        transform="rotate(-90 480 115)" filter="url(#accentGlow)" />
+      <!-- DRS Status Badge -->
+      <g id="drs-badge">
+        <rect id="drs-box" x="145" y="156" width="65" height="18" rx="3" fill="rgba(255,255,255,0.06)" stroke="rgba(255,255,255,0.12)" stroke-width="1" />
+        <text id="drs-text" x="177" y="169" text-anchor="middle" fill="#94A3B8" font-size="9" font-weight="800" font-family="'JetBrains Mono'">DRS</text>
+      </g>
+      <text x="370" y="168" text-anchor="end" fill="rgba(255,255,255,0.25)" font-size="8" font-weight="700" letter-spacing="1.5">F1 BROADCAST</text>
+
+      <!-- 3. DOMO CENTRAL: VELOCÍMETRO DUPLO COM TACÔMETRO ARREDONDADO -->
+      <circle cx="480" cy="109" r="54" fill="url(#podRadial)" stroke="rgba(0, 229, 255, 0.3)" stroke-width="1.5" />
       
-      <text x="480" y="85" text-anchor="middle" fill="#94A3B8" font-size="9" font-weight="800" letter-spacing="1">KM/H</text>
-      <text id="speed-kmh" x="480" y="115" text-anchor="middle" fill="#FFFFFF" font-size="34" font-weight="900" font-family="'JetBrains Mono'" class="tabular-nums">0</text>
-      <line x1="460" y1="120" x2="500" y2="120" stroke="rgba(255,255,255,0.15)" stroke-width="1" />
-      <text id="speed-mph" x="480" y="133" text-anchor="middle" fill="#CBD5E1" font-size="16" font-weight="700" font-family="'JetBrains Mono'" class="tabular-nums">0</text>
-      <text x="480" y="145" text-anchor="middle" fill="#64748B" font-size="8" font-weight="800" letter-spacing="0.5">MPH</text>
+      <!-- Speed Progress Arc (r=50, circumference=314.16) -->
+      <circle cx="480" cy="109" r="50" fill="none" stroke="rgba(255, 255, 255, 0.08)" stroke-width="4.5" />
+      <circle id="speed-arc" cx="480" cy="109" r="50" fill="none" stroke="#00E5FF" stroke-width="4.5"
+        stroke-dasharray="314.16" stroke-dashoffset="314.16" stroke-linecap="round"
+        transform="rotate(-90 480 109)" filter="url(#accentGlow)" />
+      
+      <!-- Speed Readouts -->
+      <text x="480" y="76" text-anchor="middle" fill="#94A3B8" font-size="9" font-weight="800" letter-spacing="1">KM/H</text>
+      <text id="speed-kmh" x="480" y="112" text-anchor="middle" fill="#FFFFFF" font-size="38" font-weight="900" font-family="'JetBrains Mono'" class="tabular-nums">0</text>
+      <line x1="455" y1="118" x2="505" y2="118" stroke="rgba(255,255,255,0.2)" stroke-width="1" />
+      <text id="speed-mph" x="480" y="135" text-anchor="middle" fill="#CBD5E1" font-size="16" font-weight="700" font-family="'JetBrains Mono'" class="tabular-nums">0</text>
+      <text x="480" y="146" text-anchor="middle" fill="#64748B" font-size="8" font-weight="800" letter-spacing="0.5">MPH</text>
+      <text id="gear-center" x="480" y="166" text-anchor="middle" fill="#00E5FF" font-size="14" font-weight="900" font-family="'JetBrains Mono'">N</text>
 
-      <!-- 3. ASA DIREITA: THROTTLE, MARCHAS & TACÔMETRO -->
-      <text x="620" y="85" fill="#10B981" font-size="10" font-weight="800" letter-spacing="0.5">THROTTLE</text>
-      <rect x="680" y="77" width="120" height="6" rx="1.5" fill="rgba(255,255,255,0.08)" />
-      <rect id="throttle-bar" x="680" y="77" width="0" height="6" rx="1.5" fill="#10B981" />
+      <!-- 4. ASA DIREITA: THROTTLE, MARCHAS & RPM -->
+      <text x="590" y="98" fill="#10B981" font-size="11" font-weight="800" letter-spacing="1">THROTTLE</text>
+      <rect x="660" y="89" width="155" height="9" rx="2.5" fill="rgba(255,255,255,0.08)" />
+      <rect id="throttle-bar" x="660" y="89" width="0" height="9" rx="2.5" fill="#10B981" />
 
       <!-- Horizontal Gear Strip (R N 1 2 3 4 5 6 7 8) -->
-      <g id="gears-row" font-family="'JetBrains Mono'" font-size="13" font-weight="700" fill="#64748B">
-        <text x="605" y="112" id="gear-R">R</text>
-        <text x="625" y="112" id="gear-N" fill="#00E5FF" font-size="15" font-weight="900">N</text>
-        <text x="645" y="112" id="gear-1">1</text>
-        <text x="665" y="112" id="gear-2">2</text>
-        <text x="685" y="112" id="gear-3">3</text>
-        <text x="705" y="112" id="gear-4">4</text>
-        <text x="725" y="112" id="gear-5">5</text>
-        <text x="745" y="112" id="gear-6">6</text>
-        <text x="765" y="112" id="gear-7">7</text>
-        <text x="785" y="112" id="gear-8">8</text>
+      <g id="gears-row" font-family="'JetBrains Mono'" font-size="13" font-weight="700">
+        <text x="592" y="122" id="gear-R" fill="#64748B">R</text>
+        <text x="615" y="122" id="gear-N" fill="#00E5FF" font-size="15" font-weight="900">N</text>
+        <text x="638" y="122" id="gear-1" fill="#64748B">1</text>
+        <text x="661" y="122" id="gear-2" fill="#64748B">2</text>
+        <text x="684" y="122" id="gear-3" fill="#64748B">3</text>
+        <text x="707" y="122" id="gear-4" fill="#64748B">4</text>
+        <text x="730" y="122" id="gear-5" fill="#64748B">5</text>
+        <text x="753" y="122" id="gear-6" fill="#64748B">6</text>
+        <text x="776" y="122" id="gear-7" fill="#64748B">7</text>
+        <text x="799" y="122" id="gear-8" fill="#64748B">8</text>
       </g>
 
-      <!-- RPM Tachometer -->
-      <text x="620" y="135" fill="#94A3B8" font-size="9" font-weight="700" letter-spacing="1">RPM x1000</text>
-      <text id="rpm-num" x="800" y="135" text-anchor="end" fill="#CBD5E1" font-size="10" font-weight="700" font-family="'JetBrains Mono'" class="tabular-nums">0</text>
-      <rect x="620" y="142" width="180" height="8" rx="2" fill="rgba(255,255,255,0.08)" />
-      <rect id="rpm-bar" x="620" y="142" width="0" height="8" rx="2" fill="url(#rpmGradient)" />
+      <!-- RPM Tachometer Bar & Number -->
+      <text x="590" y="144" fill="#94A3B8" font-size="10" font-weight="800" letter-spacing="1">RPM x1000</text>
+      <text id="rpm-num" x="815" y="144" text-anchor="end" fill="#CBD5E1" font-size="12" font-weight="800" font-family="'JetBrains Mono'" class="tabular-nums">0</text>
+      <rect x="590" y="152" width="225" height="10" rx="3" fill="rgba(255,255,255,0.08)" />
+      <rect id="rpm-bar" x="590" y="152" width="0" height="10" rx="3" fill="url(#rpmGradient)" />
       
       <!-- OVERTAKE Luminous Badge -->
       <g id="overtake-badge" style="transition: opacity 0.15s ease;" opacity="0">
-        <rect x="680" y="156" width="65" height="12" rx="2" fill="#E11D48" />
-        <text x="712" y="165" text-anchor="middle" fill="#FFFFFF" font-size="8" font-weight="900" letter-spacing="0.5">OVERTAKE</text>
+        <rect x="735" y="167" width="80" height="16" rx="3" fill="#E11D48" />
+        <text x="775" y="179" text-anchor="middle" fill="#FFFFFF" font-size="9" font-weight="900" font-family="'JetBrains Mono'" letter-spacing="1">OVERTAKE</text>
       </g>
     </svg>
   </main>
 
-  <!-- TELEMETRY TEST HARNESS (SANDBOX DRAWER) -->
+  <!-- COMPACT MODAL FOR MANUAL SLIDERS (IF OPENED) -->
   <aside id="harnessPanel"
-    class="hidden absolute top-7 right-3 z-50 w-80 p-4 rounded-xl bg-slate-900/95 backdrop-blur-md border border-cyan-500/30 shadow-2xl font-mono text-xs flex flex-col gap-3 text-gray-200">
-    <div class="flex items-center justify-between border-b border-white/10 pb-2">
+    class="hidden absolute top-8 z-50 w-96 p-4 rounded-xl bg-slate-950/95 backdrop-blur-md border border-cyan-500/40 shadow-2xl font-mono text-xs flex flex-col gap-2.5 text-gray-200">
+    <div class="flex items-center justify-between border-b border-white/10 pb-1.5">
       <div class="flex items-center gap-1.5 text-cyan-300 font-bold">
         <i data-lucide="sliders" class="w-4 h-4"></i>
-        <span>Telemetry Test Harness</span>
+        <span>Calibração Manual de Telemetria</span>
       </div>
-      <button onclick="toggleHarness(false)" class="text-gray-400 hover:text-white font-bold">&times;</button>
+      <button onclick="toggleHarnessModal(false)" class="text-gray-400 hover:text-white font-bold">&times;</button>
     </div>
 
-    <!-- Sliders -->
-    <div class="flex flex-col gap-2">
-      <!-- Speed -->
-      <div class="flex flex-col gap-0.5">
-        <div class="flex justify-between text-[11px]">
-          <span class="text-gray-400">Velocidade (KM/H):</span>
-          <span id="harnessSpeedVal" class="text-cyan-300 font-bold tabular-nums">0</span>
+    <div class="grid grid-cols-2 gap-2 text-[10px]">
+      <div>
+        <div class="flex justify-between text-gray-400">
+          <span>Velocidade:</span>
+          <span id="harnessSpeedVal" class="text-cyan-300 font-bold">0 km/h</span>
         </div>
-        <input type="range" id="hSpeed" min="0" max="360" value="0" oninput="onHarnessChange()" class="h-1.5">
+        <input type="range" id="hSpeed" min="0" max="360" value="0" oninput="onHarnessChange()" class="w-full h-1">
       </div>
-
-      <!-- Gear -->
-      <div class="flex flex-col gap-1">
-        <span class="text-gray-400 text-[11px]">Marcha Engatada:</span>
-        <div class="grid grid-cols-10 gap-1 text-[10px] text-center font-bold" id="harnessGearButtons">
-          <button onclick="setHarnessGear(-1)" class="h-gear-btn p-1 rounded bg-white/5 border border-white/10 hover:bg-white/20" data-gear="-1">R</button>
-          <button onclick="setHarnessGear(0)" class="h-gear-btn p-1 rounded bg-cyan-500 text-black border border-cyan-400 font-black" data-gear="0">N</button>
-          <button onclick="setHarnessGear(1)" class="h-gear-btn p-1 rounded bg-white/5 border border-white/10 hover:bg-white/20" data-gear="1">1</button>
-          <button onclick="setHarnessGear(2)" class="h-gear-btn p-1 rounded bg-white/5 border border-white/10 hover:bg-white/20" data-gear="2">2</button>
-          <button onclick="setHarnessGear(3)" class="h-gear-btn p-1 rounded bg-white/5 border border-white/10 hover:bg-white/20" data-gear="3">3</button>
-          <button onclick="setHarnessGear(4)" class="h-gear-btn p-1 rounded bg-white/5 border border-white/10 hover:bg-white/20" data-gear="4">4</button>
-          <button onclick="setHarnessGear(5)" class="h-gear-btn p-1 rounded bg-white/5 border border-white/10 hover:bg-white/20" data-gear="5">5</button>
-          <button onclick="setHarnessGear(6)" class="h-gear-btn p-1 rounded bg-white/5 border border-white/10 hover:bg-white/20" data-gear="6">6</button>
-          <button onclick="setHarnessGear(7)" class="h-gear-btn p-1 rounded bg-white/5 border border-white/10 hover:bg-white/20" data-gear="7">7</button>
-          <button onclick="setHarnessGear(8)" class="h-gear-btn p-1 rounded bg-white/5 border border-white/10 hover:bg-white/20" data-gear="8">8</button>
+      <div>
+        <div class="flex justify-between text-gray-400">
+          <span>RPM:</span>
+          <span id="harnessRpmVal" class="text-yellow-400 font-bold">0</span>
         </div>
+        <input type="range" id="hRpm" min="0" max="15000" value="0" oninput="onHarnessChange()" class="w-full h-1 accent-yellow-400">
       </div>
-
-      <!-- RPM -->
-      <div class="flex flex-col gap-0.5">
-        <div class="flex justify-between text-[11px]">
-          <span class="text-gray-400">RPM Motor:</span>
-          <span id="harnessRpmVal" class="text-yellow-400 font-bold tabular-nums">0</span>
+      <div>
+        <div class="flex justify-between text-gray-400">
+          <span>Throttle:</span>
+          <span id="harnessThrVal" class="text-green-400 font-bold">0%</span>
         </div>
-        <input type="range" id="hRpm" min="0" max="15000" value="0" oninput="onHarnessChange()" class="h-1.5 accent-yellow-400">
+        <input type="range" id="hThrottle" min="0" max="100" value="0" oninput="onHarnessChange()" class="w-full h-1 accent-green-400">
       </div>
-
-      <!-- Throttle & Brake -->
-      <div class="grid grid-cols-2 gap-2">
-        <div class="flex flex-col gap-0.5">
-          <div class="flex justify-between text-[11px]">
-            <span class="text-green-400">Throttle:</span>
-            <span id="harnessThrVal" class="tabular-nums">0%</span>
-          </div>
-          <input type="range" id="hThrottle" min="0" max="100" value="0" oninput="onHarnessChange()" class="h-1.5 accent-green-400">
+      <div>
+        <div class="flex justify-between text-gray-400">
+          <span>Brake:</span>
+          <span id="harnessBrkVal" class="text-red-400 font-bold">0%</span>
         </div>
-        <div class="flex flex-col gap-0.5">
-          <div class="flex justify-between text-[11px]">
-            <span class="text-red-400">Brake:</span>
-            <span id="harnessBrkVal" class="tabular-nums">0%</span>
-          </div>
-          <input type="range" id="hBrake" min="0" max="100" value="0" oninput="onHarnessChange()" class="h-1.5 accent-red-400">
-        </div>
+        <input type="range" id="hBrake" min="0" max="100" value="0" oninput="onHarnessChange()" class="w-full h-1 accent-red-400">
       </div>
-
-      <!-- ERS Battery -->
-      <div class="flex flex-col gap-0.5">
-        <div class="flex justify-between text-[11px]">
-          <span class="text-cyan-300">ERS Battery:</span>
-          <span id="harnessErsVal" class="tabular-nums">100%</span>
+      <div>
+        <div class="flex justify-between text-gray-400">
+          <span>ERS:</span>
+          <span id="harnessErsVal" class="text-cyan-300 font-bold">100%</span>
         </div>
-        <input type="range" id="hErs" min="0" max="100" value="100" oninput="onHarnessChange()" class="h-1.5 accent-cyan-400">
+        <input type="range" id="hErs" min="0" max="100" value="100" oninput="onHarnessChange()" class="w-full h-1 accent-cyan-400">
       </div>
-
-      <!-- Overtake Toggle -->
-      <label class="flex items-center justify-between cursor-pointer pt-1 border-t border-white/10 text-[11px]">
-        <span class="text-rose-400 font-bold">Overtake Mode</span>
-        <input type="checkbox" id="hOvertake" onchange="onHarnessChange()" class="accent-rose-500 w-4 h-4 cursor-pointer">
-      </label>
-    </div>
-
-    <!-- Stress Loop / Auto Cycle Button -->
-    <div class="pt-2 border-t border-white/10 flex flex-col gap-1.5">
-      <button id="btnStressLoop" onclick="toggleStressLoop()"
-        class="w-full py-1.5 rounded font-bold text-xs bg-cyan-600 hover:bg-cyan-500 text-white flex items-center justify-center gap-1.5 transition active:scale-95 shadow-lg shadow-cyan-600/30">
-        <i data-lucide="play-circle" class="w-4 h-4"></i>
-        <span id="stressLoopText">Iniciar Stress Loop (60 FPS)</span>
-      </button>
-      <span class="text-[9px] text-gray-400 text-center">Simula volta rápida com marchas, aceleração e frenagem extrema</span>
+      <div class="flex items-center justify-between pt-2">
+        <label class="flex items-center gap-1.5 cursor-pointer">
+          <input type="checkbox" id="hOvertake" onchange="onHarnessChange()" class="accent-rose-500">
+          <span class="text-rose-400 font-bold">Overtake</span>
+        </label>
+      </div>
     </div>
   </aside>
 
   <script>
     lucide.createIcons();
 
-    // Direct DOM references for zero-allocation 60Hz loop
+    // Direct DOM nodes for 60Hz loop
     const speedKmhEl = document.getElementById('speed-kmh');
     const speedMphEl = document.getElementById('speed-mph');
     const speedArcEl = document.getElementById('speed-arc');
@@ -310,7 +298,10 @@
     const throttleBarEl = document.getElementById('throttle-bar');
     const rpmBarEl = document.getElementById('rpm-bar');
     const rpmNumEl = document.getElementById('rpm-num');
+    const gearCenterEl = document.getElementById('gear-center');
     const overtakeBadgeEl = document.getElementById('overtake-badge');
+    const drsBoxEl = document.getElementById('drs-box');
+    const drsTextEl = document.getElementById('drs-text');
     const telemetryBadgeEl = document.getElementById('telemetry-badge');
 
     // Gear references
@@ -320,15 +311,15 @@
       gearEls[g] = document.getElementById(`gear-${g}`);
     });
 
-    const SPEED_CIRCUMFERENCE = 301.59; // 2 * Math.PI * 48
-    let currentGear = 0;
+    const SPEED_CIRCUMFERENCE = 314.16; // 2 * Math.PI * 50
+    let currentGear = 'N';
     let isHarnessActive = false;
     let isStressLoopActive = false;
     let stressReqId = null;
 
     // DIRECT HIGH-PERFORMANCE RENDERER
     function applyTelemetryDirect(t) {
-      // 1. Speed (KM/H and MPH)
+      // 1. Speed (KM/H & MPH)
       const kmh = Math.round(Number(t.speed) || 0);
       const mph = Math.round(kmh * 0.621371);
       speedKmhEl.textContent = kmh;
@@ -347,19 +338,19 @@
       ersPct = Math.max(0, Math.min(100, ersPct));
       
       ersPercentEl.textContent = `${Math.round(ersPct)}%`;
-      ersBarEl.setAttribute('width', (ersPct * 1.8).toFixed(1)); // 180px max
+      ersBarEl.setAttribute('width', (ersPct * 2.25).toFixed(1)); // 225px max
 
       // 3. Brake (0 to 100%)
       let brkPct = Number(t.brake) || 0;
       if (brkPct > 0 && brkPct <= 1.0) brkPct *= 100;
       brkPct = Math.max(0, Math.min(100, brkPct));
-      brakeBarEl.setAttribute('width', (brkPct * 1.3).toFixed(1)); // 130px max
+      brakeBarEl.setAttribute('width', (brkPct * 1.7).toFixed(1)); // 170px max
 
       // 4. Throttle (0 to 100%)
       let thrPct = Number(t.throttle) || 0;
       if (thrPct > 0 && thrPct <= 1.0) thrPct *= 100;
       thrPct = Math.max(0, Math.min(100, thrPct));
-      throttleBarEl.setAttribute('width', (thrPct * 1.2).toFixed(1)); // 120px max
+      throttleBarEl.setAttribute('width', (thrPct * 1.55).toFixed(1)); // 155px max
 
       // 5. Gear
       const gRaw = t.gear !== undefined ? t.gear : 0;
@@ -370,6 +361,9 @@
 
       if (currentGear !== activeGearStr) {
         currentGear = activeGearStr;
+        gearCenterEl.textContent = activeGearStr;
+        gearCenterEl.setAttribute('fill', activeGearStr === 'R' ? '#EF4444' : '#00E5FF');
+
         gearList.forEach(g => {
           const el = gearEls[g];
           if (!el) return;
@@ -388,12 +382,32 @@
       // 6. RPM (0 to 15000)
       const rpm = Number(t.engineRPM !== undefined ? t.engineRPM : (t.engine_rpm || 0));
       const rpmRatio = Math.max(0, Math.min(1, rpm / 15000));
-      rpmBarEl.setAttribute('width', (rpmRatio * 180).toFixed(1)); // 180px max
+      rpmBarEl.setAttribute('width', (rpmRatio * 225).toFixed(1)); // 225px max
       if (rpmNumEl) rpmNumEl.textContent = Math.round(rpm);
 
-      // 7. Overtake / ERS Deploy / DRS
-      const isOvertake = Boolean(t.overtake || t.ersDeploy || (t.drs === 1));
+      // 7. Overtake / DRS
+      const isOvertake = Boolean(t.overtake || t.ersDeploy);
       overtakeBadgeEl.setAttribute('opacity', isOvertake ? '1' : '0');
+
+      const drsState = t.drs === 1 ? 2 : (t.drsAllowed === 1 ? 1 : 0);
+      if (drsBoxEl && drsTextEl) {
+        if (drsState === 2) {
+          drsBoxEl.setAttribute('fill', '#00E676');
+          drsBoxEl.setAttribute('stroke', '#00E676');
+          drsTextEl.setAttribute('fill', '#000000');
+          drsTextEl.textContent = 'DRS OPEN';
+        } else if (drsState === 1) {
+          drsBoxEl.setAttribute('fill', 'rgba(0, 229, 255, 0.2)');
+          drsBoxEl.setAttribute('stroke', '#00E5FF');
+          drsTextEl.setAttribute('fill', '#00E5FF');
+          drsTextEl.textContent = 'DRS';
+        } else {
+          drsBoxEl.setAttribute('fill', 'rgba(255, 255, 255, 0.06)');
+          drsBoxEl.setAttribute('stroke', 'rgba(255, 255, 255, 0.12)');
+          drsTextEl.setAttribute('fill', '#94A3B8');
+          drsTextEl.textContent = 'DRS';
+        }
+      }
     }
 
     // WEBSOCKET TELEMETRY
@@ -415,7 +429,7 @@
       };
 
       ws.onmessage = (evt) => {
-        if (isHarnessActive) return; // Ignore live telemetry while in Harness mode
+        if (isHarnessActive) return;
         try {
           const raw = JSON.parse(evt.data);
           const data = (raw.type === 'telemetry' && raw.data) ? raw.data : raw;
@@ -438,37 +452,22 @@
       };
     }
 
-    // TELEMETRY TEST HARNESS LOGIC
-    function toggleHarness(forceState) {
-      isHarnessActive = forceState !== undefined ? forceState : !isHarnessActive;
-      const panel = document.getElementById('harnessPanel');
-      if (panel) panel.classList.toggle('hidden', !isHarnessActive);
-
-      if (telemetryBadgeEl) {
-        if (isHarnessActive) {
-          telemetryBadgeEl.textContent = 'HARNESS (MANUAL)';
-          telemetryBadgeEl.className = 'px-2 py-0.2 rounded text-[8px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-400/40';
-          onHarnessChange();
-        } else {
-          stopStressLoop();
-          telemetryBadgeEl.textContent = (ws && ws.readyState === WebSocket.OPEN) ? 'LIVE 60Hz' : 'AGUARDANDO F1...';
-          telemetryBadgeEl.className = 'px-2 py-0.2 rounded text-[8px] font-mono font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-400/30';
-        }
+    // TEST HARNESS MODAL & STRESS LOOP
+    function toggleHarnessModal(force) {
+      const p = document.getElementById('harnessPanel');
+      if (!p) return;
+      const shouldOpen = force !== undefined ? force : p.classList.contains('hidden');
+      p.classList.toggle('hidden', !shouldOpen);
+      if (shouldOpen) {
+        isHarnessActive = true;
+        telemetryBadgeEl.textContent = 'HARNESS';
+        telemetryBadgeEl.className = 'px-2 py-0.2 rounded text-[8px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-400/40';
+        onHarnessChange();
+      } else if (!isStressLoopActive) {
+        isHarnessActive = false;
+        telemetryBadgeEl.textContent = (ws && ws.readyState === WebSocket.OPEN) ? 'LIVE 60Hz' : 'AGUARDANDO F1...';
+        telemetryBadgeEl.className = 'px-2 py-0.2 rounded text-[8px] font-mono font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-400/30';
       }
-    }
-
-    let harnessSelectedGear = 0;
-    function setHarnessGear(g) {
-      harnessSelectedGear = g;
-      document.querySelectorAll('.h-gear-btn').forEach(btn => {
-        const val = Number(btn.getAttribute('data-gear'));
-        if (val === g) {
-          btn.className = 'h-gear-btn p-1 rounded bg-cyan-500 text-black border border-cyan-400 font-black';
-        } else {
-          btn.className = 'h-gear-btn p-1 rounded bg-white/5 border border-white/10 hover:bg-white/20 text-gray-300';
-        }
-      });
-      onHarnessChange();
     }
 
     function onHarnessChange() {
@@ -480,7 +479,7 @@
       const ers = Number(document.getElementById('hErs').value);
       const ovt = Boolean(document.getElementById('hOvertake').checked);
 
-      document.getElementById('harnessSpeedVal').textContent = spd;
+      document.getElementById('harnessSpeedVal').textContent = `${spd} km/h`;
       document.getElementById('harnessRpmVal').textContent = rpm;
       document.getElementById('harnessThrVal').textContent = `${thr}%`;
       document.getElementById('harnessBrkVal').textContent = `${brk}%`;
@@ -488,7 +487,7 @@
 
       applyTelemetryDirect({
         speed: spd,
-        gear: harnessSelectedGear,
+        gear: currentGear === 'R' ? -1 : (currentGear === 'N' ? 0 : Number(currentGear)),
         engineRPM: rpm,
         throttle: thr,
         brake: brk,
@@ -497,14 +496,13 @@
       });
     }
 
-    // STRESS LOOP / AUTO CYCLE (60 FPS HOT LAP SIMULATOR)
-    let stressState = 'accel'; // 'accel' | 'braking'
+    // STRESS LOOP
+    let stressState = 'accel';
     let stressGear = 1;
-    let stressSpeed = 30;
+    let stressSpeed = 35;
     let stressRpm = 4500;
     let stressThr = 100;
     let stressBrk = 0;
-    let stressErs = 95;
     let stressOvt = false;
 
     function toggleStressLoop() {
@@ -513,8 +511,8 @@
     }
 
     function startStressLoop() {
-      if (!isHarnessActive) toggleHarness(true);
       isStressLoopActive = true;
+      isHarnessActive = true;
       stressState = 'accel';
       stressGear = 1;
       stressSpeed = 40;
@@ -522,24 +520,31 @@
       stressThr = 100;
       stressBrk = 0;
 
-      const btn = document.getElementById('btnStressLoop');
-      const text = document.getElementById('stressLoopText');
-      if (btn) btn.className = 'w-full py-1.5 rounded font-bold text-xs bg-emerald-600 hover:bg-emerald-500 text-white flex items-center justify-center gap-1.5 transition active:scale-95 shadow-lg shadow-emerald-600/30';
-      if (text) text.textContent = 'Parar Stress Loop';
+      const btn = document.getElementById('btnStressQuick');
+      if (btn) {
+        btn.textContent = 'Parar Loop';
+        btn.className = 'px-2 py-0.5 rounded bg-emerald-500 text-black text-[9px] font-bold transition active:scale-95 shadow-md shadow-emerald-500/40';
+      }
+      telemetryBadgeEl.textContent = 'STRESS LOOP';
+      telemetryBadgeEl.className = 'px-2 py-0.2 rounded text-[8px] font-mono font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-400/40';
 
       runStressFrame();
     }
 
     function stopStressLoop() {
       isStressLoopActive = false;
+      isHarnessActive = false;
       if (stressReqId) {
         cancelAnimationFrame(stressReqId);
         stressReqId = null;
       }
-      const btn = document.getElementById('btnStressLoop');
-      const text = document.getElementById('stressLoopText');
-      if (btn) btn.className = 'w-full py-1.5 rounded font-bold text-xs bg-cyan-600 hover:bg-cyan-500 text-white flex items-center justify-center gap-1.5 transition active:scale-95 shadow-lg shadow-cyan-600/30';
-      if (text) text.textContent = 'Iniciar Stress Loop (60 FPS)';
+      const btn = document.getElementById('btnStressQuick');
+      if (btn) {
+        btn.textContent = '[H] Stress Loop';
+        btn.className = 'px-2 py-0.5 rounded bg-cyan-500/20 hover:bg-cyan-500/40 text-cyan-300 hover:text-white text-[9px] font-bold transition active:scale-95 border border-cyan-400/30';
+      }
+      telemetryBadgeEl.textContent = (ws && ws.readyState === WebSocket.OPEN) ? 'LIVE 60Hz' : 'AGUARDANDO F1...';
+      telemetryBadgeEl.className = 'px-2 py-0.2 rounded text-[8px] font-mono font-bold bg-cyan-500/20 text-cyan-300 border border-cyan-400/30';
     }
 
     function runStressFrame() {
@@ -558,7 +563,6 @@
             stressGear++;
             stressRpm = 9200;
           } else {
-            // Hit top speed ~335 km/h -> trigger threshold braking!
             stressState = 'braking';
           }
         }
@@ -569,7 +573,6 @@
         stressSpeed -= 3.8;
         stressRpm -= 210;
 
-        // Rapid downshifting sequence
         if (stressSpeed < 280 && stressGear === 8) { stressGear = 7; stressRpm = 11000; }
         else if (stressSpeed < 235 && stressGear === 7) { stressGear = 6; stressRpm = 11000; }
         else if (stressSpeed < 195 && stressGear === 6) { stressGear = 5; stressRpm = 11000; }
@@ -577,22 +580,23 @@
         else if (stressSpeed < 120 && stressGear === 4) { stressGear = 3; stressRpm = 11000; }
         else if (stressSpeed < 85 && stressGear === 3) { stressGear = 2; stressRpm = 10000; }
         else if (stressSpeed <= 65) {
-          // Apex reached -> punch throttle again!
           stressState = 'accel';
           stressGear = 2;
           stressRpm = 6500;
         }
       }
 
-      // Sync inputs in panel
-      document.getElementById('hSpeed').value = Math.round(stressSpeed);
-      document.getElementById('hRpm').value = Math.round(stressRpm);
-      document.getElementById('hThrottle').value = stressThr;
-      document.getElementById('hBrake').value = stressBrk;
-      document.getElementById('hOvertake').checked = stressOvt;
-      harnessSelectedGear = stressGear;
+      applyTelemetryDirect({
+        speed: Math.round(stressSpeed),
+        gear: stressGear,
+        engineRPM: Math.round(stressRpm),
+        throttle: stressThr,
+        brake: stressBrk,
+        ersPercent: Math.max(10, 100 - (stressSpeed * 0.2)),
+        overtake: stressOvt,
+        drs: stressOvt ? 1 : 0
+      });
 
-      onHarnessChange();
       stressReqId = requestAnimationFrame(runStressFrame);
     }
 
@@ -600,7 +604,7 @@
     window.addEventListener('keydown', (e) => {
       if (e.key === 'h' || e.key === 'H') {
         if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
-        toggleHarness();
+        toggleStressLoop();
       }
     });
 
@@ -621,7 +625,6 @@
       }
     };
 
-    // Initialize
     connectWs();
   </script>
 </body>
