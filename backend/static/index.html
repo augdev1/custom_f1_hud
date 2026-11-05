@@ -1,1376 +1,658 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>F1 24 Custom HUD - Studio & Live Preview</title>
+  <title>F1 24 Custom HUD - Studio Preview & Test Harness</title>
   <!-- Google Fonts: Rajdhani & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800&family=Rajdhani:wght@600;700;800&display=swap" rel="stylesheet">
+  <link
+    href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700;800;900&family=Rajdhani:wght@600;700;800;900&display=swap"
+    rel="stylesheet">
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
 
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          colors: {
-            f1: {
-              dark: '#6eb43eff',
-              red: '#E10600',
-              cyan: '#09f1daff',
-              purple: '#9B51E0',
-              yellow: '#FFB800',
-              green: '#00E676',
-            }
-          },
-          fontFamily: {
-            mono: ['"JetBrains Mono"', 'monospace'],
-            display: ['"Rajdhani"', 'system-ui', 'sans-serif'],
-          },
-          boxShadow: {
-            'glow-red': '0 0 25px rgba(225, 6, 0, 0.5)',
-            'glow-green': '0 0 25px rgba(0, 230, 118, 0.5)',
-            'glow-cyan': '0 0 25px rgba(0, 210, 190, 0.5)',
-            'glow-purple': '0 0 25px rgba(155, 81, 224, 0.7)',
-          }
-        }
-      }
-    }
-  </script>
-
   <style>
-    /* LED shift light states */
-    .led-active-green {
-      background-color: #00E676;
-      box-shadow: 0 0 12px #00E676, 0 0 20px rgba(0, 230, 118, 0.6);
+    * {
+      box-sizing: border-box;
     }
-    .led-active-red {
-      background-color: #E10600;
-      box-shadow: 0 0 12px #E10600, 0 0 20px rgba(225, 6, 0, 0.6);
+
+    body {
+      font-family: 'Rajdhani', system-ui, sans-serif;
     }
-    .led-active-purple {
-      background-color: #9B51E0;
-      box-shadow: 0 0 14px #9B51E0, 0 0 24px rgba(155, 81, 224, 0.8);
+
+    .tabular-nums {
+      font-variant-numeric: tabular-nums;
     }
-    .led-inactive {
-      background-color: rgba(255, 255, 255, 0.08);
-      box-shadow: none;
-    }
-    
+
     /* Background presets */
     .bg-cockpit {
-      background-image: url('/static/cockpit.jpg');
+      background-image: radial-gradient(circle at 50% 50%, rgba(15, 23, 42, 0.4) 0%, rgba(2, 6, 23, 0.95) 100%), url('/static/cockpit.jpg');
       background-size: cover;
       background-position: center;
       background-repeat: no-repeat;
     }
+
     .bg-carbon {
-      background-color: #090B0E;
-      background-image: radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 0);
-      background-size: 24px 24px;
-    }
-    .bg-checker {
-      background-color: #111;
-      background-image: 
-        linear-gradient(45deg, #181818 25%, transparent 25%), 
-        linear-gradient(-45deg, #181818 25%, transparent 25%), 
-        linear-gradient(45deg, transparent 75%, #181818 75%), 
-        linear-gradient(-45deg, transparent 75%, #181818 75%);
+      background-color: #0B0F17;
+      background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 0);
       background-size: 20px 20px;
-      background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
     }
 
-    /* Free Move & Touch Dragging Styles */
-    #hudCluster {
-      touch-action: none !important;
-      user-select: none !important;
-      -webkit-user-select: none !important;
-      -webkit-touch-callout: none !important;
-    }
-    #hudCluster.hud-movable {
-      cursor: grab;
-      outline: none !important;
-      border: none !important;
-      box-shadow: none !important;
-    }
-    #hudCluster.hud-movable:hover {
-      outline: none !important;
-      box-shadow: none !important;
-    }
-    #hudCluster.hud-dragging {
-      cursor: grabbing !important;
-      outline: none !important;
-      box-shadow: none !important;
-      transition: none !important;
+    .bg-checker {
+      background-color: #121620;
+      background-image:
+        linear-gradient(45deg, #182030 25%, transparent 25%),
+        linear-gradient(-45deg, #182030 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #182030 75%),
+        linear-gradient(-45deg, transparent 75%, #182030 75%);
+      background-size: 24px 24px;
+      background-position: 0 0, 0 12px, 12px -12px, -12px 0px;
     }
 
-    /* AUTHENTIC AERODYNAMIC HALO CHASSIS - Modern Frosted Glassmorphism */
-    .halo-chassis {
-      background: linear-gradient(135deg, rgba(14, 20, 34, 0.72) 0%, rgba(7, 10, 18, 0.82) 100%) !important;
-      backdrop-filter: blur(18px) saturate(160%);
-      -webkit-backdrop-filter: blur(18px) saturate(160%);
-      border-radius: 14px !important;
-      border: 1px solid rgba(255, 255, 255, 0.12) !important;
-      outline: none !important;
-      box-shadow: 
-        0 14px 34px -8px rgba(0, 0, 0, 0.55),
-        inset 0 1px 0 0 rgba(255, 255, 255, 0.22),
-        inset 0 -1px 0 0 rgba(0, 0, 0, 0.60) !important;
-      overflow: hidden;
-      transition: all 0.2s ease;
-    }
-
-    /* CENTER SPEEDOMETER POD (Frosted Glass) */
-    .halo-speed-pod {
-      background: radial-gradient(circle at 45% 35%, rgba(26, 38, 60, 0.68) 0%, rgba(8, 12, 22, 0.84) 100%) !important;
-      backdrop-filter: blur(14px);
-      -webkit-backdrop-filter: blur(14px);
-      border: 1.5px solid rgba(255, 255, 255, 0.16) !important;
-      box-shadow: 
-        0 0 22px var(--accent-glow, rgba(0, 210, 190, 0.35)),
-        inset 0 1px 1px rgba(255, 255, 255, 0.25),
-        inset 0 0 18px rgba(0, 0, 0, 0.85) !important;
-      border-radius: 50%;
-      width: 108px;
-      height: 108px;
-      position: relative;
-    }
-
-    /* RPM Circular Arc */
-    .rpm-arc-svg {
-      position: absolute;
-      top: -6px;
-      left: -6px;
-      width: 120px;
-      height: 120px;
-      pointer-events: none;
-      transform: rotate(-90deg);
-    }
-    .rpm-arc-bg {
-      fill: none;
-      stroke: rgba(255, 255, 255, 0.08);
-      stroke-width: 4;
-    }
-    .rpm-arc-meter {
-      fill: none;
-      stroke: var(--accent-color, #00D2BE);
-      stroke-width: 4.5;
-      stroke-linecap: round;
-      stroke-dasharray: 360;
-      stroke-dashoffset: 360;
-      transition: stroke-dashoffset 0.05s linear, stroke 0.15s ease;
-      filter: drop-shadow(0 0 4px var(--accent-color, #00D2BE));
-    }
-    .rpm-arc-redline {
-      stroke: #FF1744 !important;
-      filter: drop-shadow(0 0 8px #FF1744) !important;
-    }
-
-    /* VERTICAL SEGMENTED PEDAL GAUGES (Frosted Glass Container) */
-    .pedal-meter-container {
-      display: flex;
-      flex-direction: column-reverse;
-      gap: 2.5px;
-      width: 24px;
-      height: 80px;
-      background: rgba(10, 15, 25, 0.60);
-      backdrop-filter: blur(8px);
-      -webkit-backdrop-filter: blur(8px);
-      padding: 3px;
-      border-radius: 6px;
-      border: 1px solid rgba(255, 255, 255, 0.10);
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.12), inset 0 0 12px rgba(0, 0, 0, 0.8);
-    }
-    .pedal-seg {
-      width: 100%;
-      height: 4px;
-      border-radius: 1px;
-      background: rgba(255, 255, 255, 0.08);
-      transition: background-color 0.04s ease, box-shadow 0.04s ease;
-    }
-    .pedal-seg.active-thr {
-      background: #00E676 !important;
-      box-shadow: 0 0 6px rgba(0, 230, 118, 0.9) !important;
-    }
-    .pedal-seg.active-brk {
-      background: #FF1744 !important;
-      box-shadow: 0 0 6px rgba(255, 23, 68, 0.9) !important;
-    }
-
-    /* GEAR STRIP (R N 1 2 3 4 5 6 7 8) */
-    .gear-item {
-      font-family: 'JetBrains Mono', monospace;
-      font-weight: 800;
-      color: rgba(255, 255, 255, 0.35);
-      font-size: 10.5px;
-      width: 17px;
-      height: 17px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      border-radius: 4px;
-      transition: all 0.08s ease;
-    }
-    .gear-item.active {
-      color: #000000 !important;
-      background-color: var(--accent-color, #00D2BE) !important;
-      box-shadow: 0 0 12px var(--accent-color, #00D2BE) !important;
-      font-weight: 900 !important;
-      transform: scale(1.15);
-    }
-    .gear-item.active-reverse {
-      color: #ffffff !important;
-      background-color: #ef4444 !important;
-      box-shadow: 0 0 14px rgba(239, 68, 68, 0.95) !important;
-      font-weight: 900 !important;
-      transform: scale(1.15);
-    }
-
-    /* SHIFT LIGHT BAR (15 LEDs) */
-    .led-shift {
-      flex: 1;
-      height: 6px;
-      border-radius: 1.5px;
-      background-color: rgba(255, 255, 255, 0.08);
-      transition: none;
-    }
-    .led-shift.active-green { background-color: #00E676; box-shadow: 0 0 8px #00E676; }
-    .led-shift.active-red { background-color: #E10600; box-shadow: 0 0 8px #E10600; }
-    .led-shift.active-purple { background-color: #9B51E0; box-shadow: 0 0 10px #9B51E0; }
-
-    /* FROSTED GLASS SURFACE STYLING */
-    .wing-block {
-      background: rgba(14, 20, 32, 0.55);
-      backdrop-filter: blur(10px);
-      -webkit-backdrop-filter: blur(10px);
-      border: 1px solid rgba(255, 255, 255, 0.09);
-      border-radius: 8px;
-      padding: 5px 8px;
-      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+    /* Range slider custom styling */
+    input[type=range] {
+      accent-color: #00E5FF;
     }
   </style>
 </head>
 
-<body class="w-screen h-screen m-0 p-0 overflow-hidden select-none font-display text-white bg-cockpit transition-all duration-300" id="mainBody">
+<body class="w-screen h-screen m-0 p-0 overflow-hidden select-none text-white bg-cockpit transition-all duration-300" id="mainBody">
 
   <!-- TOP BAR: Control Studio & Live Status -->
-  <header class="absolute top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-3 bg-black/80 backdrop-blur-md border-b border-white/10">
+  <header class="absolute top-0 left-0 right-0 z-50 flex items-center justify-between px-6 py-3 bg-black/80 backdrop-blur-md border-b border-white/10 font-mono text-xs">
     <div class="flex items-center gap-3">
       <div class="flex items-center gap-2">
-        <i data-lucide="gauge" class="w-5 h-5 text-f1-red"></i>
-        <span class="font-extrabold tracking-wider text-lg">F1 24 CUSTOM HUD</span>
-        <span class="text-[10px] font-mono uppercase bg-f1-red/20 text-f1-red border border-f1-red/30 px-2 py-0.5 rounded font-bold">Studio Preview</span>
+        <i data-lucide="gauge" class="w-5 h-5 text-red-500"></i>
+        <span class="font-extrabold tracking-wider text-base font-['Rajdhani']">F1 24 CUSTOM HUD</span>
+        <span class="text-[10px] uppercase bg-red-500/20 text-red-400 border border-red-500/30 px-2 py-0.5 rounded font-bold">Studio Preview</span>
       </div>
 
-      <!-- Telemetry Live Status -->
-      <div class="flex items-center gap-2 ml-4 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-mono">
-        <span id="statusIndicator" class="w-2 h-2 rounded-full bg-yellow-400"></span>
+      <!-- Telemetry Status Indicator -->
+      <div class="flex items-center gap-2 ml-4 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs">
+        <span id="statusIndicator" class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
         <span id="statusText" class="text-gray-300">Conectando WebSocket...</span>
       </div>
     </div>
 
     <!-- Toolbar controls -->
-    <div class="flex items-center gap-4">
-      <!-- Background Mode -->
-      <div class="flex items-center gap-1 bg-white/5 p-1 rounded-lg border border-white/10 text-xs font-mono">
-        <span class="text-gray-400 px-2">Cenário:</span>
-        <button onclick="setBg('cockpit')" id="btnBgCockpit" class="px-2.5 py-1 rounded bg-f1-red text-white font-bold transition">🏎️ Cockpit POV</button>
+    <div class="flex items-center gap-3">
+      <!-- Background Mode Selector -->
+      <div class="flex items-center gap-1 bg-white/5 p-1 rounded-lg border border-white/10">
+        <span class="text-gray-400 px-2 text-[11px]">Cenário:</span>
+        <button onclick="setBg('cockpit')" id="btnBgCockpit" class="px-2.5 py-1 rounded bg-red-600 text-white font-bold transition">🏎️ Cockpit</button>
         <button onclick="setBg('carbon')" id="btnBgCarbon" class="px-2.5 py-1 rounded text-gray-400 hover:text-white transition">⬛ Carbon</button>
-        <button onclick="setBg('checker')" id="btnBgChecker" class="px-2.5 py-1 rounded text-gray-400 hover:text-white transition">🏁 Transparente</button>
+        <button onclick="setBg('checker')" id="btnBgChecker" class="px-2.5 py-1 rounded text-gray-400 hover:text-white transition">🏁 Grade</button>
       </div>
 
-      <!-- Live Stream vs Manual Slider Sandbox -->
-      <div class="flex items-center gap-1 bg-white/5 p-1 rounded-lg border border-white/10 text-xs font-mono">
-        <button onclick="setMode('live')" id="btnModeLive" class="px-3 py-1 rounded bg-f1-green text-black font-bold flex items-center gap-1.5 transition">
+      <!-- Mode Toggle: Live vs Test Harness -->
+      <div class="flex items-center gap-1 bg-white/5 p-1 rounded-lg border border-white/10">
+        <button onclick="setMode('live')" id="btnModeLive" class="px-3 py-1 rounded bg-emerald-500 text-black font-bold flex items-center gap-1.5 transition">
           <i data-lucide="radio" class="w-3.5 h-3.5"></i> Live 60Hz
         </button>
-        <button onclick="setMode('sandbox')" id="btnModeSandbox" class="px-3 py-1 rounded text-gray-400 hover:text-white flex items-center gap-1.5 transition">
-          <i data-lucide="sliders" class="w-3.5 h-3.5"></i> Sandbox Manual
+        <button onclick="setMode('harness')" id="btnModeHarness" class="px-3 py-1 rounded text-gray-400 hover:text-white flex items-center gap-1.5 transition">
+          <i data-lucide="sliders" class="w-3.5 h-3.5"></i> [H] Test Harness
         </button>
       </div>
 
-      <!-- Customizer Drawer Toggle -->
-      <button onclick="toggleCustomizer()" class="px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/20 border border-white/15 text-xs font-mono flex items-center gap-1.5 font-bold transition">
-        <i data-lucide="settings-2" class="w-4 h-4 text-cyan-400"></i> Personalizar HUD
+      <!-- Auto Cycle Quick Button -->
+      <button id="btnTopStressLoop" onclick="toggleStressLoop()"
+        class="px-3 py-1.5 rounded-lg bg-cyan-600/30 hover:bg-cyan-600/50 border border-cyan-400/40 text-cyan-300 hover:text-white font-bold flex items-center gap-1.5 transition">
+        <i data-lucide="play-circle" class="w-4 h-4"></i>
+        <span id="topStressText">Stress Loop</span>
       </button>
     </div>
   </header>
 
-  <!-- CUSTOMIZER DRAWER (Sliders, Scale, Module Visibility) -->
-  <aside id="customizerDrawer" class="hidden absolute top-16 right-6 z-40 w-80 p-5 rounded-2xl bg-black/90 backdrop-blur-xl border border-white/15 shadow-2xl flex flex-col gap-4 font-mono text-xs">
+  <!-- TELEMETRY TEST HARNESS (SIDE DRAWER / SANDBOX) -->
+  <aside id="harnessPanel"
+    class="hidden absolute top-16 right-6 z-40 w-80 p-5 rounded-2xl bg-slate-900/95 backdrop-blur-xl border border-cyan-500/30 shadow-2xl flex flex-col gap-3 font-mono text-xs">
     <div class="flex items-center justify-between border-b border-white/10 pb-2">
-      <span class="font-bold text-sm font-display uppercase tracking-wider text-white flex items-center gap-2">
-        <i data-lucide="sliders" class="w-4 h-4 text-cyan-400"></i> Ajustes de Visualização
+      <span class="font-bold text-sm font-['Rajdhani'] uppercase tracking-wider text-cyan-300 flex items-center gap-2">
+        <i data-lucide="sliders" class="w-4 h-4"></i> Telemetry Test Harness
       </span>
-      <button onclick="toggleCustomizer()" class="text-gray-400 hover:text-white text-base font-bold">&times;</button>
+      <button onclick="setMode('live')" class="text-gray-400 hover:text-white text-base font-bold">&times;</button>
     </div>
 
-    <!-- HUD Scale -->
-    <div class="flex flex-col gap-1.5">
-      <div class="flex justify-between text-gray-300">
-        <span>Tamanho / Escala Global:</span>
-        <span id="scaleLabel" class="text-cyan-400 font-bold">100%</span>
-      </div>
-      <input type="range" id="scaleSlider" min="70" max="140" value="100" oninput="updateScale(this.value)" class="accent-cyan-400 cursor-pointer">
-    </div>
-
-    <!-- THEMES PRESETS (F1 Teams) -->
-    <div class="flex flex-col gap-2 pt-2 border-t border-white/10">
-      <span class="text-gray-400 uppercase font-bold text-[10px] tracking-wider flex items-center gap-1">
-        <i data-lucide="palette" class="w-3.5 h-3.5 text-cyan-400"></i> Temas de Equipe F1
-      </span>
-      <div class="grid grid-cols-3 gap-1.5">
-        <button onclick="applyTheme('mercedes')" class="px-2 py-1.5 rounded bg-white/5 hover:bg-white/10 border border-cyan-400/40 text-[10px] text-cyan-300 font-bold transition flex items-center justify-center gap-1">
-          <span class="w-2 h-2 rounded-full bg-[#00D2BE]"></span> Mercedes
-        </button>
-        <button onclick="applyTheme('ferrari')" class="px-2 py-1.5 rounded bg-white/5 hover:bg-white/10 border border-red-500/40 text-[10px] text-red-400 font-bold transition flex items-center justify-center gap-1">
-          <span class="w-2 h-2 rounded-full bg-[#E10600]"></span> Ferrari
-        </button>
-        <button onclick="applyTheme('mclaren')" class="px-2 py-1.5 rounded bg-white/5 hover:bg-white/10 border border-amber-500/40 text-[10px] text-amber-400 font-bold transition flex items-center justify-center gap-1">
-          <span class="w-2 h-2 rounded-full bg-[#FF8000]"></span> McLaren
-        </button>
-        <button onclick="applyTheme('aston')" class="px-2 py-1.5 rounded bg-white/5 hover:bg-white/10 border border-emerald-500/40 text-[10px] text-emerald-400 font-bold transition flex items-center justify-center gap-1">
-          <span class="w-2 h-2 rounded-full bg-[#00E676]"></span> Aston M.
-        </button>
-        <button onclick="applyTheme('redbull')" class="px-2 py-1.5 rounded bg-white/5 hover:bg-white/10 border border-yellow-400/40 text-[10px] text-yellow-300 font-bold transition flex items-center justify-center gap-1">
-          <span class="w-2 h-2 rounded-full bg-[#FFD100]"></span> Red Bull
-        </button>
-        <button onclick="applyTheme('cyberpunk')" class="px-2 py-1.5 rounded bg-white/5 hover:bg-white/10 border border-purple-500/40 text-[10px] text-purple-300 font-bold transition flex items-center justify-center gap-1">
-          <span class="w-2 h-2 rounded-full bg-[#9B51E0]"></span> Neon
-        </button>
-      </div>
-    </div>
-
-    <!-- CUSTOM COLOR PICKERS -->
-    <div class="flex flex-col gap-2 pt-2 border-t border-white/10">
-      <span class="text-gray-400 uppercase font-bold text-[10px] tracking-wider">Cores Customizadas</span>
-      <div class="flex items-center justify-between">
-        <span class="text-gray-300">Cor de Destaque (Accent):</span>
-        <input type="color" id="accentColorPicker" value="#09f1da" onchange="setCustomAccent(this.value)" class="w-7 h-7 rounded border border-white/20 cursor-pointer bg-transparent">
-      </div>
-      <div class="flex items-center justify-between">
-        <span class="text-gray-300">Cor de Fundo (Painéis):</span>
-        <input type="color" id="panelColorPicker" value="#080a0f" onchange="setCustomPanelBg(this.value)" class="w-7 h-7 rounded border border-white/20 cursor-pointer bg-transparent">
-      </div>
-    </div>
-
-    <!-- DIMENSIONS, SHAPE & CONTOUR -->
-    <div class="flex flex-col gap-2.5 pt-2 border-t border-white/10">
-      <span class="text-gray-400 uppercase font-bold text-[10px] tracking-wider flex items-center gap-1.5">
-        <i data-lucide="sparkles" class="w-3.5 h-3.5 text-cyan-400"></i> Formato & Contorno da HUD
-      </span>
-
-      <!-- Border Radius (Arredondamento das Extremidades) -->
-      <div class="flex flex-col gap-1.5">
-        <div class="flex justify-between text-gray-300">
-          <span>Arredondamento das Bordas:</span>
-          <span id="radiusLabel" class="text-cyan-400 font-bold">20px</span>
-        </div>
-        <input type="range" id="radiusSlider" min="0" max="36" value="20" oninput="updateBorderRadius(this.value)" class="accent-cyan-400 cursor-pointer">
-        <div class="grid grid-cols-4 gap-1 pt-0.5">
-          <button onclick="setCornerRadiusPreset(0)" class="px-1.5 py-1 rounded bg-white/10 hover:bg-white/20 text-[10px] font-mono transition">Reto (0)</button>
-          <button onclick="setCornerRadiusPreset(10)" class="px-1.5 py-1 rounded bg-white/10 hover:bg-white/20 text-[10px] font-mono transition">Suave (10)</button>
-          <button onclick="setCornerRadiusPreset(20)" class="px-1.5 py-1 rounded bg-cyan-400/20 border border-cyan-400/50 text-cyan-300 text-[10px] font-mono transition font-bold">Redondo (20)</button>
-          <button onclick="setCornerRadiusPreset(32)" class="px-1.5 py-1 rounded bg-white/10 hover:bg-white/20 text-[10px] font-mono transition">Ultra (32)</button>
-        </div>
-      </div>
-
-      <!-- Contour / Border Thickness -->
-      <div class="flex items-center justify-between pt-1">
-        <span class="text-gray-300">Espessura do Contorno:</span>
-        <select id="borderWidthSelect" onchange="updateBorderWidth(this.value)" class="bg-black/60 border border-white/20 text-white rounded px-2 py-1 text-xs">
-          <option value="0" selected>Sem Borda (0px)</option>
-          <option value="1">Fino (1px)</option>
-          <option value="2">Médio (2px)</option>
-          <option value="3">Grosso / Marcante (3px)</option>
-        </select>
-      </div>
-
-      <!-- Neon Glow Effect -->
-      <div class="flex items-center justify-between pt-0.5">
-        <span class="text-gray-300">Brilho Neon da Borda (Glow):</span>
-        <label class="relative inline-flex items-center cursor-pointer">
-          <input type="checkbox" id="chkBorderGlow" onchange="toggleBorderGlow(this.checked)" class="sr-only peer">
-          <div class="w-9 h-5 bg-white/20 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-cyan-400"></div>
-        </label>
-      </div>
-
-      <!-- Shift LED Height -->
-      <div class="flex flex-col gap-1 pt-1">
-        <div class="flex justify-between text-gray-300">
-          <span>Espessura dos LEDs de RPM:</span>
-          <span id="ledHeightLabel" class="text-cyan-400 font-bold">12px</span>
-        </div>
-        <input type="range" id="ledHeightSlider" min="6" max="22" value="12" oninput="updateLedHeight(this.value)" class="accent-cyan-400 cursor-pointer">
-      </div>
-
-      <!-- Gear Font Size -->
-      <div class="flex items-center justify-between">
-        <span class="text-gray-300">Tamanho da Marcha:</span>
-        <select id="gearSizeSelect" onchange="updateGearSize(this.value)" class="bg-black/60 border border-white/20 text-white rounded px-2 py-1 text-xs">
-          <option value="text-6xl">Normal (6xl)</option>
-          <option value="text-7xl" selected>Grande (7xl)</option>
-          <option value="text-8xl">Gigante (8xl)</option>
-          <option value="text-9xl">Monstruoso (9xl)</option>
-        </select>
-      </div>
-    </div>
-
-    <!-- Glass Opacity -->
-    <div class="flex flex-col gap-1.5 pt-2 border-t border-white/10">
-      <div class="flex justify-between text-gray-300">
-        <span>Opacidade dos Painéis:</span>
-        <span id="opacityLabel" class="text-cyan-400 font-bold">78%</span>
-      </div>
-      <input type="range" id="opacitySlider" min="10" max="100" value="78" oninput="updateOpacity(this.value)" class="accent-cyan-400 cursor-pointer">
-    </div>
-
-    <!-- Vertical Offset -->
-    <div class="flex flex-col gap-1.5">
-      <div class="flex justify-between text-gray-300">
-        <span>Posição Vertical:</span>
-        <span id="posLabel" class="text-cyan-400 font-bold">32px</span>
-      </div>
-      <input type="range" id="posSlider" min="10" max="250" value="32" oninput="updateVerticalPos(this.value)" class="accent-cyan-400 cursor-pointer">
-    </div>
-
-    <!-- Toggle Modules -->
-    <div class="flex flex-col gap-2 pt-2 border-t border-white/10">
-      <span class="text-gray-400 uppercase font-bold text-[10px] tracking-wider">Módulos Ativos</span>
-      <label class="flex items-center justify-between cursor-pointer">
-        <span class="text-gray-300">Shift Lights (15 LEDs)</span>
-        <input type="checkbox" id="chkRpm" checked onchange="toggleModule('hudRpmBar', this.checked)" class="accent-cyan-400">
-      </label>
-      <label class="flex items-center justify-between cursor-pointer">
-        <span class="text-gray-300">Display Marcha & Velocidade</span>
-        <input type="checkbox" id="chkCenter" checked onchange="toggleModule('hudCenter', this.checked)" class="accent-cyan-400">
-      </label>
-      <label class="flex items-center justify-between cursor-pointer">
-        <span class="text-gray-300">ERS & DRS</span>
-        <input type="checkbox" id="chkErs" checked onchange="toggleModule('hudErsDrs', this.checked)" class="accent-cyan-400">
-      </label>
-      <label class="flex items-center justify-between cursor-pointer">
-        <span class="text-gray-300">4 Cantos (Pneus & Freios)</span>
-        <input type="checkbox" id="chkTyres" checked onchange="toggleModule('hudTyres', this.checked)" class="accent-cyan-400">
-      </label>
-    </div>
-
-    <!-- Sandbox Manual Sliders (Shown when in Sandbox Mode) -->
-    <div id="sandboxSliders" class="hidden flex flex-col gap-2.5 pt-2 border-t border-white/10">
-      <span class="text-f1-green uppercase font-bold text-[10px] tracking-wider flex items-center gap-1">
-        <i data-lucide="play-circle" class="w-3.5 h-3.5"></i> Testar Variáveis em Tempo Real
-      </span>
-      <div class="flex flex-col gap-1">
-        <div class="flex justify-between text-gray-300">
-          <span>RPM:</span>
-          <span id="manualRpmLabel" class="text-yellow-400 font-bold">11500</span>
-        </div>
-        <input type="range" id="sliderRpm" min="4000" max="13500" value="11500" oninput="manualUpdate()" class="accent-yellow-400 cursor-pointer">
-      </div>
+    <!-- Sliders and manual controls -->
+    <div class="flex flex-col gap-2.5">
+      <!-- Speed -->
       <div class="flex flex-col gap-1">
         <div class="flex justify-between text-gray-300">
           <span>Velocidade (KM/H):</span>
-          <span id="manualSpeedLabel" class="text-cyan-400 font-bold">295</span>
+          <span id="harnessSpeedVal" class="text-cyan-400 font-bold tabular-nums">295</span>
         </div>
-        <input type="range" id="sliderSpeed" min="0" max="360" value="295" oninput="manualUpdate()" class="accent-cyan-400 cursor-pointer">
+        <input type="range" id="hSpeed" min="0" max="360" value="295" oninput="onHarnessChange()" class="cursor-pointer">
       </div>
-      <div class="flex items-center justify-between">
-        <span class="text-gray-300">Marcha:</span>
-        <select id="selectGear" onchange="manualUpdate()" class="bg-black/60 border border-white/20 text-white rounded px-2 py-1">
-          <option value="-1">R (Ré)</option>
-          <option value="0">N (Neutro)</option>
-          <option value="1">1</option>
-          <option value="2">2</option>
-          <option value="3">3</option>
-          <option value="4">4</option>
-          <option value="5">5</option>
-          <option value="6">6</option>
-          <option value="7" selected>7</option>
-          <option value="8">8</option>
-        </select>
+
+      <!-- Gear Selector -->
+      <div class="flex flex-col gap-1">
+        <span class="text-gray-300">Marcha Engatada:</span>
+        <div class="grid grid-cols-10 gap-1 text-[10px] text-center font-bold" id="harnessGearButtons">
+          <button onclick="setHarnessGear(-1)" class="h-gear-btn p-1 rounded bg-white/5 border border-white/10 hover:bg-white/20" data-gear="-1">R</button>
+          <button onclick="setHarnessGear(0)" class="h-gear-btn p-1 rounded bg-white/5 border border-white/10 hover:bg-white/20" data-gear="0">N</button>
+          <button onclick="setHarnessGear(1)" class="h-gear-btn p-1 rounded bg-white/5 border border-white/10 hover:bg-white/20" data-gear="1">1</button>
+          <button onclick="setHarnessGear(2)" class="h-gear-btn p-1 rounded bg-white/5 border border-white/10 hover:bg-white/20" data-gear="2">2</button>
+          <button onclick="setHarnessGear(3)" class="h-gear-btn p-1 rounded bg-white/5 border border-white/10 hover:bg-white/20" data-gear="3">3</button>
+          <button onclick="setHarnessGear(4)" class="h-gear-btn p-1 rounded bg-white/5 border border-white/10 hover:bg-white/20" data-gear="4">4</button>
+          <button onclick="setHarnessGear(5)" class="h-gear-btn p-1 rounded bg-white/5 border border-white/10 hover:bg-white/20" data-gear="5">5</button>
+          <button onclick="setHarnessGear(6)" class="h-gear-btn p-1 rounded bg-white/5 border border-white/10 hover:bg-white/20" data-gear="6">6</button>
+          <button onclick="setHarnessGear(7)" class="h-gear-btn p-1 rounded bg-cyan-500 text-black border border-cyan-400 font-black" data-gear="7">7</button>
+          <button onclick="setHarnessGear(8)" class="h-gear-btn p-1 rounded bg-white/5 border border-white/10 hover:bg-white/20" data-gear="8">8</button>
+        </div>
       </div>
-      <div class="flex items-center justify-between">
-        <span class="text-gray-300">DRS:</span>
-        <select id="selectDrs" onchange="manualUpdate()" class="bg-black/60 border border-white/20 text-white rounded px-2 py-1">
-          <option value="0">Fechado</option>
-          <option value="1">Permitido (Ready)</option>
-          <option value="2" selected>Ativado (Active)</option>
-        </select>
+
+      <!-- RPM -->
+      <div class="flex flex-col gap-1">
+        <div class="flex justify-between text-gray-300">
+          <span>RPM Motor:</span>
+          <span id="harnessRpmVal" class="text-yellow-400 font-bold tabular-nums">11800</span>
+        </div>
+        <input type="range" id="hRpm" min="0" max="15000" value="11800" oninput="onHarnessChange()" class="accent-yellow-400 cursor-pointer">
       </div>
+
+      <!-- Throttle & Brake -->
+      <div class="grid grid-cols-2 gap-3">
+        <div class="flex flex-col gap-1">
+          <div class="flex justify-between text-gray-300">
+            <span class="text-green-400">Throttle:</span>
+            <span id="harnessThrVal" class="tabular-nums">100%</span>
+          </div>
+          <input type="range" id="hThrottle" min="0" max="100" value="100" oninput="onHarnessChange()" class="accent-green-400 cursor-pointer">
+        </div>
+        <div class="flex flex-col gap-1">
+          <div class="flex justify-between text-gray-300">
+            <span class="text-red-400">Brake:</span>
+            <span id="harnessBrkVal" class="tabular-nums">0%</span>
+          </div>
+          <input type="range" id="hBrake" min="0" max="100" value="0" oninput="onHarnessChange()" class="accent-red-400 cursor-pointer">
+        </div>
+      </div>
+
+      <!-- ERS Battery -->
+      <div class="flex flex-col gap-1">
+        <div class="flex justify-between text-gray-300">
+          <span class="text-cyan-300">ERS Battery:</span>
+          <span id="harnessErsVal" class="tabular-nums">85%</span>
+        </div>
+        <input type="range" id="hErs" min="0" max="100" value="85" oninput="onHarnessChange()" class="accent-cyan-400 cursor-pointer">
+      </div>
+
+      <!-- Overtake Toggle -->
+      <label class="flex items-center justify-between cursor-pointer pt-2 border-t border-white/10">
+        <span class="text-rose-400 font-bold">Overtake Mode</span>
+        <input type="checkbox" id="hOvertake" onchange="onHarnessChange()" class="accent-rose-500 w-4 h-4 cursor-pointer">
+      </label>
+    </div>
+
+    <!-- Stress Loop Action -->
+    <div class="pt-2 border-t border-white/10 flex flex-col gap-1.5">
+      <button id="btnStressLoop" onclick="toggleStressLoop()"
+        class="w-full py-2 rounded-lg font-bold text-xs bg-cyan-600 hover:bg-cyan-500 text-white flex items-center justify-center gap-2 transition active:scale-95 shadow-lg shadow-cyan-600/30">
+        <i data-lucide="play-circle" class="w-4 h-4"></i>
+        <span id="stressLoopText">Iniciar Stress Loop (60 FPS)</span>
+      </button>
+      <span class="text-[10px] text-gray-400 text-center">Simula volta rápida com marchas, aceleração e frenagem extrema</span>
     </div>
   </aside>
 
-  <!-- MAIN HUD OVERLAY CONTAINER -->
-  <main class="w-screen h-screen m-0 p-0 pointer-events-none overflow-hidden relative" id="hudContainer">
+  <!-- MAIN HUD CONTAINER (POSITIONED OVER COCKPIT HALO) -->
+  <main class="w-screen h-screen m-0 p-0 pointer-events-none flex flex-col justify-end items-center pb-12 relative" id="hudContainer">
     
-    <div class="fixed flex flex-col items-center w-full max-w-4xl pointer-events-auto select-none touch-none transition-shadow hud-movable" id="hudCluster" style="left: 50%; bottom: 32px; transform: translateX(-50%);">
-      
-      <!-- UNIFIED F1 REALISTIC HALO COCKPIT HUD (Matches overlay.html 1:1) -->
-      <div id="hudRoot" class="halo-chassis w-full p-2 flex flex-col justify-between relative select-none">
-        
-        <!-- 0. TOP SLIM HEADER: Drag Handle & Quick Actions -->
-        <div id="dragHeader" class="w-full h-5 px-2 flex items-center justify-between text-xs font-mono cursor-grab select-none">
-          <div class="flex items-center gap-2">
-            <i data-lucide="grip-horizontal" class="w-3.5 h-3.5 text-cyan-400"></i>
-            <span class="font-bold tracking-widest uppercase text-[9px] text-gray-300">F1 HALO COCKPIT</span>
-            <span id="coordsBadge" class="hidden sm:inline-block px-1.5 py-0.2 rounded bg-cyan-400/10 text-cyan-300 font-mono text-[8px] border border-cyan-400/20">X: -- | Y: --</span>
-          </div>
-
-          <div class="flex items-center gap-1.5">
-            <button id="btnResetPos" onclick="resetHudPosition(event)" class="px-2 py-0.5 rounded bg-white/10 hover:bg-white/20 text-gray-300 text-[9px] font-semibold transition active:scale-95" title="Centralizar na tela">
-              Centralizar
-            </button>
-            <button id="btnCloseHud" onclick="closeHud(event)" class="w-5 h-5 flex items-center justify-center rounded bg-red-500/20 hover:bg-red-500/40 text-red-300 hover:text-white text-xs font-bold transition active:scale-95 border border-red-500/30" title="Fechar HUD">
-              &times;
-            </button>
-          </div>
-        </div>
-
-        <!-- 1. MAIN TELEMETRY ARCH (Exact 1:1 F1 Halo HUD Geometry) -->
-        <div class="w-full flex-1 flex items-center justify-between px-1 my-0.5 min-h-0 relative">
+    <div id="hud-container" class="relative w-full max-w-[960px] mx-auto select-none font-['Rajdhani'] pointer-events-auto">
+      <svg viewBox="0 0 960 220" class="w-full h-auto drop-shadow-[0_8px_16px_rgba(0,0,0,0.65)] filter">
+        <defs>
+          <!-- Gradients -->
+          <linearGradient id="ersGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#00E5FF" />
+            <stop offset="100%" stop-color="#0077B6" />
+          </linearGradient>
           
-          <!-- LEFT WING: DRS, ERS & BRAKE SEGMENTS -->
-          <div class="flex-1 flex items-center justify-end gap-3 pr-2">
-            <!-- Left Wing Sub-panel: DRS & ERS Battery -->
-            <div class="flex flex-col gap-1.5 justify-center">
-              <div class="flex items-center gap-1.5">
-                <span class="text-[9px] font-mono font-bold text-gray-400 w-7">ERS</span>
-                <div class="w-24 h-2.5 bg-black/70 rounded border border-white/15 overflow-hidden p-0.5">
-                  <div id="ersBar" class="h-full rounded-sm bg-gradient-to-r from-emerald-400 via-cyan-400 to-blue-500 transition-none" style="width: 82%;"></div>
-                </div>
-                <span id="ersPctText" class="text-[9px] font-mono font-bold text-emerald-400 w-7 text-right">82%</span>
-              </div>
+          <linearGradient id="rpmGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stop-color="#00FF66" />
+            <stop offset="68%" stop-color="#FFDD00" />
+            <stop offset="92%" stop-color="#FF0055" />
+          </linearGradient>
 
-              <div id="drsBadge" class="flex items-center justify-center gap-1 px-3 py-1 rounded bg-white/5 border border-white/10 text-[10px] font-mono font-bold text-gray-400 transition-all">
-                <i data-lucide="wind" class="w-3 h-3"></i>
-                <span id="drsText">DRS</span>
-              </div>
-            </div>
+          <!-- Accent Glow Filter -->
+          <filter id="accentGlow" x="-20%" y="-20%" width="140%" height="140%">
+            <feGaussianBlur stdDeviation="3" result="blur" />
+            <feMerge>
+              <feMergeNode in="blur" />
+              <feMergeNode in="SourceGraphic" />
+            </feMerge>
+          </filter>
+        </defs>
 
-            <!-- Vertical BRAKE Meter (Segmented LEDs) -->
-            <div class="flex flex-col items-center gap-1">
-              <div class="pedal-meter-container" id="brakeMeter">
-                <!-- 12 LED segments generated via JS -->
-              </div>
-              <span class="text-[8px] font-mono font-black text-red-400 tracking-wider">BRAKE</span>
-            </div>
-          </div>
+        <!-- Asa Esquerda (Perfil Halo Inclinado) -->
+        <path d="M 120 170 L 360 145 L 360 65 L 140 85 Z" fill="rgba(10, 20, 35, 0.78)" stroke="rgba(0, 229, 255, 0.28)" stroke-width="1.5" />
+        <path d="M 140 85 L 360 65" stroke="rgba(255, 255, 255, 0.15)" stroke-width="1" />
+        
+        <!-- Domo Central (Speedometer Semicircular Pod) -->
+        <path d="M 370 145 C 370 70, 590 70, 590 145 Z" fill="rgba(8, 16, 28, 0.90)" stroke="rgba(0, 229, 255, 0.40)" stroke-width="2" />
+        <path d="M 370 145 C 410 168, 550 168, 590 145" fill="none" stroke="rgba(0, 229, 255, 0.25)" stroke-width="1" />
 
-          <!-- CENTER POD: ICONIC CIRCULAR SPEED DIAL WITH CIRCULAR RPM TACHOMETER -->
-          <div class="flex flex-col items-center justify-center flex-shrink-0 mx-2 z-10 self-center">
-            <div class="halo-speed-pod flex flex-col items-center justify-center">
-              <svg class="rpm-arc-svg" viewBox="0 0 124 124">
-                <circle class="rpm-arc-bg" cx="62" cy="62" r="54"></circle>
-                <circle id="rpmArcMeter" class="rpm-arc-meter" cx="62" cy="62" r="54"></circle>
-              </svg>
+        <!-- Asa Direita (Perfil Halo Inclinado) -->
+        <path d="M 600 145 L 840 170 L 820 85 L 600 65 Z" fill="rgba(10, 20, 35, 0.78)" stroke="rgba(0, 229, 255, 0.28)" stroke-width="1.5" />
+        <path d="M 600 65 L 820 85" stroke="rgba(255, 255, 255, 0.15)" stroke-width="1" />
 
-              <span class="text-[8px] font-mono font-bold text-gray-400 tracking-widest uppercase -mt-1">SPEED</span>
-              <span id="speedVal" class="text-4xl font-black font-display text-white tracking-tighter leading-none drop-shadow-[0_0_12px_rgba(255,255,255,0.4)]">284</span>
-              
-              <!-- Center Pod Gear Indicator (Clean, without KM/H) -->
-              <div class="flex items-center justify-center mt-0.5">
-                <span id="gearInPod" class="text-[12px] font-black font-mono text-cyan-300">7</span>
-              </div>
-            </div>
-          </div>
+        <!-- 1. ASA ESQUERDA: ERS & BRAKE -->
+        <text x="160" y="105" fill="#94A3B8" font-size="11" font-weight="700" letter-spacing="1">ERS BATTERY</text>
+        <text id="ers-percent" x="340" y="105" text-anchor="end" fill="#FFFFFF" font-size="18" font-weight="900" font-family="'JetBrains Mono'" class="tabular-nums">85%</text>
+        
+        <!-- ERS Battery Progress Bar -->
+        <rect x="160" y="115" width="180" height="8" rx="2" fill="rgba(255,255,255,0.08)" />
+        <rect id="ers-bar" x="160" y="115" width="153" height="8" rx="2" fill="url(#ersGradient)" />
+        
+        <!-- Brake Bar -->
+        <text x="160" y="145" fill="#EF4444" font-size="10" font-weight="800" letter-spacing="0.5">BRAKE</text>
+        <rect x="210" y="137" width="130" height="6" rx="1.5" fill="rgba(255,255,255,0.08)" />
+        <rect id="brake-bar" x="210" y="137" width="0" height="6" rx="1.5" fill="#EF4444" />
 
-          <!-- RIGHT WING: THROTTLE SEGMENTS, GEAR STRIP & RPM / SHIFT LIGHTS -->
-          <div class="flex-1 flex items-center justify-start gap-3 pl-2">
-            <!-- Vertical THROTTLE Meter (Segmented LEDs) -->
-            <div class="flex flex-col items-center gap-1">
-              <div class="pedal-meter-container" id="throttleMeter">
-                <!-- 12 LED segments generated via JS -->
-              </div>
-              <span class="text-[8px] font-mono font-black text-green-400 tracking-wider">THROTTLE</span>
-            </div>
+        <!-- 2. DOMO CENTRAL: VELOCÍMETRO DUPLO (KM/H + MPH) -->
+        <circle cx="480" cy="115" r="48" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="4" />
+        <circle id="speed-arc" cx="480" cy="115" r="48" fill="none" stroke="#00E5FF" stroke-width="4.5"
+          stroke-dasharray="301.59" stroke-dashoffset="54.2" stroke-linecap="round"
+          transform="rotate(-90 480 115)" filter="url(#accentGlow)" />
+        
+        <text x="480" y="85" text-anchor="middle" fill="#94A3B8" font-size="9" font-weight="800" letter-spacing="1">KM/H</text>
+        <text id="speed-kmh" x="480" y="115" text-anchor="middle" fill="#FFFFFF" font-size="34" font-weight="900" font-family="'JetBrains Mono'" class="tabular-nums">295</text>
+        <line x1="460" y1="120" x2="500" y2="120" stroke="rgba(255,255,255,0.15)" stroke-width="1" />
+        <text id="speed-mph" x="480" y="133" text-anchor="middle" fill="#CBD5E1" font-size="16" font-weight="700" font-family="'JetBrains Mono'" class="tabular-nums">183</text>
+        <text x="480" y="145" text-anchor="middle" fill="#64748B" font-size="8" font-weight="800" letter-spacing="0.5">MPH</text>
 
-            <!-- Gear Sequence Strip (R N 1 2 3 4 5 6 7 8) & RPM readout -->
-            <div class="flex flex-col gap-1.5 justify-center">
-              <div class="flex flex-col gap-0.5">
-                <div class="flex items-center justify-between text-[8px] font-mono text-gray-400 font-bold uppercase">
-                  <span>GEAR</span>
-                  <span id="rpmNumText" class="text-white font-mono">11450 RPM</span>
-                </div>
-                <div class="flex items-center gap-[3px] p-0.5 rounded bg-black/60 border border-white/10" id="gearStrip">
-                  <span id="gR" class="gear-item">R</span>
-                  <span id="gN" class="gear-item">N</span>
-                  <span id="g1" class="gear-item">1</span>
-                  <span id="g2" class="gear-item">2</span>
-                  <span id="g3" class="gear-item">3</span>
-                  <span id="g4" class="gear-item">4</span>
-                  <span id="g5" class="gear-item">5</span>
-                  <span id="g6" class="gear-item">6</span>
-                  <span id="g7" class="gear-item active">7</span>
-                  <span id="g8" class="gear-item">8</span>
-                </div>
-              </div>
+        <!-- 3. ASA DIREITA: THROTTLE, MARCHAS & TACÔMETRO -->
+        <text x="620" y="85" fill="#10B981" font-size="10" font-weight="800" letter-spacing="0.5">THROTTLE</text>
+        <rect x="680" y="77" width="120" height="6" rx="1.5" fill="rgba(255,255,255,0.08)" />
+        <rect id="throttle-bar" x="680" y="77" width="120" height="6" rx="1.5" fill="#10B981" />
 
-              <!-- 15-LED Shift Light Bar -->
-              <div class="w-full flex gap-1 p-0.5 bg-black/60 rounded border border-white/10" id="ledsContainer">
-                <!-- 15 LEDs dynamically injected -->
-              </div>
-            </div>
+        <!-- Horizontal Gear Strip (R N 1 2 3 4 5 6 7 8) -->
+        <g id="gears-row" font-family="'JetBrains Mono'" font-size="13" font-weight="700" fill="#64748B">
+          <text x="605" y="112" id="gear-R">R</text>
+          <text x="625" y="112" id="gear-N">N</text>
+          <text x="645" y="112" id="gear-1">1</text>
+          <text x="665" y="112" id="gear-2">2</text>
+          <text x="685" y="112" id="gear-3">3</text>
+          <text x="705" y="112" id="gear-4">4</text>
+          <text x="725" y="112" id="gear-5">5</text>
+          <text x="745" y="112" id="gear-6">6</text>
+          <text x="765" y="112" id="gear-7" fill="#00E5FF" font-size="15" font-weight="900">7</text>
+          <text x="785" y="112" id="gear-8">8</text>
+        </g>
 
-            <!-- 4-Corner Tyres & Brakes Thermal Telemetry -->
-            <div class="wing-block flex flex-col gap-1 text-[8px] font-mono min-w-[96px] flex-shrink-0">
-              <div class="flex justify-between items-center text-gray-400 border-b border-white/10 pb-0.5">
-                <span class="font-bold">TYRES</span>
-                <span class="text-cyan-400">°C</span>
-              </div>
-              <div class="grid grid-cols-2 gap-x-2.5 gap-y-0.5 whitespace-nowrap">
-                <div class="flex items-center gap-1 justify-between">
-                  <span class="text-gray-500 font-bold">FL</span>
-                  <span id="tyreFL" class="text-green-400 font-bold">96°</span>
-                </div>
-                <div class="flex items-center gap-1 justify-between">
-                  <span class="text-gray-500 font-bold">FR</span>
-                  <span id="tyreFR" class="text-green-400 font-bold">97°</span>
-                </div>
-                <div class="flex items-center gap-1 justify-between">
-                  <span class="text-gray-500 font-bold">RL</span>
-                  <span id="tyreRL" class="text-green-400 font-bold">98°</span>
-                </div>
-                <div class="flex items-center gap-1 justify-between">
-                  <span class="text-gray-500 font-bold">RR</span>
-                  <span id="tyreRR" class="text-green-400 font-bold">98°</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-        </div>
-
-        <!-- 2. FOOTER: Watermark & Telemetry Info -->
-        <div class="w-full flex items-center justify-between px-2 text-[9px] font-mono text-gray-400 select-none">
-          <!-- Watermark: made by augrocky™ -->
-          <div id="augrockyTrademark" class="flex items-center gap-1">
-            <span class="tracking-wider uppercase font-medium">made by <span class="font-bold text-gray-200">augrocky</span><span id="trademarkSymbolStudio" class="text-white font-bold text-[9px] ml-0.5">™</span></span>
-          </div>
-
-          <div class="flex items-center gap-2 text-[8px] text-gray-500 uppercase tracking-widest">
-            <span>F1 REALISTIC HALO</span>
-            <span>•</span>
-            <span id="fpsIndicator" class="text-cyan-400 font-bold">60 FPS</span>
-          </div>
-        </div>
-
-      </div>
-
+        <!-- RPM Tachometer -->
+        <text x="620" y="135" fill="#94A3B8" font-size="9" font-weight="700" letter-spacing="1">RPM x1000</text>
+        <text id="rpm-num" x="800" y="135" text-anchor="end" fill="#CBD5E1" font-size="10" font-weight="700" font-family="'JetBrains Mono'" class="tabular-nums">11800</text>
+        <rect x="620" y="142" width="180" height="8" rx="2" fill="rgba(255,255,255,0.08)" />
+        <rect id="rpm-bar" x="620" y="142" width="141.6" height="8" rx="2" fill="url(#rpmGradient)" />
+        
+        <!-- OVERTAKE Luminous Badge -->
+        <g id="overtake-badge" style="transition: opacity 0.15s ease;" opacity="0">
+          <rect x="680" y="156" width="65" height="12" rx="2" fill="#E11D48" />
+          <text x="712" y="165" text-anchor="middle" fill="#FFFFFF" font-size="8" font-weight="900" letter-spacing="0.5">OVERTAKE</text>
+        </g>
+      </svg>
     </div>
+
   </main>
 
   <script>
-    // Initialize Lucide icons
     lucide.createIcons();
 
-    // Generate 12 Pedal Segments for Brake & Throttle
-    const TOTAL_SEGMENTS = 12;
-    const brakeMeter = document.getElementById('brakeMeter');
-    const throttleMeter = document.getElementById('throttleMeter');
-    const brakeSegments = [];
-    const throttleSegments = [];
+    // Direct DOM references
+    const speedKmhEl = document.getElementById('speed-kmh');
+    const speedMphEl = document.getElementById('speed-mph');
+    const speedArcEl = document.getElementById('speed-arc');
+    const ersPercentEl = document.getElementById('ers-percent');
+    const ersBarEl = document.getElementById('ers-bar');
+    const brakeBarEl = document.getElementById('brake-bar');
+    const throttleBarEl = document.getElementById('throttle-bar');
+    const rpmBarEl = document.getElementById('rpm-bar');
+    const rpmNumEl = document.getElementById('rpm-num');
+    const overtakeBadgeEl = document.getElementById('overtake-badge');
+    const statusTextEl = document.getElementById('statusText');
+    const statusIndicatorEl = document.getElementById('statusIndicator');
 
-    if (brakeMeter && throttleMeter) {
-      for (let i = 0; i < TOTAL_SEGMENTS; i++) {
-        const bSeg = document.createElement('div');
-        bSeg.className = 'pedal-seg';
-        brakeMeter.appendChild(bSeg);
-        brakeSegments.push(bSeg);
+    // Gear references
+    const gearList = ['R', 'N', '1', '2', '3', '4', '5', '6', '7', '8'];
+    const gearEls = {};
+    gearList.forEach(g => {
+      gearEls[g] = document.getElementById(`gear-${g}`);
+    });
 
-        const tSeg = document.createElement('div');
-        tSeg.className = 'pedal-seg';
-        throttleMeter.appendChild(tSeg);
-        throttleSegments.push(tSeg);
-      }
-    }
+    const SPEED_CIRCUMFERENCE = 301.59;
+    let currentGear = '7';
+    let currentMode = 'live'; // 'live' | 'harness'
+    let isStressLoopActive = false;
+    let stressReqId = null;
 
-    // Generate 15 LEDs for Shift Light Bar
-    const ledsContainer = document.getElementById('ledsContainer');
-    const TOTAL_LEDS = 15;
-    const leds = [];
-    if (ledsContainer) {
-      for (let i = 0; i < TOTAL_LEDS; i++) {
-        const led = document.createElement('div');
-        led.className = 'led-shift';
-        ledsContainer.appendChild(led);
-        leds.push(led);
-      }
-    }
+    // DIRECT HIGH-PERFORMANCE RENDERER
+    function applyTelemetryDirect(t) {
+      // 1. Speed (KM/H and MPH)
+      const kmh = Math.round(Number(t.speed) || 0);
+      const mph = Math.round(kmh * 0.621371);
+      speedKmhEl.textContent = kmh;
+      speedMphEl.textContent = mph;
 
-    // State & Modes
-    let currentMode = 'live'; // 'live' or 'sandbox'
-    let ws = null;
-    let reconnectTimer = null;
+      // Arc progress (0 to 360 km/h)
+      const spdRatio = Math.min(1, Math.max(0, kmh / 360));
+      const dashOffset = SPEED_CIRCUMFERENCE * (1 - spdRatio);
+      speedArcEl.setAttribute('stroke-dashoffset', dashOffset.toFixed(1));
 
-    // DOM references for instant mutations
-    const speedVal = document.getElementById('speedVal');
-    const gearInPod = document.getElementById('gearInPod');
-    const rpmArcMeter = document.getElementById('rpmArcMeter');
-    const rpmNumText = document.getElementById('rpmNumText');
-    const ersBar = document.getElementById('ersBar');
-    const ersPctText = document.getElementById('ersPctText');
-    const drsBadge = document.getElementById('drsBadge');
-    const drsText = document.getElementById('drsText');
-    const tyreFL = document.getElementById('tyreFL');
-    const tyreFR = document.getElementById('tyreFR');
-    const tyreRL = document.getElementById('tyreRL');
-    const tyreRR = document.getElementById('tyreRR');
-    const statusIndicator = document.getElementById('statusIndicator');
-    const statusText = document.getElementById('statusText');
-
-    const gearIds = ['gR', 'gN', 'g1', 'g2', 'g3', 'g4', 'g5', 'g6', 'g7', 'g8'];
-
-    function updateGear(gear) {
-      gearIds.forEach(id => {
-        const el = document.getElementById(id);
-        if (el) el.className = 'gear-item';
-      });
-
-      let targetId = 'gN';
-      let charStr = 'N';
-      const gNum = Number(gear);
-
-      if (gear === -1 || gear === '-1' || gear === 'R' || gear === 'r' || gNum === -1) {
-        targetId = 'gR';
-        charStr = 'R';
-      } else if (gNum >= 1 && gNum <= 8) {
-        targetId = `g${gNum}`;
-        charStr = `${gNum}`;
-      } else {
-        targetId = 'gN';
-        charStr = 'N';
-      }
-
-      const activeEl = document.getElementById(targetId);
-      if (activeEl) {
-        if (targetId === 'gR') {
-          activeEl.className = 'gear-item active active-reverse';
-        } else {
-          activeEl.className = 'gear-item active';
-        }
-      }
-      if (gearInPod) {
-        gearInPod.textContent = charStr;
-        gearInPod.className = charStr === 'R' ? 'text-[11px] font-black font-mono text-red-400' :
-                              charStr === 'N' ? 'text-[11px] font-black font-mono text-yellow-400' :
-                              'text-[11px] font-black font-mono text-cyan-300';
-      }
-    }
-
-    function updatePedals(throttlePct, brakePct) {
-      const activeThrCount = Math.round((throttlePct / 100) * TOTAL_SEGMENTS);
-      for (let i = 0; i < TOTAL_SEGMENTS; i++) {
-        if (throttleSegments[i]) {
-          throttleSegments[i].className = i < activeThrCount ? 'pedal-seg active-thr' : 'pedal-seg';
-        }
-      }
-
-      const activeBrkCount = Math.round((brakePct / 100) * TOTAL_SEGMENTS);
-      for (let i = 0; i < TOTAL_SEGMENTS; i++) {
-        if (brakeSegments[i]) {
-          brakeSegments[i].className = i < activeBrkCount ? 'pedal-seg active-brk' : 'pedal-seg';
-        }
-      }
-    }
-
-    const ARC_CIRCUMFERENCE = 339.29; // 2 * PI * 54
-    function updateRpm(rpm, maxRpm) {
-      if (rpmNumText) rpmNumText.textContent = `${rpm} RPM`;
-      const pct = Math.max(0, Math.min(1, rpm / (maxRpm || 13500)));
-
-      if (rpmArcMeter) {
-        const offset = ARC_CIRCUMFERENCE * (1 - pct);
-        rpmArcMeter.style.strokeDashoffset = offset;
-        if (pct > 0.88) {
-          rpmArcMeter.classList.add('rpm-arc-redline');
-        } else {
-          rpmArcMeter.classList.remove('rpm-arc-redline');
-        }
-      }
-
-      const activeLeds = Math.floor(pct * TOTAL_LEDS);
-      for (let i = 0; i < TOTAL_LEDS; i++) {
-        if (leds[i]) {
-          if (i < activeLeds) {
-            if (i < 5) leds[i].className = 'led-shift active-green';
-            else if (i < 10) leds[i].className = 'led-shift active-red';
-            else leds[i].className = 'led-shift active-purple';
-          } else {
-            leds[i].className = 'led-shift';
-          }
-        }
-      }
-    }
-
-    function updateDrs(drsStatus) {
-      if (!drsBadge || !drsText) return;
-      if (drsStatus === 1) {
-        drsBadge.className = 'flex items-center justify-center gap-1 px-3 py-1 rounded bg-emerald-500 text-black font-black font-mono text-[10px] shadow-[0_0_15px_rgba(0,230,118,0.7)]';
-        drsText.textContent = 'DRS ACTIVE';
-      } else if (drsStatus === 2) {
-        drsBadge.className = 'flex items-center justify-center gap-1 px-3 py-1 rounded bg-yellow-400 text-black font-bold font-mono text-[10px] shadow-[0_0_12px_rgba(250,204,21,0.6)]';
-        drsText.textContent = 'DRS AVAIL';
-      } else {
-        drsBadge.className = 'flex items-center justify-center gap-1 px-3 py-1 rounded bg-white/5 border border-white/10 text-[10px] font-mono font-bold text-gray-400';
-        drsText.textContent = 'DRS';
-      }
-    }
-
-    function updateErs(pct) {
-      const cleanPct = Math.max(0, Math.min(100, pct));
-      if (ersBar) ersBar.style.width = `${cleanPct}%`;
-      if (ersPctText) ersPctText.textContent = `${Math.round(cleanPct)}%`;
-    }
-
-    function formatTyreTemp(el, temp) {
-      if (!el) return;
-      el.textContent = `${temp}°`;
-      if (temp < 85) el.className = 'text-cyan-400 font-bold';
-      else if (temp <= 108) el.className = 'text-green-400 font-bold';
-      else el.className = 'text-red-400 font-bold';
-    }
-
-    // Direct DOM Frame Dispatcher
-    function renderFrame(frame) {
-      if (!frame) return;
-      const rpm = frame.engineRPM !== undefined ? frame.engineRPM : (frame.engine_rpm || 0);
-      const maxRpm = frame.maxRPM !== undefined ? frame.maxRPM : (frame.max_rpm || 13500);
-      updateRpm(rpm, maxRpm);
-
-      if (speedVal) speedVal.textContent = Math.round(frame.speed || 0);
-      updateGear(frame.gear !== undefined ? frame.gear : 0);
-
-      let thr = frame.throttle || 0;
-      if (thr > 0 && thr <= 1.0) thr = thr * 100;
-      let brk = frame.brake || 0;
-      if (brk > 0 && brk <= 1.0) brk = brk * 100;
-      updatePedals(thr, brk);
-
-      const drsState = frame.drs === 1 ? 1 : (frame.drsAllowed === 1 ? 2 : (frame.drs || 0));
-      updateDrs(drsState);
-
+      // 2. ERS Battery (0 to 100%)
       let ersPct = 100;
-      if (frame.ersStoreEnergy !== undefined) {
-        ersPct = Math.min(100, Math.max(0, (frame.ersStoreEnergy / 4000000) * 100));
-      } else if (frame.ers_store !== undefined) {
-        ersPct = frame.ers_store;
-      }
-      updateErs(ersPct);
+      if (t.ersPercent !== undefined) ersPct = Number(t.ersPercent);
+      else if (t.ers_store !== undefined) ersPct = Number(t.ers_store);
+      else if (t.ersStoreEnergy !== undefined) ersPct = (Number(t.ersStoreEnergy) / 4000000) * 100;
+      ersPct = Math.max(0, Math.min(100, ersPct));
+      
+      ersPercentEl.textContent = `${Math.round(ersPct)}%`;
+      ersBarEl.setAttribute('width', (ersPct * 1.8).toFixed(1));
 
-      const tyres = frame.tyresSurfaceTemperature || frame.tyre_surface_temp;
-      if (tyres && tyres.length >= 4) {
-        if (frame.tyresSurfaceTemperature) {
-          formatTyreTemp(tyreFL, Math.round(tyres[2]));
-          formatTyreTemp(tyreFR, Math.round(tyres[3]));
-          formatTyreTemp(tyreRL, Math.round(tyres[0]));
-          formatTyreTemp(tyreRR, Math.round(tyres[1]));
-        } else {
-          formatTyreTemp(tyreFL, Math.round(tyres[0]));
-          formatTyreTemp(tyreFR, Math.round(tyres[1]));
-          formatTyreTemp(tyreRL, Math.round(tyres[2]));
-          formatTyreTemp(tyreRR, Math.round(tyres[3]));
-        }
+      // 3. Brake (0 to 100%)
+      let brkPct = Number(t.brake) || 0;
+      if (brkPct > 0 && brkPct <= 1.0) brkPct *= 100;
+      brkPct = Math.max(0, Math.min(100, brkPct));
+      brakeBarEl.setAttribute('width', (brkPct * 1.3).toFixed(1));
+
+      // 4. Throttle (0 to 100%)
+      let thrPct = Number(t.throttle) || 0;
+      if (thrPct > 0 && thrPct <= 1.0) thrPct *= 100;
+      thrPct = Math.max(0, Math.min(100, thrPct));
+      throttleBarEl.setAttribute('width', (thrPct * 1.2).toFixed(1));
+
+      // 5. Gear
+      const gRaw = t.gear !== undefined ? t.gear : 0;
+      let activeGearStr = 'N';
+      if (gRaw === -1 || gRaw === '-1' || gRaw === 'R' || gRaw === 'r') activeGearStr = 'R';
+      else if (gRaw >= 1 && gRaw <= 8) activeGearStr = String(gRaw);
+      else activeGearStr = 'N';
+
+      if (currentGear !== activeGearStr) {
+        currentGear = activeGearStr;
+        gearList.forEach(g => {
+          const el = gearEls[g];
+          if (!el) return;
+          if (g === activeGearStr) {
+            el.setAttribute('fill', g === 'R' ? '#EF4444' : '#00E5FF');
+            el.setAttribute('font-size', '15');
+            el.setAttribute('font-weight', '900');
+          } else {
+            el.setAttribute('fill', '#64748B');
+            el.setAttribute('font-size', '13');
+            el.setAttribute('font-weight', '700');
+          }
+        });
       }
+
+      // 6. RPM (0 to 15000)
+      const rpm = Number(t.engineRPM !== undefined ? t.engineRPM : (t.engine_rpm || 0));
+      const rpmRatio = Math.max(0, Math.min(1, rpm / 15000));
+      rpmBarEl.setAttribute('width', (rpmRatio * 180).toFixed(1));
+      if (rpmNumEl) rpmNumEl.textContent = Math.round(rpm);
+
+      // 7. Overtake / ERS Deploy / DRS
+      const isOvertake = Boolean(t.overtake || t.ersDeploy || (t.drs === 1));
+      overtakeBadgeEl.setAttribute('opacity', isOvertake ? '1' : '0');
     }
 
-    // --- CENTRAL CONFIGURATION & WEBSOCKET SYNC ---
-    let currentConfig = {
-      accentColor: '#09f1da',
-      panelBg: '#080a0f',
-      opacity: 88,
-      borderRadius: 0,
-      borderWidth: 0,
-      borderGlow: false,
-      borderGlowIntensity: 0,
-      ledHeight: 12,
-      gearSize: 'text-7xl',
-      scale: 100,
-      theme: 'mercedes',
-    };
-
-    function applyConfigToStudio(cfg) {
-      if (!cfg) return;
-      currentConfig = { ...currentConfig, ...cfg };
-      const colorHex = currentConfig.accentColor || '#09f1da';
-
-      document.documentElement.style.setProperty('--accent-color', colorHex);
-      document.documentElement.style.setProperty('--accent-glow', `${colorHex}55`);
-      document.documentElement.style.setProperty('--halo-rail', colorHex);
-
-      // 1. Accent Colors
-      document.querySelectorAll('.text-cyan-400').forEach(el => el.style.color = colorHex);
-      const ersBar = document.getElementById('ersBar');
-      if (ersBar) {
-        ersBar.style.background = `linear-gradient(to right, ${colorHex}, #3b82f6, #6366f1)`;
-      }
-      const picker = document.getElementById('accentColorPicker');
-      if (picker && picker.value !== colorHex) picker.value = colorHex;
-
-      // 2. Border Radius & Corners
-      const r = currentConfig.borderRadius !== undefined ? currentConfig.borderRadius : 0;
-      const radiusLabel = document.getElementById('radiusLabel');
-      if (radiusLabel) radiusLabel.textContent = `${r}px`;
-      const radiusSlider = document.getElementById('radiusSlider');
-      if (radiusSlider && parseInt(radiusSlider.value, 10) !== r) radiusSlider.value = r;
-
-      const hudR = document.getElementById('hudRoot');
-      if (hudR) {
-        hudR.style.borderRadius = `${r}px`;
-        const bw = currentConfig.borderWidth !== undefined ? currentConfig.borderWidth : 0;
-        hudR.style.borderWidth = `${bw}px`;
-        hudR.style.borderStyle = bw > 0 ? 'solid' : 'none';
-        hudR.style.borderColor = bw === 0 ? 'transparent' : `${colorHex}66`;
-
-        const glowOn = currentConfig.borderGlow !== undefined ? currentConfig.borderGlow : false;
-        const glowIntensity = currentConfig.borderGlowIntensity || 0;
-        hudR.style.boxShadow = (glowOn && bw > 0)
-          ? `0 0 ${glowIntensity}px ${colorHex}50, 0 15px 35px rgba(0,0,0,0.85)`
-          : '0 10px 25px rgba(0,0,0,0.7)';
-      }
-
-      const panelR = Math.max(6, r - 6);
-      document.querySelectorAll('.halo-pod').forEach(p => {
-        p.style.borderRadius = `${panelR}px`;
-        p.style.borderColor = `${colorHex}25`;
-      });
-      const dragH = document.getElementById('dragHeader');
-      if (dragH) dragH.style.borderRadius = `${Math.max(4, r - 10)}px`;
-
-      // 3. Border Contour Thickness
-      const bw = currentConfig.borderWidth !== undefined ? currentConfig.borderWidth : 1;
-      const bwSelect = document.getElementById('borderWidthSelect');
-      if (bwSelect && parseInt(bwSelect.value, 10) !== bw) bwSelect.value = bw;
-
-      // 4. Glow Effect
-      const glowOn = currentConfig.borderGlow !== undefined ? currentConfig.borderGlow : true;
-      const chkGlow = document.getElementById('chkBorderGlow');
-      if (chkGlow) chkGlow.checked = glowOn;
-
-      // 5. Opacity & Panel Background
-      const op = (currentConfig.opacity !== undefined ? currentConfig.opacity : 88) / 100;
-      const opLabel = document.getElementById('opacityLabel');
-      if (opLabel) opLabel.textContent = `${Math.round(op * 100)}%`;
-      const opSlider = document.getElementById('opacitySlider');
-      if (opSlider && parseInt(opSlider.value, 10) !== Math.round(op * 100)) opSlider.value = Math.round(op * 100);
-
-      document.querySelectorAll('.halo-pod').forEach(p => {
-        p.style.backgroundColor = currentConfig.panelBg || 'rgba(10, 14, 20, 0.85)';
-        p.style.opacity = op;
-      });
-
-      // 6. LED Height
-      if (currentConfig.ledHeight) {
-        const ledH = currentConfig.ledHeight;
-        const ledLabel = document.getElementById('ledHeightLabel');
-        if (ledLabel) ledLabel.textContent = `${ledH}px`;
-        const ledSlider = document.getElementById('ledHeightSlider');
-        if (ledSlider && parseInt(ledSlider.value, 10) !== ledH) ledSlider.value = ledH;
-        leds.forEach(led => led.style.height = `${ledH}px`);
-      }
-
-      // 7. Gear Size
-      if (currentConfig.gearSize) {
-        const gearEl = document.getElementById('gearChar');
-        if (gearEl) gearEl.className = gearEl.className.replace(/text-[6789]xl/g, currentConfig.gearSize);
-        const gearSel = document.getElementById('gearSizeSelect');
-        if (gearSel && gearSel.value !== currentConfig.gearSize) gearSel.value = currentConfig.gearSize;
-      }
-    }
-
-    // Broadcast change to both Backend (persisting & distributing to overlay) and local studio
-    function broadcastConfig(partial) {
-      applyConfigToStudio(partial);
-
-      if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify({ type: 'config_update', config: partial }));
-      }
-      fetch('/api/config', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(partial)
-      }).catch(() => {});
-    }
-
-    // Connect WebSocket
+    // WEBSOCKET TELEMETRY
+    let ws = null;
     function connectWs() {
-      const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const wsUrl = `${protocol}//${window.location.host}/ws/telemetry`;
-
-      statusIndicator.className = 'w-2 h-2 rounded-full bg-yellow-400 animate-ping';
-      statusText.textContent = 'Conectando WebSocket...';
+      const loc = window.location;
+      const wsProto = loc.protocol === 'https:' ? 'wss:' : 'ws:';
+      const wsHost = loc.hostname || '127.0.0.1';
+      const wsPort = loc.port || '8000';
+      const wsUrl = `${wsProto}//${wsHost}:${wsPort}/ws/telemetry`;
 
       ws = new WebSocket(wsUrl);
 
       ws.onopen = () => {
-        statusIndicator.className = 'w-2 h-2 rounded-full bg-green-400 shadow-glow-green';
-        statusText.textContent = 'F1 24 Telemetria 60Hz (Online)';
+        if (currentMode === 'live') {
+          statusIndicatorEl.className = 'w-2 h-2 rounded-full bg-emerald-400';
+          statusTextEl.textContent = 'F1 24 Conectado (60Hz)';
+        }
       };
 
-      ws.onmessage = (event) => {
+      ws.onmessage = (evt) => {
+        if (currentMode !== 'live') return;
         try {
-          const payload = JSON.parse(event.data);
-          // Config sync from backend or other window
-          if (payload.type === 'config_update') {
-            applyConfigToStudio(payload.config || payload.data || payload);
-            return;
+          const raw = JSON.parse(evt.data);
+          const data = (raw.type === 'telemetry' && raw.data) ? raw.data : raw;
+          if (data && (data.speed !== undefined || data.engineRPM !== undefined || data.engine_rpm !== undefined)) {
+            applyTelemetryDirect(data);
           }
-          if (payload.accentColor && payload.speed === undefined) {
-            applyConfigToStudio(payload);
-            return;
-          }
-
-          if (currentMode !== 'live') return;
-          const frame = (payload.type === 'telemetry' && payload.data) ? payload.data : payload;
-          if (frame && (frame.speed !== undefined || frame.engineRPM !== undefined || frame.engine_rpm !== undefined)) {
-            renderFrame(frame);
-          }
-        } catch {}
+        } catch (e) { }
       };
 
       ws.onclose = () => {
-        statusIndicator.className = 'w-2 h-2 rounded-full bg-red-500';
-        statusText.textContent = 'Desconectado (Tentando reconectar...)';
-        if (reconnectTimer) clearTimeout(reconnectTimer);
-        reconnectTimer = setTimeout(connectWs, 2000);
+        if (currentMode === 'live') {
+          statusIndicatorEl.className = 'w-2 h-2 rounded-full bg-yellow-400 animate-pulse';
+          statusTextEl.textContent = 'Aguardando F1 24 (UDP 20777)...';
+        }
+        setTimeout(connectWs, 2000);
       };
 
       ws.onerror = () => {
-        ws.close();
+        try { ws.close(); } catch (e) { }
       };
     }
 
-    connectWs();
-
-    // Fetch persisted config on load
-    fetch('/api/config')
-      .then(r => r.json())
-      .then(cfg => applyConfigToStudio(cfg))
-      .catch(() => {});
-
-    // Switch Background
-    function setBg(bgName) {
-      const body = document.getElementById('mainBody');
-      body.className = `w-screen h-screen m-0 p-0 overflow-hidden select-none font-display text-white transition-all duration-300 bg-${bgName}`;
-
-      document.getElementById('btnBgCockpit').className = bgName === 'cockpit' ? 'px-2.5 py-1 rounded bg-f1-red text-white font-bold transition' : 'px-2.5 py-1 rounded text-gray-400 hover:text-white transition';
-      document.getElementById('btnBgCarbon').className = bgName === 'carbon' ? 'px-2.5 py-1 rounded bg-f1-red text-white font-bold transition' : 'px-2.5 py-1 rounded text-gray-400 hover:text-white transition';
-      document.getElementById('btnBgChecker').className = bgName === 'checker' ? 'px-2.5 py-1 rounded bg-f1-red text-white font-bold transition' : 'px-2.5 py-1 rounded text-gray-400 hover:text-white transition';
-    }
-
-    // Switch Mode
+    // MODE SELECTION: LIVE VS HARNESS
     function setMode(mode) {
       currentMode = mode;
       const btnLive = document.getElementById('btnModeLive');
-      const btnSandbox = document.getElementById('btnModeSandbox');
-      const sandboxSliders = document.getElementById('sandboxSliders');
+      const btnHarness = document.getElementById('btnModeHarness');
+      const panel = document.getElementById('harnessPanel');
 
       if (mode === 'live') {
-        btnLive.className = 'px-3 py-1 rounded bg-f1-green text-black font-bold flex items-center gap-1.5 transition';
-        btnSandbox.className = 'px-3 py-1 rounded text-gray-400 hover:text-white flex items-center gap-1.5 transition';
-        sandboxSliders.classList.add('hidden');
+        stopStressLoop();
+        btnLive.className = 'px-3 py-1 rounded bg-emerald-500 text-black font-bold flex items-center gap-1.5 transition';
+        btnHarness.className = 'px-3 py-1 rounded text-gray-400 hover:text-white flex items-center gap-1.5 transition';
+        panel.classList.add('hidden');
+        statusIndicatorEl.className = (ws && ws.readyState === WebSocket.OPEN) ? 'w-2 h-2 rounded-full bg-emerald-400' : 'w-2 h-2 rounded-full bg-yellow-400 animate-pulse';
+        statusTextEl.textContent = (ws && ws.readyState === WebSocket.OPEN) ? 'F1 24 Conectado (60Hz)' : 'Aguardando F1 24...';
       } else {
-        btnSandbox.className = 'px-3 py-1 rounded bg-cyan-400 text-black font-bold flex items-center gap-1.5 transition';
         btnLive.className = 'px-3 py-1 rounded text-gray-400 hover:text-white flex items-center gap-1.5 transition';
-        sandboxSliders.classList.remove('hidden');
-        document.getElementById('customizerDrawer').classList.remove('hidden');
-        manualUpdate();
+        btnHarness.className = 'px-3 py-1 rounded bg-cyan-500 text-black font-bold flex items-center gap-1.5 transition';
+        panel.classList.remove('hidden');
+        statusIndicatorEl.className = 'w-2 h-2 rounded-full bg-amber-400';
+        statusTextEl.textContent = 'Harness Ativo (Manual)';
+        onHarnessChange();
       }
     }
 
-    // Manual Slider Updates (Sandbox Mode)
-    function manualUpdate() {
-      const rpm = parseInt(document.getElementById('sliderRpm').value, 10);
-      const speed = parseInt(document.getElementById('sliderSpeed').value, 10);
-      const gear = parseInt(document.getElementById('selectGear').value, 10);
-      const drsState = parseInt(document.getElementById('selectDrs').value, 10);
+    // TELEMETRY TEST HARNESS LOGIC
+    let harnessSelectedGear = 7;
+    function setHarnessGear(g) {
+      harnessSelectedGear = g;
+      document.querySelectorAll('.h-gear-btn').forEach(btn => {
+        const val = Number(btn.getAttribute('data-gear'));
+        if (val === g) {
+          btn.className = 'h-gear-btn p-1 rounded bg-cyan-500 text-black border border-cyan-400 font-black';
+        } else {
+          btn.className = 'h-gear-btn p-1 rounded bg-white/5 border border-white/10 hover:bg-white/20 text-gray-300';
+        }
+      });
+      onHarnessChange();
+    }
 
-      document.getElementById('manualRpmLabel').textContent = rpm;
-      document.getElementById('manualSpeedLabel').textContent = speed;
+    function onHarnessChange() {
+      if (currentMode !== 'harness') return;
+      const spd = Number(document.getElementById('hSpeed').value);
+      const rpm = Number(document.getElementById('hRpm').value);
+      const thr = Number(document.getElementById('hThrottle').value);
+      const brk = Number(document.getElementById('hBrake').value);
+      const ers = Number(document.getElementById('hErs').value);
+      const ovt = Boolean(document.getElementById('hOvertake').checked);
 
-      renderFrame({
+      document.getElementById('harnessSpeedVal').textContent = spd;
+      document.getElementById('harnessRpmVal').textContent = rpm;
+      document.getElementById('harnessThrVal').textContent = `${thr}%`;
+      document.getElementById('harnessBrkVal').textContent = `${brk}%`;
+      document.getElementById('harnessErsVal').textContent = `${ers}%`;
+
+      applyTelemetryDirect({
+        speed: spd,
+        gear: harnessSelectedGear,
         engineRPM: rpm,
-        maxRPM: 13500,
-        speed: speed,
-        gear: gear,
-        throttle: speed > 100 ? 0.95 : 0.4,
-        brake: 0.0,
-        drs: drsState === 2 ? 1 : 0,
-        drsAllowed: drsState >= 1 ? 1 : 0,
-        ersStoreEnergy: 3200000,
-        ersDeployMode: 2,
-        tyresSurfaceTemperature: [98, 97, 101, 100],
-        brakesTemperature: [450, 430, 480, 470],
+        throttle: thr,
+        brake: brk,
+        ersPercent: ers,
+        overtake: ovt
       });
     }
 
-    // Customizer Drawer Toggle
-    function toggleCustomizer() {
-      const drawer = document.getElementById('customizerDrawer');
-      drawer.classList.toggle('hidden');
+    // STRESS LOOP / AUTO CYCLE (60 FPS HOT LAP SIMULATOR)
+    let stressState = 'accel';
+    let stressGear = 1;
+    let stressSpeed = 35;
+    let stressRpm = 4500;
+    let stressThr = 100;
+    let stressBrk = 0;
+    let stressOvt = false;
+
+    function toggleStressLoop() {
+      if (isStressLoopActive) stopStressLoop();
+      else startStressLoop();
     }
 
-    // Scale HUD
-    function updateScale(val) {
-      document.getElementById('scaleLabel').textContent = `${val}%`;
-      document.getElementById('hudCluster').style.transform = `scale(${val / 100})`;
-      broadcastConfig({ scale: parseInt(val, 10) });
+    function startStressLoop() {
+      if (currentMode !== 'harness') setMode('harness');
+      isStressLoopActive = true;
+      stressState = 'accel';
+      stressGear = 1;
+      stressSpeed = 40;
+      stressRpm = 5000;
+      stressThr = 100;
+      stressBrk = 0;
+
+      const btn = document.getElementById('btnStressLoop');
+      const text = document.getElementById('stressLoopText');
+      const topBtn = document.getElementById('btnTopStressLoop');
+      const topText = document.getElementById('topStressText');
+
+      if (btn) btn.className = 'w-full py-2 rounded-lg font-bold text-xs bg-emerald-600 hover:bg-emerald-500 text-white flex items-center justify-center gap-2 transition active:scale-95 shadow-lg shadow-emerald-600/30';
+      if (text) text.textContent = 'Parar Stress Loop';
+      if (topBtn) topBtn.className = 'px-3 py-1.5 rounded-lg bg-emerald-600 text-white font-bold flex items-center gap-1.5 transition';
+      if (topText) topText.textContent = 'Parar Loop';
+
+      runStressFrame();
     }
 
-    // Opacity
-    function updateOpacity(val) {
-      broadcastConfig({ opacity: parseInt(val, 10) });
-    }
-
-    // Vertical Position
-    function updateVerticalPos(val) {
-      document.getElementById('posLabel').textContent = `${val}px`;
-      document.getElementById('hudContainer').style.paddingBottom = `${val}px`;
-    }
-
-    // Toggle Modules
-    function toggleModule(id, isVisible) {
-      const el = document.getElementById(id);
-      if (isVisible) el.classList.remove('hidden');
-      else el.classList.add('hidden');
-    }
-
-    // Team Themes Presets
-    const THEMES = {
-      mercedes: { accent: '#00D2BE', panel: '#080c10' },
-      ferrari: { accent: '#E10600', panel: '#0e0808' },
-      mclaren: { accent: '#FF8000', panel: '#0f0a07' },
-      aston: { accent: '#00E676', panel: '#060d0b' },
-      redbull: { accent: '#FFD100', panel: '#070b14' },
-      cyberpunk: { accent: '#9B51E0', panel: '#11071a' }
-    };
-
-    function applyTheme(team) {
-      const t = THEMES[team];
-      if (!t) return;
-      broadcastConfig({ accentColor: t.accent, panelBg: t.panel, theme: team });
-    }
-
-    function setCustomAccent(colorHex) {
-      broadcastConfig({ accentColor: colorHex });
-    }
-
-    function setCustomPanelBg(colorHex) {
-      broadcastConfig({ panelBg: colorHex });
-    }
-
-    function updateLedHeight(heightPx) {
-      broadcastConfig({ ledHeight: parseInt(heightPx, 10) });
-    }
-
-    function updateGearSize(sizeClass) {
-      broadcastConfig({ gearSize: sizeClass });
-    }
-
-    // Arredondamento das Bordas (Cantos da HUD)
-    function updateBorderRadius(radiusPx) {
-      broadcastConfig({ borderRadius: parseInt(radiusPx, 10) });
-    }
-
-    function setCornerRadiusPreset(val) {
-      broadcastConfig({ borderRadius: val });
-    }
-
-    // Espessura do Contorno
-    function updateBorderWidth(widthPx) {
-      broadcastConfig({ borderWidth: parseInt(widthPx, 10) });
-    }
-
-    // Brilho Neon (Glow)
-    function toggleBorderGlow(enabled) {
-      broadcastConfig({ borderGlow: enabled });
-    }
-
-    // --- TOUCH & MOUSE DRAGGING SYSTEM IN STUDIO ---
-    const hudCluster = document.getElementById('hudCluster');
-    const coordsBadge = document.getElementById('coordsBadge');
-    
-    let isDragging = false;
-    let dragStartX = 0, dragStartY = 0;
-    let initialLeft = 0, initialTop = 0;
-    let animFrameId = null;
-    let targetLeft = 0, targetTop = 0;
-
-    function updateBadge(left, top) {
-      if (coordsBadge) {
-        coordsBadge.textContent = `X: ${Math.round(left)}px | Y: ${Math.round(top)}px`;
+    function stopStressLoop() {
+      isStressLoopActive = false;
+      if (stressReqId) {
+        cancelAnimationFrame(stressReqId);
+        stressReqId = null;
       }
+      const btn = document.getElementById('btnStressLoop');
+      const text = document.getElementById('stressLoopText');
+      const topBtn = document.getElementById('btnTopStressLoop');
+      const topText = document.getElementById('topStressText');
+
+      if (btn) btn.className = 'w-full py-2 rounded-lg font-bold text-xs bg-cyan-600 hover:bg-cyan-500 text-white flex items-center justify-center gap-2 transition active:scale-95 shadow-lg shadow-cyan-600/30';
+      if (text) text.textContent = 'Iniciar Stress Loop (60 FPS)';
+      if (topBtn) topBtn.className = 'px-3 py-1.5 rounded-lg bg-cyan-600/30 hover:bg-cyan-600/50 border border-cyan-400/40 text-cyan-300 hover:text-white font-bold flex items-center gap-1.5 transition';
+      if (topText) topText.textContent = 'Stress Loop';
     }
 
-    function loadSavedPosition() {
-      const saved = localStorage.getItem('f1_hud_coordinates');
-      if (saved) {
-        try {
-          const { left, top } = JSON.parse(saved);
-          if (left !== undefined && top !== undefined) {
-            hudCluster.style.left = left;
-            hudCluster.style.top = top;
-            hudCluster.style.bottom = 'auto';
-            hudCluster.style.transform = 'none';
-            updateBadge(parseFloat(left), parseFloat(top));
-            return;
+    function runStressFrame() {
+      if (!isStressLoopActive) return;
+
+      if (stressState === 'accel') {
+        stressThr = 100;
+        stressBrk = 0;
+        stressRpm += 125 + (stressGear * 10);
+        stressSpeed += 0.85 * (9 - stressGear);
+
+        if (stressGear >= 7) stressOvt = true;
+
+        if (stressRpm >= 13500) {
+          if (stressGear < 8) {
+            stressGear++;
+            stressRpm = 9200;
+          } else {
+            stressState = 'braking';
           }
-        } catch {}
+        }
+      } else if (stressState === 'braking') {
+        stressThr = 0;
+        stressBrk = 100;
+        stressOvt = false;
+        stressSpeed -= 3.8;
+        stressRpm -= 210;
+
+        if (stressSpeed < 280 && stressGear === 8) { stressGear = 7; stressRpm = 11000; }
+        else if (stressSpeed < 235 && stressGear === 7) { stressGear = 6; stressRpm = 11000; }
+        else if (stressSpeed < 195 && stressGear === 6) { stressGear = 5; stressRpm = 11000; }
+        else if (stressSpeed < 155 && stressGear === 5) { stressGear = 4; stressRpm = 11000; }
+        else if (stressSpeed < 120 && stressGear === 4) { stressGear = 3; stressRpm = 11000; }
+        else if (stressSpeed < 85 && stressGear === 3) { stressGear = 2; stressRpm = 10000; }
+        else if (stressSpeed <= 65) {
+          stressState = 'accel';
+          stressGear = 2;
+          stressRpm = 6500;
+        }
       }
-      resetHudPosition();
+
+      document.getElementById('hSpeed').value = Math.round(stressSpeed);
+      document.getElementById('hRpm').value = Math.round(stressRpm);
+      document.getElementById('hThrottle').value = stressThr;
+      document.getElementById('hBrake').value = stressBrk;
+      document.getElementById('hOvertake').checked = stressOvt;
+      harnessSelectedGear = stressGear;
+
+      onHarnessChange();
+      stressReqId = requestAnimationFrame(runStressFrame);
     }
 
-    window.resetHudPosition = function(e) {
-      if (e) e.stopPropagation();
-      localStorage.removeItem('f1_hud_coordinates');
-      const w = hudCluster.offsetWidth || 896;
-      const h = hudCluster.offsetHeight || 260;
-      const defaultLeft = Math.max(0, (window.innerWidth - w) / 2);
-      const defaultTop = Math.max(0, window.innerHeight - h - 32);
-      hudCluster.style.left = `${defaultLeft}px`;
-      hudCluster.style.top = `${defaultTop}px`;
-      hudCluster.style.bottom = 'auto';
-      hudCluster.style.transform = 'none';
-      updateBadge(defaultLeft, defaultTop);
-    };
+    // HOTKEY 'H' LISTENER
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'h' || e.key === 'H') {
+        if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+        setMode(currentMode === 'live' ? 'harness' : 'live');
+      }
+    });
 
-    window.closeHud = function(e) {
-      if (e) e.stopPropagation();
-      if (window.pywebview && window.pywebview.api && window.pywebview.api.close_hud) {
-        window.pywebview.api.close_hud();
+    // SCENARIO BACKGROUND TOGGLE
+    function setBg(preset) {
+      const b = document.getElementById('mainBody');
+      const bC = document.getElementById('btnBgCockpit');
+      const bK = document.getElementById('btnBgCarbon');
+      const bG = document.getElementById('btnBgChecker');
+
+      b.classList.remove('bg-cockpit', 'bg-carbon', 'bg-checker');
+      [bC, bK, bG].forEach(btn => btn.className = 'px-2.5 py-1 rounded text-gray-400 hover:text-white transition');
+
+      if (preset === 'cockpit') {
+        b.classList.add('bg-cockpit');
+        bC.className = 'px-2.5 py-1 rounded bg-red-600 text-white font-bold transition';
+      } else if (preset === 'carbon') {
+        b.classList.add('bg-carbon');
+        bK.className = 'px-2.5 py-1 rounded bg-red-600 text-white font-bold transition';
       } else {
-        const cluster = document.getElementById('hudCluster');
-        if (cluster) cluster.classList.toggle('hidden');
-      }
-    };
-
-    function onDragStart(clientX, clientY, targetEl) {
-      if (targetEl && targetEl.closest('button, input, select, a')) return false;
-
-      isDragging = true;
-      hudCluster.classList.add('hud-dragging');
-
-      const rect = hudCluster.getBoundingClientRect();
-      dragStartX = clientX;
-      dragStartY = clientY;
-      initialLeft = rect.left;
-      initialTop = rect.top;
-      targetLeft = initialLeft;
-      targetTop = initialTop;
-      return true;
-    }
-
-    function onDragMove(clientX, clientY) {
-      if (!isDragging) return;
-
-      const dx = clientX - dragStartX;
-      const dy = clientY - dragStartY;
-
-      const clusterW = hudCluster.offsetWidth || 896;
-      const clusterH = hudCluster.offsetHeight || 260;
-      const maxLeft = Math.max(0, window.innerWidth - clusterW);
-      const maxTop = Math.max(0, window.innerHeight - clusterH);
-
-      targetLeft = Math.max(0, Math.min(maxLeft, initialLeft + dx));
-      targetTop = Math.max(0, Math.min(maxTop, initialTop + dy));
-
-      if (!animFrameId) {
-        animFrameId = requestAnimationFrame(() => {
-          hudCluster.style.left = `${targetLeft}px`;
-          hudCluster.style.top = `${targetTop}px`;
-          hudCluster.style.bottom = 'auto';
-          hudCluster.style.transform = 'none';
-          updateBadge(targetLeft, targetTop);
-          animFrameId = null;
-        });
+        b.classList.add('bg-checker');
+        bG.className = 'px-2.5 py-1 rounded bg-red-600 text-white font-bold transition';
       }
     }
 
-    function onDragEnd() {
-      if (!isDragging) return;
-      isDragging = false;
-      hudCluster.classList.remove('hud-dragging');
-      if (animFrameId) {
-        cancelAnimationFrame(animFrameId);
-        animFrameId = null;
-      }
-
-      localStorage.setItem('f1_hud_coordinates', JSON.stringify({
-        left: hudCluster.style.left,
-        top: hudCluster.style.top
-      }));
-    }
-
-    function initDragging() {
-      loadSavedPosition();
-
-      hudCluster.addEventListener('pointerdown', (e) => {
-        if (onDragStart(e.clientX, e.clientY, e.target)) {
-          try { hudCluster.setPointerCapture(e.pointerId); } catch {}
-        }
-      });
-
-      window.addEventListener('pointermove', (e) => {
-        if (isDragging) onDragMove(e.clientX, e.clientY);
-      });
-
-      window.addEventListener('pointerup', (e) => {
-        if (isDragging) {
-          try { hudCluster.releasePointerCapture(e.pointerId); } catch {}
-          onDragEnd();
-        }
-      });
-
-      window.addEventListener('pointercancel', (e) => {
-        if (isDragging) onDragEnd();
-      });
-
-      hudCluster.addEventListener('touchstart', (e) => {
-        if (e.touches.length > 0) {
-          const touch = e.touches[0];
-          if (onDragStart(touch.clientX, touch.clientY, e.target)) {
-            e.preventDefault();
-          }
-        }
-      }, { passive: false });
-
-      window.addEventListener('touchmove', (e) => {
-        if (isDragging && e.touches.length > 0) {
-          const touch = e.touches[0];
-          onDragMove(touch.clientX, touch.clientY);
-          e.preventDefault();
-        }
-      }, { passive: false });
-
-      window.addEventListener('touchend', (e) => {
-        if (isDragging) onDragEnd();
-      });
-
-      window.addEventListener('touchcancel', (e) => {
-        if (isDragging) onDragEnd();
-      });
-
-      window.addEventListener('resize', () => {
-        const clusterW = hudCluster.offsetWidth || 896;
-        const clusterH = hudCluster.offsetHeight || 260;
-        const rect = hudCluster.getBoundingClientRect();
-        const maxLeft = Math.max(0, window.innerWidth - clusterW);
-        const maxTop = Math.max(0, window.innerHeight - clusterH);
-
-        const clampedL = Math.max(0, Math.min(maxLeft, rect.left));
-        const clampedT = Math.max(0, Math.min(maxTop, rect.top));
-
-        hudCluster.style.left = `${clampedL}px`;
-        hudCluster.style.top = `${clampedT}px`;
-        updateBadge(clampedL, clampedT);
-      });
-    }
-
-    window.addEventListener('DOMContentLoaded', initDragging);
-    setTimeout(initDragging, 200);
+    // INITIAL LOAD
+    connectWs();
+    applyTelemetryDirect({
+      speed: 295,
+      gear: 7,
+      engineRPM: 11800,
+      throttle: 100,
+      brake: 0,
+      ersPercent: 85,
+      overtake: false
+    });
   </script>
 </body>
+
 </html>
