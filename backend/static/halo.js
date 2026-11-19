@@ -40,7 +40,7 @@ window.toggleLock=async()=>{const next=!locked;const api=window.pywebview?.api;i
 $('lockButton').onclick=window.toggleLock;$('centerButton').onclick=()=>window.pywebview?.api.center_hud();$('closeButton').onclick=()=>window.pywebview?.api.close_hud();
 // Native F8 is handled globally by the shell. Browser preview needs a local handler.
 document.addEventListener('keydown',e=>{if(e.key==='F8'&&!window.pywebview){e.preventDefault();window.toggleLock();}});
-window.addEventListener('message',e=>{if((e.origin===location.origin||e.origin==='null'||!e.origin)&&e.data?.type==='halo-preview-config')applyConfig(e.data.config);});
+window.addEventListener('message',e=>{if(e.origin===location.origin||e.origin==='null'||!e.origin){if(e.data?.type==='halo-preview-config')applyConfig(e.data.config);if(e.data?.type==='telemetry'){lastFrame=performance.now();pending=e.data;updateStatus();}}});
 window.addEventListener('beforeunload',()=>{disposed=true;clearTimeout(retry);clearInterval(statusTimer);cancelAnimationFrame(raf);ws?.close();});
 const apiBase=location.protocol==='file:'?'http://127.0.0.1:8765':'';
 fetch(apiBase+'/api/config').then(r=>{if(!r.ok)throw Error(r.status);return r.json();}).then(applyConfig).catch(()=>{});connect();

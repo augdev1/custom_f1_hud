@@ -25,7 +25,7 @@
 <body>
   <header>
     <a href="/" class="brand">HALO<span>STUDIO / F1 24</span></a>
-    <div id="health" role="status">Conectando…</div>
+    <div id="health" role="status"><span class="pulse-offline"></span>Conectando…</div>
     <span class="local">LOCAL / WINDOWS</span>
   </header>
   <main>
@@ -33,10 +33,11 @@
       <div>
         <div class="eyebrow">BROADCAST TELEMETRY</div>
         <h1>O essencial. Na sua linha de visão.</h1>
-        <p>Halo transparente, velocidade compacta e cores que você reconhece em uma fração de segundo.</p>
+        <p>Halo transparente, velocidade compacta e cores sincronizadas em tempo real com a HUD do jogo.</p>
       </div>
       <button id="simulate" class="primary">Testar aceleração</button>
     </section>
+
     <section class="preview" aria-label="Prévia da HUD no cockpit de referência">
       <div class="preview-head">
         <span>01 / HALO TRANSPARENTE</span>
@@ -48,18 +49,26 @@
         <span>ERS / SPEED / GEAR / DRS</span>
       </div>
     </section>
+
     <section class="settings">
+      <!-- 01: Transparência e Escala -->
       <article>
         <h2>01 <span>Transparência e escala</span></h2>
         <label for="opacity">Opacidade dos painéis <output id="opacityValue">18%</output></label>
         <input id="opacity" type="range" min="0" max="100" value="18">
-        <p>Os textos e indicadores mantêm a legibilidade.</p>
+        <p>Os textos e indicadores mantêm 100% de legibilidade.</p>
+        
         <label for="scale">Escala da HUD <output id="scaleValue">100%</output></label>
         <input id="scale" type="range" min="60" max="110" value="100">
-        <label class="check"><input id="showTyres" type="checkbox"> Mostrar temperaturas dos pneus</label>
+        
+        <label class="check">
+          <input id="showTyres" type="checkbox"> Mostrar temperaturas dos pneus
+        </label>
       </article>
+
+      <!-- 02: Paleta e Presets -->
       <article>
-        <h2>02 <span>Paleta de corrida</span></h2>
+        <h2>02 <span>Paleta de corrida & Presets</span></h2>
         <div class="colors">
           <label><input type="color" id="panelBg" value="#101722">Painel</label>
           <label><input type="color" id="gearColor" value="#56c8ff">Marcha</label>
@@ -67,14 +76,56 @@
           <label><input type="color" id="throttleColor" value="#21d99a">Acelerador</label>
           <label><input type="color" id="brakeColor" value="#ff4055">Freio</label>
         </div>
+
+        <div class="team-presets">
+          <span class="sub-label">PRESETS OFICIAIS DE EQUIPE (1 CLIQUE)</span>
+          <div class="preset-grid">
+            <button type="button" class="preset-btn" data-preset="mercedes">MERCEDES</button>
+            <button type="button" class="preset-btn" data-preset="ferrari">FERRARI</button>
+            <button type="button" class="preset-btn" data-preset="redbull">RED BULL</button>
+            <button type="button" class="preset-btn" data-preset="mclaren">MCLAREN</button>
+            <button type="button" class="preset-btn" data-preset="aston">ASTON</button>
+            <button type="button" class="preset-btn" data-preset="cyberpunk">CYBERPUNK</button>
+          </div>
+        </div>
+
         <div class="actions">
-          <button id="reset">Restaurar modelo</button>
+          <button id="reset">Restaurar padrão</button>
           <button id="save" class="primary">Salvar na HUD</button>
         </div>
-        <p id="saveStatus" role="status">Ajustes são pré-visualizados antes de salvar.</p>
+        <p id="saveStatus" role="status">Ajustes são sincronizados automaticamente com a HUD.</p>
       </article>
+
+      <!-- 03: Calibração e Harness Manual -->
       <article>
-        <h2>03 <span>Pronto para a pista</span></h2>
+        <h2>03 <span>Calibração manual (Harness)</span></h2>
+        <label>Velocidade <output id="harnessSpeedVal">284 km/h</output></label>
+        <input id="harnessSpeed" type="range" min="0" max="360" value="284">
+
+        <label>Marcha ativa</label>
+        <div class="gear-picker" id="gearPicker">
+          <button type="button" class="gear-btn" data-gear="-1">R</button>
+          <button type="button" class="gear-btn" data-gear="0">N</button>
+          <button type="button" class="gear-btn" data-gear="1">1</button>
+          <button type="button" class="gear-btn" data-gear="2">2</button>
+          <button type="button" class="gear-btn" data-gear="3">3</button>
+          <button type="button" class="gear-btn" data-gear="4">4</button>
+          <button type="button" class="gear-btn" data-gear="5">5</button>
+          <button type="button" class="gear-btn" data-gear="6">6</button>
+          <button type="button" class="gear-btn active" data-gear="7">7</button>
+          <button type="button" class="gear-btn" data-gear="8">8</button>
+        </div>
+
+        <label>Acelerador <output id="harnessThrottleVal">100%</output></label>
+        <input id="harnessThrottle" type="range" min="0" max="100" value="100">
+
+        <label>Freio <output id="harnessBrakeVal">0%</output></label>
+        <input id="harnessBrake" type="range" min="0" max="100" value="0">
+      </article>
+
+      <!-- 04: Conexão e Portas de Jogo -->
+      <article>
+        <h2>04 <span>Pronto para a pista</span></h2>
         <dl>
           <div><dt>Telemetria F1 24</dt><dd>127.0.0.1 : 20777 / UDP</dd></div>
           <div><dt>HUD local</dt><dd>8765 / TCP + WebSocket</dd></div>
@@ -84,6 +135,7 @@
         <p id="packetInfo">Nenhum pacote recebido.</p>
       </article>
     </section>
+
     <footer>
       <span>HALO / TRANSPARENT BROADCAST</span>
       <span>made by augrocky™</span>
