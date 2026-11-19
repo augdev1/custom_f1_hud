@@ -1,0 +1,16 @@
+const $=id=>document.getElementById(id);
+const defaults={panelBg:'#101722',opacity:18,scale:100,gearColor:'#56c8ff',accentColor:'#56c8ff',primaryColor:'#56c8ff',secondaryColor:'#101722',ersColor:'#ffd400',throttleColor:'#21d99a',brakeColor:'#ff4055',showTyres:false,theme:'halo-transparent'};
+const fields=['panelBg','opacity','scale','gearColor','ersColor','throttleColor','brakeColor','showTyres'];
+let cfg={...defaults},simulating=false;
+async function api(path,body){const response=await fetch(path,body===undefined?{}:{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});if(!response.ok)throw Error(`HTTP ${response.status}`);return response.json();}
+function read(){for(const id of fields)cfg[id]=$(id).type==='checkbox'?$(id).checked:$(id).type==='range'?Number($(id).value):$(id).value;cfg.accentColor=cfg.primaryColor=cfg.gearColor;cfg.secondaryColor=cfg.panelBg;return cfg;}
+function preview(){read();$('opacityValue').value=`${cfg.opacity}%`;$('scaleValue').value=`${cfg.scale}%`;$('preview').contentWindow.postMessage({type:'halo-preview-config',config:cfg},location.origin);}
+function populate(){for(const id of fields){if($(id).type==='checkbox')$(id).checked=!!cfg[id];else $(id).value=cfg[id];}preview();}
+fields.forEach(id=>$(id).addEventListener('input',()=>{preview();$('saveStatus').textContent='Prévia atualizada. Salve para aplicar à janela da HUD.';}));
+$('preview').addEventListener('load',preview);
+$('save').onclick=async()=>{try{await api('/api/config',read());$('saveStatus').textContent='Configuração salva e enviada à HUD.';}catch(e){$('saveStatus').textContent=`Falha ao salvar: ${e.message}`;}};
+$('reset').onclick=()=>{cfg={...cfg,...defaults};populate();$('saveStatus').textContent='Modelo restaurado na prévia. Clique em Salvar na HUD.';};
+$('background').onclick=()=>{const check=document.querySelector('.preview').classList.toggle('checker');$('background').textContent=check?'Fundo: contraste':'Fundo: cockpit';};
+$('simulate').onclick=async()=>{const button=$('simulate');button.disabled=true;try{if(!simulating){const h=await api('/health');if(h.game_connected){$('source').textContent='TELEMETRIA JÁ ATIVA · SIMULADOR NÃO INICIADO';return;}}await api(`/api/simulator/${simulating?'stop':'start'}`,{});simulating=!simulating;button.textContent=simulating?'Parar simulação':'Testar aceleração';$('source').textContent=simulating?'SIMULAÇÃO UDP / ACELERAÇÃO + FREIO':'AGUARDANDO TELEMETRIA';}catch(e){$('source').textContent=`Falha no simulador: ${e.message}`;}finally{button.disabled=false;}};
+async function health(){try{const h=await api('/health');$('health').textContent=h.game_connected?'● TELEMETRIA RECEBIDA':'● BACKEND ONLINE';$('packetInfo').textContent=`${h.packets_received.toLocaleString('pt-BR')} pacotes · ${h.active_clients} cliente(s)`;if(!simulating)$('source').textContent=h.game_connected?'TELEMETRIA UDP ATIVA':'AGUARDANDO TELEMETRIA';}catch{$('health').textContent='BACKEND OFFLINE';}}
+api('/api/config').then(data=>{cfg={...defaults,...data};populate();}).catch(()=>populate());health();const timer=setInterval(health,1500);window.addEventListener('beforeunload',()=>{clearInterval(timer);if(simulating)navigator.sendBeacon('/api/simulator/stop');});

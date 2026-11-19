@@ -204,3 +204,54 @@ Métricas obtidas em testes de estresse sob carga sintética contínua a 60Hz:
 - **Desktop Shell & Transparência:** pywebview, Win32 API, DWM (Desktop Window Manager), Chroma Keying.
 - **Frontend & Interface:** HTML5, CSS3, Tailwind CSS, Lucide Icons, JetBrains Mono & Rajdhani Typography.
 - **Qualidade & Validação:** Pytest, pytest-asyncio, HTTPX.
+
+## 9. Halo Transparente — execução local (16/11/2026)
+
+A interface atual segue o conceito aprovado: arco contínuo, velocímetro compacto,
+painéis com 18% de opacidade e indicadores opacos. Studio e overlay compartilham
+`halo.css`, `halo.js` e `halo-model.js`; não dependem de CDN, Docker ou build Node.
+O Studio permite ajustar cores, opacidade, escala, pneus e simular aceleração/freio.
+
+### Portas deste PC
+- **20777/UDP**: telemetria do jogo (formato 2024, 60 Hz, destino 127.0.0.1).
+- **8765/TCP**: Studio, HTTP e WebSocket. A porta 8000 tem outro serviço neste PC.
+- `iniciar_hud.bat`, `iniciar_studio.bat` e `reiniciar_hud.bat` configuram 8765.
+- Para iniciar manualmente em PowerShell:
+  ```powershell
+  $env:API_HOST='127.0.0.1'
+  $env:API_PORT='8765'
+  .venv\Scripts\python.exe -m backend.server
+  # Em outro terminal:
+  .venv\Scripts\python.exe run_overlay.py
+  ```
+- Studio: http://127.0.0.1:8765/ ; estado: http://127.0.0.1:8765/health .
+- F8 alterna mover/corrida; controles desaparecem no modo corrida.
+- O simulador deve ser parado antes de iniciar o jogo. O Studio não o inicia se
+  já existe telemetria UDP ativa.
+
+### Harness reproduzível
+1. `.venv\Scripts\python.exe -m pytest -v -p no:cacheprovider`
+2. `node scripts/test_halo.mjs` (Node apenas para testes, não para executar a HUD).
+3. Com backend local iniciado e jogo/simulador parados:
+   `.venv\Scripts\python.exe -m scripts.harness_live`
+4. O terceiro comando envia 1.200 frames binários F1 24 pelas portas reais,
+   verifica aceleração, frenagem, marcha, DRS, ERS, contrato dual e sinal expirado.
+   Grava evidência em `scratch/harness-live.json` e encerra seu emissor UDP.
+5. Validar visualmente o Studio e, no desktop interativo, mover, F8, transparência
+   sobre outra janela, click-through e topmost com F1 24 em janela sem bordas.
+
+Resultado desta execução: 11 testes Python + 4 testes JS aprovados; 1.200/1.200
+frames no teste UDP/WS. Tempo médio servidor→cliente WS: 0,314 ms, P99: 0,524 ms.
+Esses tempos não incluem a renderização nem representam latência de ponta a ponta.
+Há um aviso preexistente de depreciação Starlette/httpx.
+A visualização no navegador foi conferida. A janela Win32 foi inicializada, mas
+não ficou acessível à captura de desktop desta sessão: F8/click-through/topmost
+sobre o jogo ainda precisam de validação no desktop do usuário.
+
+### Transparência atual
+O fundo HTML permanece transparente para o WebView2, com painéis SVG de alpha
+configurável. Não aplicar opacidade à janela inteira: isso apagaria os textos.
+A regra histórica de fundo HTML preto/chroma key não descreve este renderer.
+O shell mantém `transparent=True`, fundo nativo preto e a extensão DWM existente.
+A transparência parcial sobre o jogo depende do compositor WebView2/Win32 e deve
+ser conferida no desktop, não inferida apenas da prévia do navegador.

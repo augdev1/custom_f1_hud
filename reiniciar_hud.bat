@@ -1,6 +1,9 @@
 @echo off
 title F1 24 Custom HUD - Reiniciar Sistema
 cd /d "%~dp0"
+set API_HOST=127.0.0.1
+set API_PORT=8765
+set HUD_BACKEND_PORT=8765
 
 echo ========================================================
 echo       REINICIANDO F1 24 CUSTOM HUD & BACKEND

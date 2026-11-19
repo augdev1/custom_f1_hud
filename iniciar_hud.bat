@@ -1,5 +1,8 @@
 @echo off
 cd /d "%~dp0"
+set API_HOST=127.0.0.1
+set API_PORT=8765
+set HUD_BACKEND_PORT=8765
 
 :: 0. Auto-instalacao / Auto-recuperacao se o ambiente .venv nao existir na maquina clonada
 if not exist ".venv\Scripts\python.exe" (
@@ -24,8 +27,8 @@ if not exist ".venv\Scripts\python.exe" (
     echo ========================================================
 )
 
-:: 1. Inicia o servidor backend nativo (UDP 20777 + WebSocket 8000) caso nao esteja rodando
-curl -s http://127.0.0.1:8000/health >nul 2>&1
+:: 1. Inicia o servidor backend nativo (UDP 20777 + WebSocket 8765) caso nao esteja rodando
+curl -s http://127.0.0.1:8765/health >nul 2>&1
 if %ERRORLEVEL% NEQ 0 (
     start "" /b ".venv\Scripts\python.exe" -m backend.server
     ping 127.0.0.1 -n 2 >nul

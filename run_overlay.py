@@ -44,8 +44,8 @@ dwmapi = ctypes.windll.dwmapi
 
 CONFIG_PATH = os.path.join(os.path.dirname(os.path.abspath(__file__)), "hud_position.json")
 
-HUD_WIDTH = 896
-HUD_HEIGHT = 175
+HUD_WIDTH = 1000
+HUD_HEIGHT = 230
 
 is_clickthrough_active = False
 app_window = None
@@ -341,7 +341,7 @@ def topmost_watchdog_worker(window):
 
 
 BACKEND_HOST = os.getenv("HUD_BACKEND_HOST", "127.0.0.1")
-BACKEND_PORT = os.getenv("HUD_BACKEND_PORT", "8000")
+BACKEND_PORT = os.getenv("HUD_BACKEND_PORT", "8765")
 BACKEND_BASE_URL = os.getenv("HUD_BACKEND_URL", f"http://{BACKEND_HOST}:{BACKEND_PORT}")
 
 
@@ -355,7 +355,7 @@ def ensure_backend_running():
     health_url = f"{BACKEND_BASE_URL}/health"
     try:
         with urllib.request.urlopen(health_url, timeout=0.8) as r:
-            if r.status == 200:
+            if r.status == 200 and json.load(r).get("udp_port") == 20777:
                 print(f"[HUD Overlay] Servidor backend de telemetria ativo em {BACKEND_BASE_URL}.")
                 return True
     except Exception:
@@ -382,14 +382,15 @@ def ensure_backend_running():
             cwd=base_dir,
             stdout=f_log,
             stderr=subprocess.STDOUT,
-            creationflags=flags
+            creationflags=flags,
+            env={**os.environ, "API_HOST": BACKEND_HOST, "API_PORT": BACKEND_PORT}
         )
 
         for _ in range(30):
             time.sleep(0.2)
             try:
                 with urllib.request.urlopen(health_url, timeout=0.4) as r:
-                    if r.status == 200:
+                    if r.status == 200 and json.load(r).get("udp_port") == 20777:
                         print(f"[HUD Overlay] Servidor backend iniciado com sucesso! Escutando UDP 20777.")
                         return True
             except Exception:
@@ -423,10 +424,10 @@ def main():
     print("[HUD Overlay] DICA: Pressione F8 a qualquer momento para TRAVAR ou DESTRAVAR o movimento da HUD!")
 
     # Check / start backend server automatically
-    ensure_backend_running()
-    overlay_html_file = os.path.abspath(os.path.join(os.path.dirname(__file__), "backend", "static", "overlay.html"))
-    # Carrega diretamente o arquivo local para refletir alterações em tempo real
-    overlay_url = f"file:///{overlay_html_file.replace(os.sep, '/')}"
+    if not ensure_backend_running():
+        raise RuntimeError(f"Backend F1 indisponível em {BACKEND_BASE_URL}. Verifique as portas locais.")
+    # Same local renderer as Studio; same-origin assets and WebSocket endpoint.
+    overlay_url = f"{BACKEND_BASE_URL}/overlay"
 
     api = OverlayAPI()
 
@@ -442,6 +443,7 @@ def main():
         resizable=False,
         easy_drag=True,
         transparent=True,
+        background_color="#000000",
         js_api=api,
     )
 
