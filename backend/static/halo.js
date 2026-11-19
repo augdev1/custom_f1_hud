@@ -29,7 +29,7 @@ export function applyConfig(cfg){if(!cfg||typeof cfg!=='object')return;const sty
   if(cfg.scale!=null){const scale=clamp(cfg.scale,60,110)/100;$('halo').style.transform=`scale(${scale})`;$('halo').style.transformOrigin='50% 50%';}
   document.body.classList.toggle('show-tyres',cfg.showTyres===true);
 }
-function connect(){if(disposed)return;ws=new WebSocket(`${location.protocol==='https:'?'wss:':'ws:'}//${location.host}/ws/telemetry`);
+function connect(){if(disposed)return;const wsHost=(location.host&&location.protocol!=='file:')?location.host:'127.0.0.1:8765';ws=new WebSocket(`${location.protocol==='https:'?'wss:':'ws:'}//${wsHost}/ws/telemetry`);
   ws.onopen=()=>{connected=true;lastFrame=null;updateStatus();};
   ws.onmessage=event=>{try{const raw=JSON.parse(event.data);if(raw.type==='config_update'){applyConfig(raw.config||raw.data||raw);return;}const data=raw.type==='telemetry'?(raw.data||raw):raw;if(data.speed!==undefined||data.engineRPM!==undefined||data.engine_rpm!==undefined){lastFrame=performance.now();pending=raw;updateStatus();}}catch(error){console.warn('Pacote HUD inválido',error);}};
   ws.onclose=()=>{connected=false;pending=null;updateStatus();if(!disposed)retry=setTimeout(connect,1500);};ws.onerror=()=>ws.close();
@@ -40,6 +40,7 @@ window.toggleLock=async()=>{const next=!locked;const api=window.pywebview?.api;i
 $('lockButton').onclick=window.toggleLock;$('centerButton').onclick=()=>window.pywebview?.api.center_hud();$('closeButton').onclick=()=>window.pywebview?.api.close_hud();
 // Native F8 is handled globally by the shell. Browser preview needs a local handler.
 document.addEventListener('keydown',e=>{if(e.key==='F8'&&!window.pywebview){e.preventDefault();window.toggleLock();}});
-window.addEventListener('message',e=>{if(e.origin===location.origin&&e.source===parent&&e.data?.type==='halo-preview-config')applyConfig(e.data.config);});
+window.addEventListener('message',e=>{if((e.origin===location.origin||e.origin==='null'||!e.origin)&&e.data?.type==='halo-preview-config')applyConfig(e.data.config);});
 window.addEventListener('beforeunload',()=>{disposed=true;clearTimeout(retry);clearInterval(statusTimer);cancelAnimationFrame(raf);ws?.close();});
-fetch('/api/config').then(r=>{if(!r.ok)throw Error(r.status);return r.json();}).then(applyConfig).catch(()=>{});connect();
+const apiBase=location.protocol==='file:'?'http://127.0.0.1:8765':'';
+fetch(apiBase+'/api/config').then(r=>{if(!r.ok)throw Error(r.status);return r.json();}).then(applyConfig).catch(()=>{});connect();

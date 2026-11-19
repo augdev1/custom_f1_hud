@@ -414,6 +414,14 @@ async def websocket_telemetry_endpoint(websocket: WebSocket):
         await broadcaster.disconnect(websocket)
 
 
+@app.get("/{filename:path}")
+async def serve_static_fallback(filename: str):
+    file_path = STATIC_DIR / filename
+    if file_path.is_file():
+        return FileResponse(str(file_path))
+    return {"message": f"{filename} not found"}
+
+
 if __name__ == "__main__":
     import uvicorn
     host = os.getenv("API_HOST", "0.0.0.0")

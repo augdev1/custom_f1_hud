@@ -2,9 +2,10 @@ const $=id=>document.getElementById(id);
 const defaults={panelBg:'#101722',opacity:18,scale:100,gearColor:'#56c8ff',accentColor:'#56c8ff',primaryColor:'#56c8ff',secondaryColor:'#101722',ersColor:'#ffd400',throttleColor:'#21d99a',brakeColor:'#ff4055',showTyres:false,theme:'halo-transparent'};
 const fields=['panelBg','opacity','scale','gearColor','ersColor','throttleColor','brakeColor','showTyres'];
 let cfg={...defaults},simulating=false;
-async function api(path,body){const response=await fetch(path,body===undefined?{}:{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});if(!response.ok)throw Error(`HTTP ${response.status}`);return response.json();}
+const apiBase=location.protocol==='file:'?'http://127.0.0.1:8765':'';
+async function api(path,body){const response=await fetch(apiBase+path,body===undefined?{}:{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});if(!response.ok)throw Error(`HTTP ${response.status}`);return response.json();}
 function read(){for(const id of fields)cfg[id]=$(id).type==='checkbox'?$(id).checked:$(id).type==='range'?Number($(id).value):$(id).value;cfg.accentColor=cfg.primaryColor=cfg.gearColor;cfg.secondaryColor=cfg.panelBg;return cfg;}
-function preview(){read();$('opacityValue').value=`${cfg.opacity}%`;$('scaleValue').value=`${cfg.scale}%`;$('preview').contentWindow.postMessage({type:'halo-preview-config',config:cfg},location.origin);}
+function preview(){read();$('opacityValue').value=`${cfg.opacity}%`;$('scaleValue').value=`${cfg.scale}%`;const targetOrigin=(location.origin&&location.origin!=='null')?location.origin:'*';try{$('preview').contentWindow.postMessage({type:'halo-preview-config',config:cfg},targetOrigin);}catch{}}
 function populate(){for(const id of fields){if($(id).type==='checkbox')$(id).checked=!!cfg[id];else $(id).value=cfg[id];}preview();}
 fields.forEach(id=>$(id).addEventListener('input',()=>{preview();$('saveStatus').textContent='Prévia atualizada. Salve para aplicar à janela da HUD.';}));
 $('preview').addEventListener('load',preview);

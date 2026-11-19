@@ -1,9 +1,94 @@
 <!doctype html>
-<html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Halo Studio · F1 24</title><link rel="stylesheet" href="/static/studio.css"></head>
-<body><header><a href="/" class="brand">HALO<span>STUDIO / F1 24</span></a><div id="health" role="status">Conectando…</div><span class="local">LOCAL / WINDOWS</span></header>
-<main><section class="intro"><div><div class="eyebrow">BROADCAST TELEMETRY</div><h1>O essencial. Na sua linha de visão.</h1><p>Halo transparente, velocidade compacta e cores que você reconhece em uma fração de segundo.</p></div><button id="simulate" class="primary">Testar aceleração</button></section>
-<section class="preview" aria-label="Prévia da HUD no cockpit de referência"><div class="preview-head"><span>01 / HALO TRANSPARENTE</span><button id="background">Fundo: cockpit</button></div><iframe id="preview" title="HUD ao vivo" src="/overlay?embedded=1"></iframe><div class="preview-foot"><span id="source">AGUARDANDO TELEMETRIA</span><span>ERS / SPEED / GEAR / DRS</span></div></section>
-<section class="settings"><article><h2>01 <span>Transparência e escala</span></h2><label for="opacity">Opacidade dos painéis <output id="opacityValue">18%</output></label><input id="opacity" type="range" min="0" max="100" value="18"><p>Os textos e indicadores mantêm a legibilidade.</p><label for="scale">Escala da HUD <output id="scaleValue">100%</output></label><input id="scale" type="range" min="60" max="110" value="100"><label class="check"><input id="showTyres" type="checkbox"> Mostrar temperaturas dos pneus</label></article>
-<article><h2>02 <span>Paleta de corrida</span></h2><div class="colors"><label><input type="color" id="panelBg" value="#101722">Painel</label><label><input type="color" id="gearColor" value="#56c8ff">Marcha</label><label><input type="color" id="ersColor" value="#ffd400">ERS</label><label><input type="color" id="throttleColor" value="#21d99a">Acelerador</label><label><input type="color" id="brakeColor" value="#ff4055">Freio</label></div><div class="actions"><button id="reset">Restaurar modelo</button><button id="save" class="primary">Salvar na HUD</button></div><p id="saveStatus" role="status">Ajustes são pré-visualizados antes de salvar.</p></article>
-<article><h2>03 <span>Pronto para a pista</span></h2><dl><div><dt>Telemetria F1 24</dt><dd>127.0.0.1 : 20777 / UDP</dd></div><div><dt>HUD local</dt><dd>8765 / TCP + WebSocket</dd></div><div><dt>Formato / frequência</dt><dd>2024 / 60 Hz</dd></div></dl><p>Abra <strong>iniciar_hud.bat</strong> para usar sobre o jogo. Arraste para alinhar ao halo e pressione <kbd>F8</kbd> para travar ou mover.</p><p id="packetInfo">Nenhum pacote recebido.</p></article></section>
-<footer><span>HALO / TRANSPARENT BROADCAST</span><span>made by augrocky™</span></footer></main><script type="module" src="/static/studio.js"></script></body></html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Halo Studio · F1 24</title>
+  <script>
+    // Quando aberto diretamente do disco via file:///, redireciona automaticamente para o servidor local
+    if (location.protocol === 'file:') {
+      fetch('http://127.0.0.1:8765/health')
+        .then(function(r) { if (r.ok) location.replace('http://127.0.0.1:8765/'); })
+        .catch(function() {
+          document.addEventListener('DOMContentLoaded', function() {
+            var b = document.createElement('div');
+            b.style.cssText = 'position:fixed;top:0;left:0;right:0;background:#ff4055;color:#fff;padding:12px 16px;text-align:center;font-family:sans-serif;font-weight:bold;font-size:13px;z-index:99999;box-shadow:0 4px 12px rgba(0,0,0,0.5);';
+            b.innerHTML = 'Aviso: Você abriu este arquivo diretamente pelo disco (file:///). Execute o arquivo <strong>iniciar_studio.bat</strong> ou abra <a href="http://127.0.0.1:8765/" style="color:#fff;text-decoration:underline;">http://127.0.0.1:8765/</a> no seu navegador para carregar os estilos e a telemetria ao vivo.';
+            document.body.prepend(b);
+          });
+        });
+    }
+  </script>
+  <link rel="stylesheet" href="studio.css">
+  <link rel="stylesheet" href="/static/studio.css">
+</head>
+<body>
+  <header>
+    <a href="/" class="brand">HALO<span>STUDIO / F1 24</span></a>
+    <div id="health" role="status">Conectando…</div>
+    <span class="local">LOCAL / WINDOWS</span>
+  </header>
+  <main>
+    <section class="intro">
+      <div>
+        <div class="eyebrow">BROADCAST TELEMETRY</div>
+        <h1>O essencial. Na sua linha de visão.</h1>
+        <p>Halo transparente, velocidade compacta e cores que você reconhece em uma fração de segundo.</p>
+      </div>
+      <button id="simulate" class="primary">Testar aceleração</button>
+    </section>
+    <section class="preview" aria-label="Prévia da HUD no cockpit de referência">
+      <div class="preview-head">
+        <span>01 / HALO TRANSPARENTE</span>
+        <button id="background">Fundo: cockpit</button>
+      </div>
+      <iframe id="preview" title="HUD ao vivo" src="overlay?embedded=1"></iframe>
+      <div class="preview-foot">
+        <span id="source">AGUARDANDO TELEMETRIA</span>
+        <span>ERS / SPEED / GEAR / DRS</span>
+      </div>
+    </section>
+    <section class="settings">
+      <article>
+        <h2>01 <span>Transparência e escala</span></h2>
+        <label for="opacity">Opacidade dos painéis <output id="opacityValue">18%</output></label>
+        <input id="opacity" type="range" min="0" max="100" value="18">
+        <p>Os textos e indicadores mantêm a legibilidade.</p>
+        <label for="scale">Escala da HUD <output id="scaleValue">100%</output></label>
+        <input id="scale" type="range" min="60" max="110" value="100">
+        <label class="check"><input id="showTyres" type="checkbox"> Mostrar temperaturas dos pneus</label>
+      </article>
+      <article>
+        <h2>02 <span>Paleta de corrida</span></h2>
+        <div class="colors">
+          <label><input type="color" id="panelBg" value="#101722">Painel</label>
+          <label><input type="color" id="gearColor" value="#56c8ff">Marcha</label>
+          <label><input type="color" id="ersColor" value="#ffd400">ERS</label>
+          <label><input type="color" id="throttleColor" value="#21d99a">Acelerador</label>
+          <label><input type="color" id="brakeColor" value="#ff4055">Freio</label>
+        </div>
+        <div class="actions">
+          <button id="reset">Restaurar modelo</button>
+          <button id="save" class="primary">Salvar na HUD</button>
+        </div>
+        <p id="saveStatus" role="status">Ajustes são pré-visualizados antes de salvar.</p>
+      </article>
+      <article>
+        <h2>03 <span>Pronto para a pista</span></h2>
+        <dl>
+          <div><dt>Telemetria F1 24</dt><dd>127.0.0.1 : 20777 / UDP</dd></div>
+          <div><dt>HUD local</dt><dd>8765 / TCP + WebSocket</dd></div>
+          <div><dt>Formato / frequência</dt><dd>2024 / 60 Hz</dd></div>
+        </dl>
+        <p>Abra <strong>iniciar_hud.bat</strong> para usar sobre o jogo. Arraste para alinhar ao halo e pressione <kbd>F8</kbd> para travar ou mover.</p>
+        <p id="packetInfo">Nenhum pacote recebido.</p>
+      </article>
+    </section>
+    <footer>
+      <span>HALO / TRANSPARENT BROADCAST</span>
+      <span>made by augrocky™</span>
+    </footer>
+  </main>
+  <script type="module" src="studio.js"></script>
+</body>
+</html>
