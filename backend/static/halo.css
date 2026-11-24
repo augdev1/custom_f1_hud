@@ -4,14 +4,14 @@
   --muted: #8B9BB0;
   --accent: #00F5D4;
   --neon-green: #76FF03;
-  --neon-cyan: #00F5D4;
-  --panel: #040A10;
+  --neon-cyan: #00F0FF;
+  --panel: #03080E;
   --panel-opacity: 0.72;
   --throttle: #76FF03;
   --brake: #FF2A4D;
   --ers: #00D2BE;
   --gear-active: #00F5D4;
-  --gear-text-active: #040A10;
+  --gear-text-active: #03080E;
 }
 
 * { box-sizing: border-box; }
@@ -34,63 +34,125 @@ html, body {
   position: absolute; inset: 0;
   width: 100%; height: 100%;
   overflow: visible;
-  filter: drop-shadow(0 6px 20px rgba(0, 0, 0, 0.9));
+  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.95));
 }
 
-/* Tipografia Base em SVG */
-svg text {
-  fill: var(--text);
-  font-family: 'Titillium Web', 'Chakra Petch', sans-serif;
-  font-weight: 800;
-  font-style: italic;
-  paint-order: stroke fill;
-  stroke: #020609;
-  stroke-width: 1.2px;
-  stroke-linejoin: round;
-}
-
-/* Corpo e Borda Contínua do Halo */
-.halo-canopy-bg {
+/* ============================================== */
+/* 1. ESTRUTURA BASE DA ASA DO HALO               */
+/* ============================================== */
+.halo-canopy-body {
   fill: var(--panel);
   fill-opacity: var(--panel-opacity);
-  stroke: rgba(0, 245, 212, 0.15);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  stroke: rgba(0, 245, 212, 0.18);
   stroke-width: 1;
-  backdrop-filter: blur(6px);
 }
 
-.halo-border-glow {
+/* Borda com Gradiente Neon e Glow */
+.halo-neon-edge {
   fill: none;
-  stroke: var(--accent);
-  stroke-width: 2.2;
+  stroke: url(#haloBorderGrad);
+  stroke-width: 2.8;
   stroke-linecap: round;
-  filter: url(#f1CyanGlow);
+  filter: url(#neonGlow);
 }
 
-/* DRS Crest & Pill (Topo Central) */
-.drs-crest-bg {
-  fill: rgba(4, 10, 16, 0.9);
-  stroke: rgba(118, 255, 3, 0.3);
-  stroke-width: 1;
+.halo-neon-edge-bottom {
+  fill: none;
+  stroke: url(#haloBorderGrad);
+  stroke-width: 1.5;
+  stroke-opacity: 0.6;
+  filter: url(#neonGlow);
 }
 
-.drs-pill rect {
-  fill: rgba(4, 12, 8, 0.9);
-  stroke: var(--neon-green);
+/* ============================================== */
+/* 2. POD CENTRAL (VELOCÍMETRO)                   */
+/* ============================================== */
+.speed-dial-base {
+  fill: rgba(3, 7, 12, 0.92);
+  backdrop-filter: blur(8px);
+}
+
+.speed-dial-ring {
+  fill: none;
+  stroke: #00F0FF;
   stroke-width: 2;
-  filter: drop-shadow(0 0 10px rgba(118, 255, 3, 0.8));
+  filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.5));
+}
+
+.speed-digital-val {
+  font-size: 52px;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: -2px;
+  fill: #FFFFFF;
+  paint-order: stroke fill;
+  stroke: #020508;
+  stroke-width: 2px;
+}
+
+.rpm-label-text, .unit-label-text {
+  font-size: 10.5px;
+  font-weight: 850;
+  font-style: italic;
+  letter-spacing: 1.5px;
+  fill: var(--muted);
+}
+
+.sub-mph-val {
+  font-size: 13.5px;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: 1px;
+  fill: var(--accent);
+}
+
+/* Tacômetro de RPM (LEDs Radiais) */
+.rpm-led {
+  stroke: rgba(255, 255, 255, 0.12);
+  stroke-width: 4.8;
+  stroke-linecap: round;
+  transition: stroke 0.04s ease;
+}
+
+.rpm-led.active {
+  stroke: var(--neon-green);
+  filter: drop-shadow(0 0 8px rgba(118, 255, 3, 0.85));
+}
+
+.rpm-led.cyan.active {
+  stroke: var(--neon-cyan);
+  filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.85));
+}
+
+.rpm-led.redline.active {
+  stroke: #FF2A4D;
+  filter: drop-shadow(0 0 10px rgba(255, 42, 77, 0.95));
+}
+
+/* ============================================== */
+/* 3. PÍLULA DO DRS (ENCAIXE NO TOPO DO ARO)      */
+/* ============================================== */
+.drs-pill rect {
+  fill: rgba(3, 10, 6, 0.92);
+  stroke: var(--neon-green);
+  stroke-width: 2.2;
+  filter: url(#drsGreenGlow);
   transition: all 0.15s ease-out;
 }
 
-.drs-text {
+.drs-pill-text {
   font-size: 16px;
   font-weight: 900;
+  font-style: italic;
   letter-spacing: 2px;
   fill: var(--neon-green);
-  stroke: none;
+  paint-order: stroke fill;
 }
 
 .drs-pill.ready rect {
-  fill: rgba(4, 18, 12, 0.95);
+  fill: rgba(4, 18, 10, 0.96);
   stroke: var(--neon-green);
   stroke-width: 2.5;
   filter: drop-shadow(0 0 14px rgba(118, 255, 3, 0.9));
@@ -100,11 +162,11 @@ svg text {
   fill: var(--neon-green);
   stroke: #FFFFFF;
   stroke-width: 1.5;
-  filter: drop-shadow(0 0 18px rgba(118, 255, 3, 1));
+  filter: drop-shadow(0 0 20px rgba(118, 255, 3, 1));
 }
 
-.drs-pill.on .drs-text {
-  fill: #040A10;
+.drs-pill.on .drs-pill-text {
+  fill: #03080E;
   stroke: none;
 }
 
@@ -112,193 +174,134 @@ svg text {
   stroke: rgba(139, 155, 176, 0.35);
   filter: none;
 }
-.drs-pill.off .drs-text {
+.drs-pill.off .drs-pill-text {
   fill: var(--muted);
 }
 
-/* Pod Central */
-.pod-inner-disc {
-  fill: rgba(2, 6, 10, 0.88);
-  stroke: rgba(0, 245, 212, 0.5);
-  stroke-width: 1.8;
-  filter: drop-shadow(0 0 12px rgba(0, 245, 212, 0.35));
-}
-
-.speed-number {
-  font-size: 48px;
+/* ============================================== */
+/* 4. ASA ESQUERDA: PILOTOS & BATTLE (<textPath>) */
+/* ============================================== */
+.wing-driver-text {
+  font-size: 18px;
   font-weight: 900;
-  letter-spacing: -2px;
+  font-style: italic;
+  letter-spacing: 1px;
   fill: #FFFFFF;
-  stroke: #020609;
+  paint-order: stroke fill;
+  stroke: #020508;
   stroke-width: 2px;
 }
 
-.rpm-title {
-  font-size: 10px;
-  font-weight: 850;
-  letter-spacing: 1.5px;
-  fill: var(--muted);
-}
+.wing-driver-text .team-badge.ferrari { fill: #FFEB3B; }
+.wing-driver-text .team-badge.mercedes { fill: #00F5D4; }
 
-.unit-title {
-  font-size: 11px;
-  font-weight: 850;
-  letter-spacing: 1.5px;
-  fill: var(--muted);
-}
-
-.mph-number {
-  font-size: 13px;
+.wing-delta-text {
+  font-size: 14.5px;
   font-weight: 900;
-  letter-spacing: 1px;
-  fill: var(--accent);
-}
-
-/* Tacômetro de RPM (LEDs Radiais em Arco) */
-.rpm-led {
-  stroke: rgba(255, 255, 255, 0.12);
-  stroke-width: 4.5;
-  stroke-linecap: round;
-  transition: stroke 0.04s ease;
-}
-
-.rpm-led.active {
-  stroke: var(--neon-green);
-  stroke-opacity: 1;
-  filter: drop-shadow(0 0 6px rgba(118, 255, 3, 0.8));
-}
-
-.rpm-led.cyan.active {
-  stroke: var(--neon-cyan);
-  filter: drop-shadow(0 0 6px rgba(0, 245, 212, 0.8));
-}
-
-.rpm-led.redline.active {
-  stroke: #FF2A4D;
-  filter: drop-shadow(0 0 8px rgba(255, 42, 77, 0.95));
-}
-
-/* Asa Esquerda: Battle Tracker */
-.team-shield.ferrari {
-  fill: #FFEB3B;
-  stroke: #C62828;
-  stroke-width: 1;
-}
-
-.driver-num {
-  font-size: 18px;
-  font-weight: 900;
-  fill: #FFFFFF;
-}
-
-.driver-name {
-  font-size: 18px;
-  font-weight: 900;
-  letter-spacing: 1px;
-  fill: #FFFFFF;
-}
-
-.delta-val {
-  font-size: 14px;
-  font-weight: 850;
-  letter-spacing: 0.5px;
+  font-style: italic;
   fill: var(--neon-green);
+  letter-spacing: 0.5px;
 }
+.wing-delta-text .chevron { font-size: 10px; }
 
-.battle-divider {
-  stroke: rgba(255, 255, 255, 0.15);
-  stroke-width: 1;
-  fill: none;
-}
-
-/* Bateria ERS Integrada */
-.ers-tag {
-  font-size: 9.5px;
+/* Bateria ERS Integrada na Curva */
+.ers-text-tag {
+  font-size: 10.5px;
   font-weight: 850;
+  font-style: italic;
   fill: var(--muted);
   letter-spacing: 1px;
 }
-.track { fill: rgba(139, 155, 176, 0.18); }
-.ers-fill {
-  fill: var(--ers);
-  filter: drop-shadow(0 0 6px rgba(0, 210, 190, 0.7));
-}
-.ers-pct {
-  font-size: 11px;
+
+.ers-pct-text {
+  font-size: 12px;
   font-weight: 900;
+  font-style: italic;
   fill: #FFFFFF;
 }
 
-/* Asa Direita: Barras de Throttle e Brake */
-.gauge-rail {
+.ers-track-line {
+  fill: none;
+  stroke: rgba(139, 155, 176, 0.2);
+  stroke-width: 6;
+  stroke-linecap: round;
+}
+
+.ers-fill-line {
+  fill: none;
+  stroke: url(#ersGrad);
+  stroke-width: 6;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 6px rgba(0, 210, 190, 0.8));
+}
+
+/* ============================================== */
+/* 5. ASA DIREITA: TELEMETRIA & MARCHAS CURVAS    */
+/* ============================================== */
+.throttle-track-line {
   fill: none;
   stroke: rgba(255, 255, 255, 0.15);
-  stroke-width: 7;
+  stroke-width: 8;
   stroke-linecap: round;
 }
 
-.gauge-rail.brake {
+.throttle-fill-line {
+  fill: none;
+  stroke: url(#throttleGrad);
+  stroke-width: 8;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 8px rgba(118, 255, 3, 0.8));
+}
+
+.brake-track-line {
+  fill: none;
   stroke: rgba(255, 255, 255, 0.12);
-  stroke-width: 3.5;
-}
-
-.throttle-segment {
-  stroke: var(--throttle);
-  stroke-width: 7;
+  stroke-width: 4;
   stroke-linecap: round;
-  transition: opacity 0.05s ease;
-  filter: drop-shadow(0 0 6px rgba(118, 255, 3, 0.7));
 }
 
-.brake-line {
+.brake-fill-line {
   fill: none;
   stroke: var(--brake);
   stroke-width: 4;
   stroke-linecap: round;
-  filter: drop-shadow(0 0 6px rgba(255, 42, 77, 0.8));
+  filter: drop-shadow(0 0 8px rgba(255, 42, 77, 0.85));
 }
 
-.pedal-val-text {
-  font-size: 14px;
+.pedal-readout-text {
+  font-size: 12px;
   font-weight: 900;
-  fill: var(--throttle);
+  font-style: italic;
+  letter-spacing: 1px;
 }
+.pedal-readout-text .pct { fill: var(--neon-green); }
+.pedal-readout-text .label.throttle { fill: var(--neon-green); }
+.pedal-readout-text .label.brake { fill: var(--brake); }
 
-.pedal-title-text {
-  font-size: 11px;
+/* Régua Curva de Marchas (<textPath>) */
+.curved-gear-strip {
+  font-size: 19px;
   font-weight: 900;
-  letter-spacing: 1.2px;
-}
-.pedal-title-text.throttle { fill: var(--throttle); }
-.pedal-title-text.brake { fill: var(--brake); }
-
-/* Régua de Marchas Curva */
-.gear-cell {
-  cursor: pointer;
-}
-.gear-cell text {
-  font-size: 18px;
-  font-weight: 850;
-  text-anchor: middle;
+  font-style: italic;
   fill: #FFFFFF;
+  letter-spacing: 2px;
+  paint-order: stroke fill;
+  stroke: #020508;
+  stroke-width: 1.5px;
 }
-.gear-cell rect {
-  fill: transparent;
+
+.curved-gear-strip .g-cell {
+  transition: all 0.1s ease;
+}
+
+.curved-gear-strip .g-cell.active {
+  fill: #03080E;
   stroke: none;
-}
-.gear-cell.active rect {
-  fill: var(--gear-active);
-  stroke: #FFFFFF;
-  stroke-width: 1.5;
+  background-color: var(--gear-active);
   filter: drop-shadow(0 0 10px rgba(0, 245, 212, 0.9));
 }
-.gear-cell.active text {
-  fill: var(--gear-text-active);
-  font-weight: 900;
-  stroke: none;
-}
 
-/* Tyres */
+/* Tyres Readout */
 .tyre-readout {
   font-size: 10px;
   fill: var(--muted);
@@ -312,7 +315,7 @@ svg text {
   position: absolute; bottom: 0; left: 50%;
   transform: translateX(-50%);
   display: flex; align-items: center; gap: 8px;
-  background: rgba(4, 10, 16, 0.9);
+  background: rgba(3, 8, 14, 0.9);
   border: 1px solid rgba(0, 245, 212, 0.4);
   border-radius: 4px;
   padding: 4px 12px;
@@ -335,7 +338,7 @@ button:hover { background: rgba(0, 245, 212, 0.25); border-color: var(--accent);
   position: absolute; bottom: 32px; left: 50%;
   transform: translateX(-50%);
   font-size: 9px; font-weight: 800; letter-spacing: 1.2px;
-  background: rgba(4, 10, 16, 0.85);
+  background: rgba(3, 8, 14, 0.85);
   border: 1px solid rgba(255, 212, 0, 0.45);
   padding: 3px 12px; border-radius: 3px;
   color: #FFD400;

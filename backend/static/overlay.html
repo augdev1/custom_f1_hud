@@ -14,185 +14,221 @@
 <main id="hudRoot">
 <svg id="halo" viewBox="0 0 1200 420" role="img" aria-label="F1 Official Broadcast Halo HUD">
   <defs>
-    <!-- Filtro de Glow Néon F1 -->
-    <filter id="f1CyanGlow" x="-20%" y="-20%" width="140%" height="140%">
+    <!-- Gradiente Neon da Borda da Asa do Halo -->
+    <linearGradient id="haloBorderGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00F5D4" stop-opacity="0.9"/>
+      <stop offset="30%" stop-color="#00F0FF" stop-opacity="1"/>
+      <stop offset="50%" stop-color="#76FF03" stop-opacity="1"/>
+      <stop offset="70%" stop-color="#00F0FF" stop-opacity="1"/>
+      <stop offset="100%" stop-color="#00F5D4" stop-opacity="0.9"/>
+    </linearGradient>
+
+    <!-- Gradiente de Aceleração (Throttle) -->
+    <linearGradient id="throttleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#00F5D4"/>
+      <stop offset="70%" stop-color="#76FF03"/>
+      <stop offset="100%" stop-color="#CCFF00"/>
+    </linearGradient>
+
+    <!-- Gradiente de ERS -->
+    <linearGradient id="ersGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#0099FF"/>
+      <stop offset="100%" stop-color="#00F5D4"/>
+    </linearGradient>
+
+    <!-- Filtros de Glow -->
+    <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
       <feGaussianBlur stdDeviation="4" result="blur"/>
       <feMerge>
         <feMergeNode in="blur"/>
         <feMergeNode in="SourceGraphic"/>
       </feMerge>
     </filter>
-    <filter id="f1GreenGlow" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="5" result="blur"/>
+
+    <filter id="drsGreenGlow" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
       <feMerge>
         <feMergeNode in="blur"/>
         <feMergeNode in="SourceGraphic"/>
       </feMerge>
     </filter>
-    <linearGradient id="rpmGrad" x1="0%" y1="100%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#00F5D4"/>
-      <stop offset="60%" stop-color="#76FF03"/>
-      <stop offset="100%" stop-color="#FF2A4D"/>
-    </linearGradient>
-    <linearGradient id="throttleGradH" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#00F5D4"/>
-      <stop offset="100%" stop-color="#76FF03"/>
-    </linearGradient>
+
+    <!-- ============================================== -->
+    <!-- TRILHAS DE CURVATURA ANATÔMICA (<textPath>)   -->
+    <!-- ============================================== -->
+    <!-- Piloto 1 (Sainz) -->
+    <path id="leftTrackP1" d="M 160 215 C 270 210, 390 220, 505 235" fill="none"/>
+    <!-- Piloto 2 (Russell) -->
+    <path id="leftTrackP2" d="M 180 258 C 285 252, 400 260, 505 275" fill="none"/>
+    <!-- ERS Bateria -->
+    <path id="ersTrackPath" d="M 210 298 C 300 295, 400 298, 495 310" fill="none"/>
+    <!-- Trilho de Acelerador (Throttle) -->
+    <path id="throttleRailPath" d="M 695 235 C 805 220, 925 210, 1035 215" fill="none"/>
+    <!-- Trilho de Freio (Brake) -->
+    <path id="brakeRailPath" d="M 700 254 C 805 240, 920 230, 1015 235" fill="none"/>
+    <!-- Trilho de Marchas (N 1 2 3 4 5 6 7 8) -->
+    <path id="gearRailPath" d="M 695 288 C 795 272, 905 262, 1015 268" fill="none"/>
   </defs>
 
   <!-- ========================================== -->
-  <!-- 1. CORPO UNIFICADO DO HALO HUD (CANOPY)   -->
+  <!-- 1. CORPO DA ASA DO HALO (BASE SIMÉTRICA)   -->
+  <!-- Ombros altos mergulhando em direção ao pod -->
   <!-- ========================================== -->
-  <g id="haloChassis">
-    <!-- Fundo de Vidro Fumê Escuro Contínuo -->
-    <path class="halo-canopy-bg" d="
-      M 535 60
-      C 515 60, 480 90, 410 115
-      C 320 150, 200 185, 140 250
-      C 120 272, 115 310, 155 330
-      C 190 345, 230 330, 280 270
-      C 350 190, 430 160, 490 150
-      C 490 230, 520 275, 600 275
-      C 680 275, 710 230, 710 150
-      C 770 160, 850 190, 920 270
-      C 970 330, 1010 345, 1045 330
-      C 1085 310, 1080 272, 1060 250
-      C 1000 185, 880 150, 790 115
-      C 720 90, 685 60, 665 60
+  <g id="haloWingBase">
+    <!-- Carenagem de Vidro Fumê Translúcido com Blur -->
+    <path class="halo-canopy-body" d="
+      M 130 220
+      C 145 155, 260 170, 380 188
+      C 460 200, 515 200, 545 180
+      C 555 145, 570 130, 600 130
+      C 630 130, 645 145, 655 180
+      C 685 200, 740 200, 820 188
+      C 940 170, 1055 155, 1070 220
+      C 1085 260, 1055 295, 985 288
+      C 880 278, 770 285, 672 305
+      A 82 82 0 0 1 528 305
+      C 430 285, 320 278, 215 288
+      C 145 295, 115 260, 130 220
       Z
     "/>
 
-    <!-- Borda Ciano Luminosa Contínua com Chanfros -->
-    <path class="halo-border-glow" d="
-      M 530 65
-      C 505 68, 470 95, 410 120
-      C 310 158, 200 195, 145 255
-      C 128 275, 130 305, 160 322
-      C 190 335, 225 318, 275 265
-      C 340 195, 420 168, 485 158
-      M 715 158
-      C 780 168, 860 195, 925 265
-      C 975 318, 1010 335, 1040 322
-      C 1070 305, 1072 275, 1055 255
-      C 1000 195, 890 158, 790 120
-      C 730 95, 695 68, 670 65
+    <!-- Borda Neon Superior Contínua com Gradiente e Glow -->
+    <path class="halo-neon-edge" d="
+      M 130 220
+      C 145 155, 260 170, 380 188
+      C 460 200, 515 200, 545 180
+      C 555 145, 570 130, 600 130
+      C 630 130, 645 145, 655 180
+      C 685 200, 740 200, 820 188
+      C 940 170, 1055 155, 1070 220
+    "/>
+
+    <!-- Borda Neon Inferior Contínua -->
+    <path class="halo-neon-edge-bottom" d="
+      M 140 270
+      C 215 288, 320 278, 430 285
+      C 480 292, 515 300, 532 305
+      M 668 305
+      C 685 300, 720 292, 770 285
+      C 880 278, 985 288, 1060 270
     "/>
   </g>
 
   <!-- ========================================== -->
-  <!-- 2. CÚPULA SUPERIOR: DRS BADGE              -->
+  <!-- 2. POD CENTRAL: VELOCÍMETRO & TACÔMETRO   -->
   <!-- ========================================== -->
-  <g id="drsCrest" transform="translate(600 60)">
-    <!-- Pill em destaque no topo -->
-    <path class="drs-crest-bg" d="M -55 0 L 55 0 C 70 0, 80 -15, 65 -30 C 55 -40, -55 -40, -65 -30 C -80 -15, -70 0, -55 0 Z"/>
-    <g id="drsBadge" class="drs-pill">
-      <rect x="-48" y="-35" width="96" height="30" rx="15"/>
-      <text id="drsText" class="drs-text" x="0" y="-15" text-anchor="middle">DRS</text>
-    </g>
-  </g>
+  <g id="centerPod" transform="translate(600 248)">
+    <!-- Disco Central de Vidro Fumê com Anel Neon -->
+    <circle class="speed-dial-base" cx="0" cy="0" r="78"/>
+    <circle class="speed-dial-ring" cx="0" cy="0" r="78"/>
 
-  <!-- ========================================== -->
-  <!-- 3. POD CENTRAL: VELOCIDADE & TACÔMETRO     -->
-  <!-- ========================================== -->
-  <g id="centerPod" transform="translate(600 205)">
-    <!-- Círculo Central de Vidro -->
-    <circle class="pod-inner-disc" cx="0" cy="0" r="74"/>
-    
-    <!-- Arco Superior de LEDs do Tacômetro (RPM) -->
+    <!-- Tacômetro Superior (Arco de LEDs de -155° a -25°) -->
     <g id="rpmSegments"></g>
 
-    <!-- Rótulo RPM Superior -->
-    <text class="rpm-title" x="0" y="-32" text-anchor="middle">RPM</text>
-    
-    <!-- Velocidade Digital Gigante (264) -->
-    <text id="speedVal" class="speed-number" x="0" y="8" text-anchor="middle">264</text>
-    
-    <!-- Rótulo KM/H Inferior -->
-    <text class="unit-title" x="0" y="32" text-anchor="middle">KM/H</text>
-
-    <!-- Velocidade Secundária MPH (Abaixo do Pod) -->
-    <text id="mphVal" class="mph-number" x="0" y="55" text-anchor="middle">164 MPH</text>
+    <!-- Labels e Leituras Digitais -->
+    <text class="rpm-label-text" x="0" y="-30" text-anchor="middle">RPM</text>
+    <text id="speedVal" class="speed-digital-val" x="0" y="10" text-anchor="middle">264</text>
+    <text class="unit-label-text" x="0" y="32" text-anchor="middle">KM/H</text>
+    <text id="mphVal" class="sub-mph-val" x="0" y="54" text-anchor="middle">164 MPH</text>
   </g>
 
   <!-- ========================================== -->
-  <!-- 4. ASA ESQUERDA: DRIVER BATTLE TRACKER    -->
+  <!-- 3. PÍLULA DO DRS ENCAIXADA NO TOPO DO ARO  -->
   <!-- ========================================== -->
-  <g id="battleTracker" transform="translate(180 180)">
-    <!-- Linha 1: Piloto à Frente (11 SAINZ) -->
-    <g class="driver-entry p1" transform="translate(0 20)">
-      <!-- Escudo / Logo Ferrari -->
-      <polygon class="team-shield ferrari" points="0,0 14,0 12,18 7,22 2,18"/>
-      <text class="driver-num" x="22" y="15">11</text>
-      <text class="driver-name" x="50" y="15">SAINZ</text>
-      <!-- Delta Superior -->
-      <g class="delta-tag" transform="translate(160 0)">
-        <text class="delta-val" x="0" y="15">+0.241s</text>
-        <path class="delta-chevron" d="M 52 8 L 57 12 L 52 16" fill="none" stroke="#76FF03" stroke-width="2"/>
-      </g>
-    </g>
-
-    <!-- Linha Divisória de Intervalo -->
-    <path class="battle-divider" d="M 20 48 L 225 48"/>
-
-    <!-- Linha 2: Seu Carro (12 RUSSELL) -->
-    <g class="driver-entry p2" transform="translate(30 65)">
-      <!-- Logo Mercedes (Círculo com Estrela) -->
-      <g class="team-logo merc" transform="translate(6 10)">
-        <circle cx="0" cy="0" r="9" fill="none" stroke="#00F5D4" stroke-width="1.2"/>
-        <line x1="0" y1="0" x2="0" y2="-8" stroke="#00F5D4" stroke-width="1.2"/>
-        <line x1="0" y1="0" x2="-7" y2="5" stroke="#00F5D4" stroke-width="1.2"/>
-        <line x1="0" y1="0" x2="7" y2="5" stroke="#00F5D4" stroke-width="1.2"/>
-      </g>
-      <text class="driver-num" x="22" y="15">12</text>
-      <text class="driver-name" x="50" y="15">RUSSELL</text>
-      
-      <!-- Barra Dinâmica de Delta / Intervalo -->
-      <g class="delta-tag" transform="translate(155 0)">
-        <text id="deltaText" class="delta-val live" x="0" y="15">+0.241s</text>
-        <path class="delta-chevron" d="M 52 8 L 57 12 L 52 16" fill="none" stroke="#76FF03" stroke-width="2"/>
-      </g>
-    </g>
-
-    <!-- Barra de Bateria ERS Integrada na Base da Asa Esquerda -->
-    <g class="ers-bracket" transform="translate(50 112)">
-      <text class="ers-tag" x="0" y="8">ERS</text>
-      <rect class="track" x="28" y="0" width="130" height="9" rx="3"/>
-      <rect id="ersBar" class="ers-fill" x="28" y="0" width="100" height="9" rx="3"/>
-      <text id="ersPctText" class="ers-pct" x="165" y="8">78%</text>
+  <g id="drsPod" transform="translate(600 152)">
+    <!-- Encaixe e Contorno Luminoso -->
+    <g id="drsBadge" class="drs-pill ready">
+      <rect x="-48" y="-17" width="96" height="32" rx="16"/>
+      <text id="drsText" class="drs-pill-text" x="0" y="4" text-anchor="middle">DRS</text>
     </g>
   </g>
 
   <!-- ========================================== -->
-  <!-- 5. ASA DIREITA: TELEMETRIA & MARCHAS      -->
+  <!-- 4. ASA ESQUERDA: CURVATURA (<textPath>)    -->
   <!-- ========================================== -->
-  <g id="rightTelemetry" transform="translate(690 150)">
-    <!-- SEÇÃO SUPERIOR: BARRAS DE THROTTLE E BRAKE -->
-    <g class="pedal-bars-group">
-      <!-- Barra Curva de Throttle (Segmentos Verdes) -->
-      <g id="throttleSegmentsGroup" transform="translate(30 15)">
-        <path class="gauge-rail" d="M 0 0 C 60 5, 120 22, 175 48"/>
-        <!-- Segmentos de Acelerador gerados dinamicamente via JS -->
-        <g id="throttleBars"></g>
-        <text id="throttlePctText" class="pedal-val-text" x="185" y="52">100%</text>
-        <text class="pedal-title-text throttle" x="235" y="50">THROTTLE</text>
-      </g>
+  <g id="leftWingTelemetry">
+    <!-- Linha 1: 11 SAINZ + Delta -->
+    <text class="wing-driver-text">
+      <textPath href="#leftTrackP1" startOffset="3%">
+        <tspan class="team-badge ferrari">■ </tspan>
+        <tspan class="d-num">11 </tspan>
+        <tspan class="d-name">SAINZ</tspan>
+      </textPath>
+    </text>
+    <text class="wing-delta-text">
+      <textPath href="#leftTrackP1" startOffset="72%">
+        +0.241s <tspan class="chevron">▶</tspan>
+      </textPath>
+    </text>
 
-      <!-- Barra de Brake (Vermelha) -->
-      <g id="brakeSegmentsGroup" transform="translate(45 42)">
-        <path class="gauge-rail brake" d="M 0 0 C 50 6, 110 24, 160 48"/>
-        <path id="brakeBar" class="brake-line" d="M 0 0 C 0 0, 0 0, 0 0"/>
-        <text class="pedal-title-text brake" x="220" y="48">BRAKE</text>
-      </g>
-    </g>
+    <!-- Linha 2: 12 RUSSELL + Delta Dinâmico -->
+    <text class="wing-driver-text">
+      <textPath href="#leftTrackP2" startOffset="3%">
+        <tspan class="team-badge mercedes">● </tspan>
+        <tspan class="d-num">12 </tspan>
+        <tspan class="d-name">RUSSELL</tspan>
+      </textPath>
+    </text>
+    <text class="wing-delta-text live">
+      <textPath href="#leftTrackP2" startOffset="72%" id="deltaTextPath">
+        +0.241s <tspan class="chevron">▶</tspan>
+      </textPath>
+    </text>
 
-    <!-- SEÇÃO INFERIOR: RÉGUA DE MARCHAS (N 1 2 3 4 5 6 7 8) -->
-    <g id="gearStrip" transform="translate(35 90)">
-      <!-- Células de Marchas N 1 2 3 4 5 6 7 8 geradas com curvatura -->
-    </g>
+    <!-- Barra de Bateria ERS Integrada na Curva -->
+    <text class="ers-text-tag">
+      <textPath href="#ersTrackPath" startOffset="3%">ERS</textPath>
+    </text>
+    <!-- Trilha e Preenchimento Curvo de ERS -->
+    <path class="ers-track-line" d="M 235 299 C 320 297, 395 300, 460 307"/>
+    <path id="ersBar" class="ers-fill-line" d="M 235 299 C 320 297, 395 300, 460 307"/>
+    <text class="ers-pct-text">
+      <textPath href="#ersTrackPath" startOffset="88%" id="ersPctText">78%</textPath>
+    </text>
   </g>
 
-  <!-- Temperaturas dos Pneus (Opcional - Ativado via Studio) -->
-  <g id="tyres" transform="translate(600 375)">
+  <!-- ========================================== -->
+  <!-- 5. ASA DIREITA: TELEMETRIA (<textPath>)    -->
+  <!-- ========================================== -->
+  <g id="rightWingTelemetry">
+    <!-- Barra de Aceleração Curva (Throttle) -->
+    <path class="throttle-track-line" d="M 695 235 C 805 220, 925 210, 1035 215"/>
+    <path id="throttleBar" class="throttle-fill-line" d="M 695 235 C 805 220, 925 210, 1035 215"/>
+    <text class="pedal-readout-text">
+      <textPath href="#throttleRailPath" startOffset="78%">
+        <tspan id="throttlePctVal" class="pct">100%</tspan>
+        <tspan class="label throttle"> THROTTLE</tspan>
+      </textPath>
+    </text>
+
+    <!-- Barra de Freio Curva (Brake) -->
+    <path class="brake-track-line" d="M 700 254 C 805 240, 920 230, 1015 235"/>
+    <path id="brakeBar" class="brake-fill-line" d="M 700 254 C 805 240, 920 230, 1015 235"/>
+    <text class="pedal-readout-text">
+      <textPath href="#brakeRailPath" startOffset="84%">
+        <tspan class="label brake">BRAKE</tspan>
+      </textPath>
+    </text>
+
+    <!-- Régua Curva de Marchas (N 1 2 3 4 5 6 7 8) -->
+    <text class="curved-gear-strip">
+      <textPath href="#gearRailPath" startOffset="2%">
+        <tspan id="g_R" class="g-cell">R  </tspan>
+        <tspan id="g_N" class="g-cell">N  </tspan>
+        <tspan id="g_1" class="g-cell">1  </tspan>
+        <tspan id="g_2" class="g-cell">2  </tspan>
+        <tspan id="g_3" class="g-cell">3  </tspan>
+        <tspan id="g_4" class="g-cell">4  </tspan>
+        <tspan id="g_5" class="g-cell">5  </tspan>
+        <tspan id="g_6" class="g-cell active"> 6 </tspan>
+        <tspan id="g_7" class="g-cell">  7  </tspan>
+        <tspan id="g_8" class="g-cell">8</tspan>
+      </textPath>
+    </text>
+  </g>
+
+  <!-- Temperaturas dos Pneus (Opcional) -->
+  <g id="tyres" transform="translate(600 395)">
     <text id="tyreText" class="tyre-readout" text-anchor="middle">FL 100°   FR 100°   RL 100°   RR 100°</text>
   </g>
 </svg>

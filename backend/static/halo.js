@@ -7,7 +7,7 @@ document.body.classList.toggle('embedded', embedded);
 const ns = 'http://www.w3.org/2000/svg';
 
 // ==========================================
-// 1. ARCO DE TACÔMETRO (LEDS SUPERIORES DO POD)
+// 1. TACÔMETRO SUPERIOR (LEDS RADIAIS DO POD)
 // ==========================================
 const TOTAL_LEDS = 24;
 const START_ANGLE = -155 * Math.PI / 180;
@@ -16,88 +16,32 @@ const END_ANGLE = -25 * Math.PI / 180;
 const segments = Array.from({length: TOTAL_LEDS}, (_, i) => {
   const angle = START_ANGLE + (i * (END_ANGLE - START_ANGLE) / (TOTAL_LEDS - 1));
   const line = document.createElementNS(ns, 'line');
-  line.setAttribute('x1', (Math.cos(angle) * 62).toFixed(2));
-  line.setAttribute('y1', (Math.sin(angle) * 62).toFixed(2));
-  line.setAttribute('x2', (Math.cos(angle) * 72).toFixed(2));
-  line.setAttribute('y2', (Math.sin(angle) * 72).toFixed(2));
-  
+  line.setAttribute('x1', (Math.cos(angle) * 66).toFixed(2));
+  line.setAttribute('y1', (Math.sin(angle) * 66).toFixed(2));
+  line.setAttribute('x2', (Math.cos(angle) * 76).toFixed(2));
+  line.setAttribute('y2', (Math.sin(angle) * 76).toFixed(2));
+
   const type = i < 6 ? ' cyan' : i >= 20 ? ' redline' : '';
   line.setAttribute('class', 'rpm-led' + type);
   $('rpmSegments').append(line);
   return line;
 });
 
-// ==========================================
-// 2. RÉGUA DE MARCHAS (ASA DIREITA)
-// ==========================================
-const gearList = ['N', '1', '2', '3', '4', '5', '6', '7', '8'];
-const gears = gearList.map((gear, i) => {
-  const g = document.createElementNS(ns, 'g');
-  g.setAttribute('class', 'gear-cell');
-  // Leve curvatura acompanhando a inclinação do Halo
-  const x = i * 23;
-  const y = i * 3.5;
-  g.setAttribute('transform', `translate(${x.toFixed(1)} ${y.toFixed(1)})`);
+// Comprimentos de traçado para animação fluida 60 FPS
+let throttleTotalLen = 340;
+let brakeTotalLen = 310;
+let ersTotalLen = 225;
 
-  const rect = document.createElementNS(ns, 'rect');
-  rect.setAttribute('x', -11);
-  rect.setAttribute('y', -14);
-  rect.setAttribute('width', 22);
-  rect.setAttribute('height', 28);
-  rect.setAttribute('rx', 4);
-
-  const t = document.createElementNS(ns, 'text');
-  t.setAttribute('x', 0);
-  t.setAttribute('y', 6);
-  t.textContent = gear;
-
-  g.append(rect, t);
-  $('gearStrip').append(g);
-  return {gear, g};
-});
-
-// ==========================================
-// 3. SEGMENTOS CURVOS DE ACELERADOR (THROTTLE)
-// ==========================================
-const TOTAL_THROTTLE_BARS = 18;
-// Pontos de controle da curva de aceleração: P0=(0,0), P1=(60,5), P2=(120,22), P3=(175,48)
-function getBezierPoint(t, p0, p1, p2, p3) {
-  const u = 1 - t;
-  const tt = t * t;
-  const uu = u * u;
-  const uuu = uu * u;
-  const ttt = tt * t;
-  return {
-    x: uuu * p0.x + 3 * uu * t * p1.x + 3 * u * tt * p2.x + ttt * p3.x,
-    y: uuu * p0.y + 3 * uu * t * p1.y + 3 * u * tt * p2.y + ttt * p3.y
-  };
-}
-
-const throttleSegments = Array.from({length: TOTAL_THROTTLE_BARS}, (_, i) => {
-  const t1 = i / TOTAL_THROTTLE_BARS;
-  const t2 = (i + 0.75) / TOTAL_THROTTLE_BARS;
-  const pt1 = getBezierPoint(t1, {x:0, y:0}, {x:60, y:5}, {x:120, y:22}, {x:175, y:48});
-  const pt2 = getBezierPoint(t2, {x:0, y:0}, {x:60, y:5}, {x:120, y:22}, {x:175, y:48});
-
-  const line = document.createElementNS(ns, 'line');
-  line.setAttribute('x1', pt1.x.toFixed(1));
-  line.setAttribute('y1', pt1.y.toFixed(1));
-  line.setAttribute('x2', pt2.x.toFixed(1));
-  line.setAttribute('y2', pt2.y.toFixed(1));
-  line.setAttribute('class', 'throttle-segment');
-  line.style.opacity = '0.15';
-  $('throttleBars').append(line);
-  return line;
-});
-
-// Comprimento da trilha de freio para interpolação contínua
-let brakeTotalLen = 170;
 try {
-  const bPath = $('brakeBar');
-  if (bPath && bPath.getTotalLength) {
-    brakeTotalLen = bPath.getTotalLength() || 170;
-  }
+  const tEl = $('throttleBar');
+  if (tEl && tEl.getTotalLength) throttleTotalLen = tEl.getTotalLength() || 340;
+  const bEl = $('brakeBar');
+  if (bEl && bEl.getTotalLength) brakeTotalLen = bEl.getTotalLength() || 310;
+  const eEl = $('ersBar');
+  if (eEl && eEl.getTotalLength) ersTotalLen = eEl.getTotalLength() || 225;
 } catch {}
+
+const gearKeys = ['R', 'N', '1', '2', '3', '4', '5', '6', '7', '8'];
 
 let connected = false;
 let lastFrame = null;
@@ -123,12 +67,12 @@ function updateStatus() {
   $('connection').textContent = labels[state];
 
   if (state !== 'LIVE') {
-    // Estado de repouso / espera
+    // Estado de espera
     $('speedVal').textContent = '0';
     $('mphVal').textContent = '0 MPH';
-    $('throttlePctText').textContent = '0%';
+    if ($('throttlePctVal')) $('throttlePctVal').textContent = '0%';
     $('drsBadge').setAttribute('class', 'drs-pill off');
-    throttleSegments.forEach(el => el.style.opacity = '0.15');
+    if ($('throttleBar')) $('throttleBar').style.strokeDasharray = `0 ${throttleTotalLen}`;
     if ($('brakeBar')) $('brakeBar').style.strokeDasharray = `0 ${brakeTotalLen}`;
     segments.forEach(el => el.classList.remove('active'));
   }
@@ -145,33 +89,39 @@ function render(raw) {
   const activeCount = Math.round(clamp((f.rpm - 4000) / (f.maxRpm - 4000), 0, 1) * segments.length);
   segments.forEach((el, i) => el.classList.toggle('active', i < activeCount));
 
-  // 3. DRS Badge Central Superior
+  // 3. DRS Badge Central Encaixado no Topo
   const drsClass = f.drs === 'ON' ? 'drs-pill on' : f.drs === 'READY' ? 'drs-pill ready' : 'drs-pill off';
   $('drsBadge').setAttribute('class', drsClass);
 
-  // 4. Acelerador (Throttle) Segmentado
-  const activeThrottle = Math.round((f.throttle / 100) * TOTAL_THROTTLE_BARS);
-  throttleSegments.forEach((el, i) => {
-    el.style.opacity = i < activeThrottle ? '1' : '0.15';
-  });
-  $('throttlePctText').textContent = `${Math.round(f.throttle)}%`;
+  // 4. Acelerador Curvo (Throttle)
+  const tLen = (throttleTotalLen * f.throttle / 100).toFixed(1);
+  if ($('throttleBar')) {
+    $('throttleBar').style.strokeDasharray = `${tLen} ${throttleTotalLen}`;
+  }
+  if ($('throttlePctVal')) {
+    $('throttlePctVal').textContent = `${Math.round(f.throttle)}%`;
+  }
 
-  // 5. Freio (Brake) Contínuo
+  // 5. Freio Curvo (Brake)
   const bLen = (brakeTotalLen * f.brake / 100).toFixed(1);
   if ($('brakeBar')) {
     $('brakeBar').style.strokeDasharray = `${bLen} ${brakeTotalLen}`;
   }
 
-  // 6. Régua de Marchas
-  gears.forEach(({gear, g}) => {
-    const isActive = (gear === f.gear) || (gear === 'N' && f.gear === 'R');
-    g.classList.toggle('active', isActive);
+  // 6. Régua Curva de Marchas
+  gearKeys.forEach(g => {
+    const el = $('g_' + g);
+    if (el) el.classList.toggle('active', g === f.gear);
   });
 
-  // 7. Bateria ERS Integrada
-  const ersW = (130 * f.ers / 100).toFixed(1);
-  $('ersBar').setAttribute('width', ersW);
-  $('ersPctText').textContent = `${Math.round(f.ers)}%`;
+  // 7. Bateria ERS Integrada na Curva
+  const eLen = (ersTotalLen * f.ers / 100).toFixed(1);
+  if ($('ersBar')) {
+    $('ersBar').style.strokeDasharray = `${eLen} ${ersTotalLen}`;
+  }
+  if ($('ersPctText')) {
+    $('ersPctText').textContent = `${Math.round(f.ers)}%`;
+  }
 
   // 8. Temperaturas dos Pneus
   if (f.tyres) {
