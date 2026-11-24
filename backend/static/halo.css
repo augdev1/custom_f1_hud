@@ -3,14 +3,15 @@
   --text: #F4F7FA;
   --muted: #8B9BB0;
   --accent: #00F5D4;
-  --panel: #060E14;
-  --panel-opacity: 0.55;
-  --throttle: #00F5D4;
+  --neon-green: #76FF03;
+  --neon-cyan: #00F5D4;
+  --panel: #040A10;
+  --panel-opacity: 0.72;
+  --throttle: #76FF03;
   --brake: #FF2A4D;
   --ers: #00D2BE;
   --gear-active: #00F5D4;
-  --gear-text-active: #060E14;
-  --border-cyan: rgba(0, 245, 212, 0.45);
+  --gear-text-active: #040A10;
 }
 
 * { box-sizing: border-box; }
@@ -19,7 +20,7 @@ html, body {
   background: transparent !important;
   overflow: hidden;
   user-select: none;
-  font-family: 'Titillium Web', 'Chakra Petch', 'Arial Narrow', sans-serif;
+  font-family: 'Titillium Web', 'Chakra Petch', sans-serif;
   color: var(--text);
 }
 
@@ -33,213 +34,288 @@ html, body {
   position: absolute; inset: 0;
   width: 100%; height: 100%;
   overflow: visible;
-  filter: drop-shadow(0 4px 14px rgba(0, 0, 0, 0.8));
+  filter: drop-shadow(0 6px 20px rgba(0, 0, 0, 0.9));
 }
 
 /* Tipografia Base em SVG */
 svg text {
   fill: var(--text);
   font-family: 'Titillium Web', 'Chakra Petch', sans-serif;
-  font-weight: 700;
+  font-weight: 800;
   font-style: italic;
   paint-order: stroke fill;
-  stroke: #03080C;
-  stroke-width: 1px;
+  stroke: #020609;
+  stroke-width: 1.2px;
   stroke-linejoin: round;
 }
 
-/* Contorno do Halo */
-.halo-outline {
-  fill: none;
-  stroke: #00F5D4;
-  stroke-width: 1;
-  stroke-opacity: 0.15;
-}
-
-/* Painéis de Vidro Fumê com Contorno F1 */
-.panel {
+/* Corpo e Borda Contínua do Halo */
+.halo-canopy-bg {
   fill: var(--panel);
   fill-opacity: var(--panel-opacity);
-  stroke: var(--border-cyan);
+  stroke: rgba(0, 245, 212, 0.15);
   stroke-width: 1;
-  backdrop-filter: blur(4px);
+  backdrop-filter: blur(6px);
 }
 
-.pod-body {
-  stroke-width: 1.5;
+.halo-border-glow {
+  fill: none;
   stroke: var(--accent);
-  stroke-opacity: 0.6;
+  stroke-width: 2.2;
+  stroke-linecap: round;
+  filter: url(#f1CyanGlow);
 }
 
-/* Velocidade Digital */
-.speed {
-  font-size: 38px;
+/* DRS Crest & Pill (Topo Central) */
+.drs-crest-bg {
+  fill: rgba(4, 10, 16, 0.9);
+  stroke: rgba(118, 255, 3, 0.3);
+  stroke-width: 1;
+}
+
+.drs-pill rect {
+  fill: rgba(4, 12, 8, 0.9);
+  stroke: var(--neon-green);
+  stroke-width: 2;
+  filter: drop-shadow(0 0 10px rgba(118, 255, 3, 0.8));
+  transition: all 0.15s ease-out;
+}
+
+.drs-text {
+  font-size: 16px;
   font-weight: 900;
-  letter-spacing: -1.5px;
-  fill: #FFFFFF;
+  letter-spacing: 2px;
+  fill: var(--neon-green);
+  stroke: none;
 }
 
-.pod-unit {
-  font-size: 8px;
-  letter-spacing: 1.2px;
+.drs-pill.ready rect {
+  fill: rgba(4, 18, 12, 0.95);
+  stroke: var(--neon-green);
+  stroke-width: 2.5;
+  filter: drop-shadow(0 0 14px rgba(118, 255, 3, 0.9));
+}
+
+.drs-pill.on rect {
+  fill: var(--neon-green);
+  stroke: #FFFFFF;
+  stroke-width: 1.5;
+  filter: drop-shadow(0 0 18px rgba(118, 255, 3, 1));
+}
+
+.drs-pill.on .drs-text {
+  fill: #040A10;
+  stroke: none;
+}
+
+.drs-pill.off rect {
+  stroke: rgba(139, 155, 176, 0.35);
+  filter: none;
+}
+.drs-pill.off .drs-text {
   fill: var(--muted);
 }
 
-.sub-speed {
-  font-size: 11px;
-  font-weight: 800;
-  letter-spacing: 0.8px;
-  fill: var(--accent);
+/* Pod Central */
+.pod-inner-disc {
+  fill: rgba(2, 6, 10, 0.88);
+  stroke: rgba(0, 245, 212, 0.5);
+  stroke-width: 1.8;
+  filter: drop-shadow(0 0 12px rgba(0, 245, 212, 0.35));
 }
 
-/* Badge Central de DRS */
-.drs-pill rect {
-  fill: rgba(6, 14, 20, 0.8);
-  stroke: rgba(139, 155, 176, 0.4);
-  stroke-width: 1;
-  transition: all 0.15s ease-out;
-}
-.drs-pill .drs-label {
-  font-size: 11px;
+.speed-number {
+  font-size: 48px;
   font-weight: 900;
+  letter-spacing: -2px;
+  fill: #FFFFFF;
+  stroke: #020609;
+  stroke-width: 2px;
+}
+
+.rpm-title {
+  font-size: 10px;
+  font-weight: 850;
   letter-spacing: 1.5px;
   fill: var(--muted);
 }
 
-.drs-pill.ready rect {
-  stroke: #00F5D4;
-  stroke-width: 1.5;
-  filter: drop-shadow(0 0 6px rgba(0, 245, 212, 0.6));
-}
-.drs-pill.ready .drs-label {
-  fill: #00F5D4;
+.unit-title {
+  font-size: 11px;
+  font-weight: 850;
+  letter-spacing: 1.5px;
+  fill: var(--muted);
 }
 
-.drs-pill.on rect {
-  fill: #00F5D4;
-  stroke: #FFFFFF;
-  stroke-width: 1;
-  filter: drop-shadow(0 0 10px rgba(0, 245, 212, 0.9));
-}
-.drs-pill.on .drs-label {
-  fill: #060E14;
-  stroke: none;
+.mph-number {
+  font-size: 13px;
+  font-weight: 900;
+  letter-spacing: 1px;
+  fill: var(--accent);
 }
 
 /* Tacômetro de RPM (LEDs Radiais em Arco) */
 .rpm-led {
-  stroke: rgba(255, 255, 255, 0.16);
-  stroke-width: 3.5;
+  stroke: rgba(255, 255, 255, 0.12);
+  stroke-width: 4.5;
   stroke-linecap: round;
-  transition: stroke 0.05s ease;
+  transition: stroke 0.04s ease;
 }
+
 .rpm-led.active {
-  stroke: #00F5D4;
+  stroke: var(--neon-green);
   stroke-opacity: 1;
-  filter: drop-shadow(0 0 4px rgba(0, 245, 212, 0.8));
+  filter: drop-shadow(0 0 6px rgba(118, 255, 3, 0.8));
 }
+
+.rpm-led.cyan.active {
+  stroke: var(--neon-cyan);
+  filter: drop-shadow(0 0 6px rgba(0, 245, 212, 0.8));
+}
+
 .rpm-led.redline.active {
   stroke: #FF2A4D;
-  filter: drop-shadow(0 0 5px rgba(255, 42, 77, 0.9));
+  filter: drop-shadow(0 0 8px rgba(255, 42, 77, 0.95));
 }
 
-/* Barras Verticais de Pedais */
-.pedal-pod {
-  stroke: rgba(255, 255, 255, 0.12);
-  stroke-width: 0.8;
+/* Asa Esquerda: Battle Tracker */
+.team-shield.ferrari {
+  fill: #FFEB3B;
+  stroke: #C62828;
+  stroke-width: 1;
 }
-.pedal-label {
-  font-size: 7px;
-  font-weight: 800;
+
+.driver-num {
+  font-size: 18px;
+  font-weight: 900;
+  fill: #FFFFFF;
+}
+
+.driver-name {
+  font-size: 18px;
+  font-weight: 900;
   letter-spacing: 1px;
-  fill: var(--muted);
-}
-.pedal-track {
-  fill: rgba(139, 155, 176, 0.18);
-}
-.brake {
-  fill: var(--brake);
-  filter: drop-shadow(0 0 4px rgba(255, 42, 77, 0.6));
-}
-.throttle {
-  fill: var(--throttle);
-  filter: drop-shadow(0 0 4px rgba(0, 245, 212, 0.6));
+  fill: #FFFFFF;
 }
 
-/* Régua de Marchas */
-.gear-cell rect {
-  fill: rgba(6, 14, 20, 0.5);
-  stroke: rgba(255, 255, 255, 0.1);
-  stroke-width: 0.8;
+.delta-val {
+  font-size: 14px;
+  font-weight: 850;
+  letter-spacing: 0.5px;
+  fill: var(--neon-green);
+}
+
+.battle-divider {
+  stroke: rgba(255, 255, 255, 0.15);
+  stroke-width: 1;
+  fill: none;
+}
+
+/* Bateria ERS Integrada */
+.ers-tag {
+  font-size: 9.5px;
+  font-weight: 850;
+  fill: var(--muted);
+  letter-spacing: 1px;
+}
+.track { fill: rgba(139, 155, 176, 0.18); }
+.ers-fill {
+  fill: var(--ers);
+  filter: drop-shadow(0 0 6px rgba(0, 210, 190, 0.7));
+}
+.ers-pct {
+  font-size: 11px;
+  font-weight: 900;
+  fill: #FFFFFF;
+}
+
+/* Asa Direita: Barras de Throttle e Brake */
+.gauge-rail {
+  fill: none;
+  stroke: rgba(255, 255, 255, 0.15);
+  stroke-width: 7;
+  stroke-linecap: round;
+}
+
+.gauge-rail.brake {
+  stroke: rgba(255, 255, 255, 0.12);
+  stroke-width: 3.5;
+}
+
+.throttle-segment {
+  stroke: var(--throttle);
+  stroke-width: 7;
+  stroke-linecap: round;
+  transition: opacity 0.05s ease;
+  filter: drop-shadow(0 0 6px rgba(118, 255, 3, 0.7));
+}
+
+.brake-line {
+  fill: none;
+  stroke: var(--brake);
+  stroke-width: 4;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 6px rgba(255, 42, 77, 0.8));
+}
+
+.pedal-val-text {
+  font-size: 14px;
+  font-weight: 900;
+  fill: var(--throttle);
+}
+
+.pedal-title-text {
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 1.2px;
+}
+.pedal-title-text.throttle { fill: var(--throttle); }
+.pedal-title-text.brake { fill: var(--brake); }
+
+/* Régua de Marchas Curva */
+.gear-cell {
+  cursor: pointer;
 }
 .gear-cell text {
-  font-size: 15px;
+  font-size: 18px;
   font-weight: 850;
   text-anchor: middle;
-  fill: var(--muted);
+  fill: #FFFFFF;
 }
-.gear-cell.active rect {
-  fill: var(--accent);
-  stroke: #FFFFFF;
-  stroke-width: 1.2;
-  filter: drop-shadow(0 0 8px rgba(0, 245, 212, 0.8));
-}
-.gear-cell.active text {
-  fill: #060E14;
+.gear-cell rect {
+  fill: transparent;
   stroke: none;
 }
-.gear-cell.reverse.active rect {
-  fill: var(--brake);
+.gear-cell.active rect {
+  fill: var(--gear-active);
   stroke: #FFFFFF;
-}
-
-.rpm-label { font-size: 8px; fill: var(--muted); letter-spacing: 0.8px; }
-.rpm-live { font-size: 9px; fill: var(--text); letter-spacing: 0.5px; }
-.rpm-ticks { font-size: 8px; fill: var(--muted); letter-spacing: 1.2px; }
-.rail { stroke: var(--accent); stroke-opacity: 0.35; stroke-width: 1; fill: none; }
-
-/* Battle Tracker & ERS */
-.driver-accent.p1 { fill: #E10600; }
-.driver-accent.p2 { fill: #00F5D4; }
-.driver-num { font-size: 11px; font-weight: 850; fill: var(--text); }
-.driver-name { font-size: 11px; font-weight: 900; letter-spacing: 1px; fill: #FFFFFF; }
-.driver-gap { font-size: 7.5px; font-weight: 800; fill: var(--muted); letter-spacing: 1px; }
-.driver-delta { font-size: 11px; font-weight: 900; fill: var(--accent); letter-spacing: 0.5px; }
-
-.ers-label { font-size: 8px; font-weight: 800; fill: var(--muted); letter-spacing: 1px; }
-.track { fill: rgba(139, 155, 176, 0.18); }
-.ers { fill: var(--ers); filter: drop-shadow(0 0 4px rgba(0, 210, 190, 0.6)); }
-.ers-pct { font-size: 9px; font-weight: 800; fill: var(--text); }
-
-/* Badge de Rádio */
-.radio-bg {
-  fill: rgba(6, 14, 20, 0.7);
-  stroke: rgba(0, 245, 212, 0.35);
-  stroke-width: 0.8;
-}
-.radio-bar { fill: var(--accent); }
-.radio-title { font-size: 9.5px; font-weight: 900; letter-spacing: 1px; fill: #FFFFFF; }
-.radio-sub { font-size: 8px; font-weight: 800; letter-spacing: 1.2px; fill: var(--accent); }
-.radio-wave line {
-  stroke: var(--accent);
   stroke-width: 1.5;
-  stroke-linecap: round;
+  filter: drop-shadow(0 0 10px rgba(0, 245, 212, 0.9));
+}
+.gear-cell.active text {
+  fill: var(--gear-text-active);
+  font-weight: 900;
+  stroke: none;
 }
 
 /* Tyres */
-.tyres-text { font-size: 9px; fill: var(--muted); letter-spacing: 1px; }
+.tyre-readout {
+  font-size: 10px;
+  fill: var(--muted);
+  letter-spacing: 1.2px;
+}
 #tyres { display: none; }
 .show-tyres #tyres { display: block; }
 
-/* Barra de Controles (pywebview draggable) */
+/* Controles Pywebview */
 #controls {
   position: absolute; bottom: 0; left: 50%;
   transform: translateX(-50%);
   display: flex; align-items: center; gap: 8px;
-  background: rgba(6, 14, 20, 0.85);
-  border: 1px solid rgba(0, 245, 212, 0.3);
+  background: rgba(4, 10, 16, 0.9);
+  border: 1px solid rgba(0, 245, 212, 0.4);
   border-radius: 4px;
-  padding: 4px 10px;
+  padding: 4px 12px;
   font-size: 10px;
   white-space: nowrap;
 }
@@ -247,23 +323,23 @@ button {
   font: inherit;
   color: var(--text);
   background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.15);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   border-radius: 3px;
   padding: 3px 8px;
   cursor: pointer;
 }
-button:hover { background: rgba(0, 245, 212, 0.2); border-color: var(--accent); }
+button:hover { background: rgba(0, 245, 212, 0.25); border-color: var(--accent); }
 .locked #controls, .embedded #controls { display: none; }
 
 #connection {
-  position: absolute; bottom: 30px; left: 50%;
+  position: absolute; bottom: 32px; left: 50%;
   transform: translateX(-50%);
-  font-size: 9px; font-weight: 700; letter-spacing: 1.2px;
-  background: rgba(6, 14, 20, 0.8);
-  border: 1px solid rgba(255, 212, 0, 0.4);
-  padding: 3px 10px; border-radius: 3px;
+  font-size: 9px; font-weight: 800; letter-spacing: 1.2px;
+  background: rgba(4, 10, 16, 0.85);
+  border: 1px solid rgba(255, 212, 0, 0.45);
+  padding: 3px 12px; border-radius: 3px;
   color: #FFD400;
 }
-.embedded #connection { bottom: 4px; }
+.embedded #connection { bottom: 6px; }
 .live #connection { display: none; }
 .stale #halo, .offline #halo { opacity: 0.55; }
