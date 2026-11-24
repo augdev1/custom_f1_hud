@@ -1,22 +1,22 @@
 const $ = id => document.getElementById(id);
 
 const defaults = {
-  panelBg: '#101722',
-  opacity: 18,
+  panelBg: '#060E14',
+  opacity: 55,
   scale: 100,
-  gearColor: '#56c8ff',
-  accentColor: '#56c8ff',
-  primaryColor: '#56c8ff',
-  secondaryColor: '#101722',
-  ersColor: '#ffd400',
-  throttleColor: '#21d99a',
-  brakeColor: '#ff4055',
+  gearColor: '#00F5D4',
+  accentColor: '#00F5D4',
+  primaryColor: '#00F5D4',
+  secondaryColor: '#060E14',
+  ersColor: '#00D2BE',
+  throttleColor: '#00F5D4',
+  brakeColor: '#FF2A4D',
   showTyres: false,
-  theme: 'halo-transparent'
+  theme: 'f1-broadcast-halo'
 };
 
 const presets = {
-  mercedes: { panelBg: '#0A1218', gearColor: '#00F0FF', accentColor: '#00F0FF', ersColor: '#00F0FF', throttleColor: '#00E676', brakeColor: '#FF1744' },
+  mercedes: { panelBg: '#060E14', gearColor: '#00F5D4', accentColor: '#00F5D4', ersColor: '#00D2BE', throttleColor: '#00F5D4', brakeColor: '#FF2A4D' },
   ferrari: { panelBg: '#180A0A', gearColor: '#EF4444', accentColor: '#EF4444', ersColor: '#FFD700', throttleColor: '#00E676', brakeColor: '#FF1744' },
   redbull: { panelBg: '#080E1E', gearColor: '#FFD700', accentColor: '#FFD700', ersColor: '#00F0FF', throttleColor: '#00E676', brakeColor: '#FF1744' },
   mclaren: { panelBg: '#181008', gearColor: '#FF8700', accentColor: '#FF8700', ersColor: '#00F0FF', throttleColor: '#00E676', brakeColor: '#FF1744' },
