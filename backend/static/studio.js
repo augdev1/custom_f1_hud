@@ -1,30 +1,22 @@
 const $ = id => document.getElementById(id);
 
 const defaults = {
-  panelBg: '#060E14',
-  opacity: 55,
-  scale: 100,
-  gearColor: '#00F5D4',
-  accentColor: '#00F5D4',
-  primaryColor: '#00F5D4',
-  secondaryColor: '#060E14',
-  ersColor: '#00D2BE',
-  throttleColor: '#00F5D4',
-  brakeColor: '#FF2A4D',
-  showTyres: false,
-  theme: 'f1-broadcast-halo'
+  panelBg:'#162631', borderColor:'#AADAE8', textColor:'#F4F7FA', opacity:30, scale:100,
+  gearColor:'#54D8E8', accentColor:'#AADAE8', primaryColor:'#54D8E8',
+  secondaryColor:'#162631', ersColor:'#FFC857', throttleColor:'#69E6A6',
+  brakeColor:'#FF5268', showTyres:false, showHaloBar:false, theme:'halo-glass-edition'
 };
 
 const presets = {
-  mercedes: { panelBg: '#060E14', gearColor: '#00F5D4', accentColor: '#00F5D4', ersColor: '#00D2BE', throttleColor: '#00F5D4', brakeColor: '#FF2A4D' },
-  ferrari: { panelBg: '#180A0A', gearColor: '#EF4444', accentColor: '#EF4444', ersColor: '#FFD700', throttleColor: '#00E676', brakeColor: '#FF1744' },
-  redbull: { panelBg: '#080E1E', gearColor: '#FFD700', accentColor: '#FFD700', ersColor: '#00F0FF', throttleColor: '#00E676', brakeColor: '#FF1744' },
-  mclaren: { panelBg: '#181008', gearColor: '#FF8700', accentColor: '#FF8700', ersColor: '#00F0FF', throttleColor: '#00E676', brakeColor: '#FF1744' },
-  aston: { panelBg: '#061614', gearColor: '#006F62', accentColor: '#006F62', ersColor: '#00F0FF', throttleColor: '#00E676', brakeColor: '#FF1744' },
-  cyberpunk: { panelBg: '#16081A', gearColor: '#FF007F', accentColor: '#FF007F', ersColor: '#00F0FF', throttleColor: '#00E676', brakeColor: '#FF007F' }
+  mercedes: { panelBg: '#060E14', borderColor: '#00F5D4', textColor: '#F4F7FA', gearColor: '#00F5D4', accentColor: '#00F5D4', ersColor: '#00D2BE', throttleColor: '#00F5D4', brakeColor: '#FF2A4D' },
+  ferrari: { panelBg: '#180A0A', borderColor: '#EF4444', textColor: '#F4F7FA', gearColor: '#EF4444', accentColor: '#EF4444', ersColor: '#FFD700', throttleColor: '#00E676', brakeColor: '#FF1744' },
+  redbull: { panelBg: '#080E1E', borderColor: '#FFD700', textColor: '#F4F7FA', gearColor: '#FFD700', accentColor: '#FFD700', ersColor: '#00F0FF', throttleColor: '#00E676', brakeColor: '#FF1744' },
+  mclaren: { panelBg: '#181008', borderColor: '#FF8700', textColor: '#F4F7FA', gearColor: '#FF8700', accentColor: '#FF8700', ersColor: '#00F0FF', throttleColor: '#00E676', brakeColor: '#FF1744' },
+  aston: { panelBg: '#061614', borderColor: '#00A88F', textColor: '#F4F7FA', gearColor: '#006F62', accentColor: '#00A88F', ersColor: '#00F0FF', throttleColor: '#00E676', brakeColor: '#FF1744' },
+  cyberpunk: { panelBg: '#16081A', borderColor: '#FF007F', textColor: '#F4F7FA', gearColor: '#FF007F', accentColor: '#FF007F', ersColor: '#00F0FF', throttleColor: '#00E676', brakeColor: '#FF007F' }
 };
 
-const fields = ['panelBg', 'opacity', 'scale', 'gearColor', 'ersColor', 'throttleColor', 'brakeColor', 'showTyres'];
+const fields = ['panelBg', 'borderColor', 'textColor', 'opacity', 'scale', 'gearColor', 'ersColor', 'throttleColor', 'brakeColor', 'showTyres'];
 let cfg = { ...defaults };
 let simulating = false;
 let syncTimer = null;
@@ -47,7 +39,8 @@ function read() {
     if (!el) continue;
     cfg[id] = el.type === 'checkbox' ? el.checked : el.type === 'range' ? Number(el.value) : el.value;
   }
-  cfg.accentColor = cfg.primaryColor = cfg.gearColor;
+  cfg.accentColor = cfg.borderColor || cfg.gearColor;
+  cfg.primaryColor = cfg.gearColor;
   cfg.secondaryColor = cfg.panelBg;
   return cfg;
 }
