@@ -386,6 +386,7 @@ async def set_hud_config(payload: Dict[str, Any]):
     return {"status": "ok", "config": current_hud_config}
 
 
+@app.websocket("/ws")
 @app.websocket("/ws/telemetry")
 async def websocket_telemetry_endpoint(websocket: WebSocket):
     await broadcaster.connect(websocket)

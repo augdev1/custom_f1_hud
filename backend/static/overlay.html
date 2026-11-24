@@ -7,8 +7,13 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,600;0,700;1,700;1,800&family=Titillium+Web:ital,wght@0,700;0,800;0,900;1,700;1,900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/static/halo.css">
-  <link rel="stylesheet" href="halo.css">
+  <link rel="stylesheet" href="/static/halo.css" id="haloCss">
+  <script>
+    // Fallback para quando aberto diretamente via file:///
+    if (location.protocol === 'file:') {
+      document.getElementById('haloCss').href = 'halo.css';
+    }
+  </script>
 </head>
 <body>
 <main id="hudRoot">
@@ -24,6 +29,5 @@
 </main>
 
 <script type="module" src="/static/halo.js"></script>
-<script type="module" src="halo.js"></script>
 </body>
 </html>
