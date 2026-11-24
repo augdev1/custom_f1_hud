@@ -12,164 +12,109 @@
 </head>
 <body>
 <main id="hudRoot">
-  <div id="haloContainer">
-    <!-- ============================================== -->
-    <!-- CAMADA 0: SILHUETA DE BASE DO HALO (ARCO INVERTIDO) -->
-    <!-- ============================================== -->
-    <svg class="halo-base-layer" viewBox="0 0 1140 460" preserveAspectRatio="none">
-      <defs>
-        <linearGradient id="haloBorderGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-          <stop offset="0%" stop-color="#00F5D4" stop-opacity="0.85"/>
-          <stop offset="35%" stop-color="#00F0FF" stop-opacity="1"/>
-          <stop offset="50%" stop-color="#76FF03" stop-opacity="1"/>
-          <stop offset="65%" stop-color="#00F0FF" stop-opacity="1"/>
-          <stop offset="100%" stop-color="#00F5D4" stop-opacity="0.85"/>
-        </linearGradient>
-        <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
-          <feGaussianBlur stdDeviation="4" result="blur"/>
-          <feMerge>
-            <feMergeNode in="blur"/>
-            <feMergeNode in="SourceGraphic"/>
-          </feMerge>
-        </filter>
-      </defs>
-      <!-- Base sólida em arco invertido (asas inclinadas descendo ~20° e centro elevado) -->
-      <path class="halo-silhouette-path" d="
-        M 50,390
-        C 180,240 370,165 485,155
-        A 88,88 0 0,1 655,155
-        C 770,165 960,240 1090,390
-        L 1000,430
-        C 890,290 760,230 650,225
-        A 88,88 0 0,1 490,225
-        C 380,230 250,290 140,430
-        Z
-      "/>
-      <path class="halo-border-path" d="
-        M 50,390
-        C 180,240 370,165 485,155
-        A 88,88 0 0,1 655,155
-        C 770,165 960,240 1090,390
-        L 1000,430
-        C 890,290 760,230 650,225
-        A 88,88 0 0,1 490,225
-        C 380,230 250,290 140,430
-        Z
-      "/>
-    </svg>
+  <div id="haloHud">
+    <!-- ASA ESQUERDA: PILOTOS + DELTA + ERS -->
+    <div id="leftWing" class="halo-wing wing-left">
+      <div class="wing-content">
+        <!-- Piloto 1 (11 SAINZ) -->
+        <div class="driver-row">
+          <div class="driver-info">
+            <span class="team-badge ferrari">■</span>
+            <span class="driver-num">11</span>
+            <span class="driver-name">SAINZ</span>
+          </div>
+          <div class="delta-tag">
+            <span class="delta-val">+0.241s</span>
+            <span class="delta-arrow">▶</span>
+          </div>
+        </div>
 
-    <!-- ============================================== -->
-    <!-- CAMADA 1: BLOCO ESQUERDO (PILOTOS + ERS)       -->
-    <!-- transform: rotate(-18deg)                      -->
-    <!-- ============================================== -->
-    <div id="leftWingBlock" class="hud-block wing-left">
-      <!-- Linha 1: Piloto à Frente -->
-      <div class="driver-row">
-        <div class="driver-id">
-          <span class="team-badge ferrari">■</span>
-          <span class="driver-num">11</span>
-          <span class="driver-name">SAINZ</span>
-        </div>
-        <div class="driver-delta">
-          <span class="delta-val">+0.241s</span>
-          <span class="delta-arrow">▶</span>
-        </div>
-      </div>
+        <div class="wing-divider"></div>
 
-      <div class="wing-divider"></div>
+        <!-- Piloto 2 (12 RUSSELL) -->
+        <div class="driver-row">
+          <div class="driver-info">
+            <span class="team-badge merc">●</span>
+            <span class="driver-num">12</span>
+            <span class="driver-name">RUSSELL</span>
+          </div>
+          <div class="delta-tag live">
+            <span id="deltaText" class="delta-val live">+0.241s</span>
+            <span class="delta-arrow">▶</span>
+          </div>
+        </div>
 
-      <!-- Linha 2: Seu Carro -->
-      <div class="driver-row">
-        <div class="driver-id">
-          <span class="team-badge merc">●</span>
-          <span class="driver-num">12</span>
-          <span class="driver-name">RUSSELL</span>
+        <!-- Bateria ERS -->
+        <div class="ers-row">
+          <span class="ers-label">ERS</span>
+          <div class="ers-track">
+            <div id="ersBar" class="ers-fill" style="width: 78%;"></div>
+          </div>
+          <span id="ersPctText" class="ers-pct">78%</span>
         </div>
-        <div class="driver-delta live">
-          <span id="deltaText" class="delta-val live">+0.241s</span>
-          <span class="delta-arrow">▶</span>
-        </div>
-      </div>
-
-      <!-- Linha 3: Bateria ERS -->
-      <div class="ers-row">
-        <span class="ers-label">ERS</span>
-        <div class="ers-track">
-          <div id="ersBar" class="ers-bar" style="width: 78%;"></div>
-        </div>
-        <span id="ersPctText" class="ers-pct">78%</span>
       </div>
     </div>
 
-    <!-- ============================================== -->
-    <!-- CAMADA 2: POD CENTRAL (VELOCÍMETRO + DRS)     -->
-    <!-- Centro elevado com velocímetro circular        -->
-    <!-- ============================================== -->
-    <div id="centerPodBlock">
+    <!-- POD CENTRAL: TACÔMETRO + VELOCIDADE + DRS -->
+    <div id="centerPod" class="halo-center-pod">
       <!-- Pílula DRS Encaixada no Topo -->
       <div id="drsBadge" class="drs-pill ready">
-        <span id="drsText" class="drs-label">DRS</span>
+        <span id="drsText" class="drs-text">DRS</span>
       </div>
 
-      <!-- Velocímetro Circular -->
+      <!-- Dial Circular -->
       <div class="speed-dial">
-        <!-- Arco de LEDs de RPM em SVG -->
-        <svg class="rpm-dial-svg" viewBox="0 0 180 180">
+        <!-- Arco de LEDs de RPM -->
+        <svg class="rpm-svg" viewBox="0 0 180 180">
           <g id="rpmSegments" transform="translate(90 90)"></g>
         </svg>
 
-        <div class="dial-content">
-          <span class="rpm-label">RPM</span>
-          <span id="speedVal" class="speed-number">264</span>
-          <span class="unit-label">KM/H</span>
+        <div class="speed-display">
+          <span class="rpm-title">RPM</span>
+          <span id="speedVal" class="speed-val">264</span>
+          <span class="unit-title">KM/H</span>
         </div>
       </div>
     </div>
 
-    <!-- ============================================== -->
-    <!-- CAMADA 3: BLOCO DIREITO (THROTTLE + MARCHAS)   -->
-    <!-- transform: rotate(18deg)                       -->
-    <!-- ============================================== -->
-    <div id="rightWingBlock" class="hud-block wing-right">
-      <!-- Linha 1: Throttle (Acelerador 0-100%) -->
-      <div class="pedal-row">
-        <div class="pedal-track">
-          <div id="throttleBar" class="pedal-bar throttle" style="width: 100%;"></div>
+    <!-- ASA DIREITA: THROTTLE + BRAKE + MARCHAS -->
+    <div id="rightWing" class="halo-wing wing-right">
+      <div class="wing-content">
+        <!-- Throttle Bar -->
+        <div class="pedal-row">
+          <div class="pedal-track">
+            <div id="throttleBar" class="pedal-fill throttle" style="width: 100%;"></div>
+          </div>
+          <div class="pedal-info">
+            <span id="throttlePctVal" class="pedal-pct">100%</span>
+            <span class="pedal-label throttle">THROTTLE</span>
+          </div>
         </div>
-        <div class="pedal-info">
-          <span id="throttlePctVal" class="pedal-pct">100%</span>
-          <span class="pedal-tag throttle">THROTTLE</span>
+
+        <!-- Brake Bar -->
+        <div class="pedal-row brake-row">
+          <div class="pedal-track brake-track">
+            <div id="brakeBar" class="pedal-fill brake" style="width: 0%;"></div>
+          </div>
+          <div class="pedal-info">
+            <span class="pedal-label brake">BRAKE</span>
+          </div>
+        </div>
+
+        <!-- Régua de Marchas (N 1 2 3 4 5 6 7 8) -->
+        <div id="gearStrip" class="gear-strip">
+          <span id="g_R" class="gear-cell">R</span>
+          <span id="g_N" class="gear-cell">N</span>
+          <span id="g_1" class="gear-cell">1</span>
+          <span id="g_2" class="gear-cell">2</span>
+          <span id="g_3" class="gear-cell">3</span>
+          <span id="g_4" class="gear-cell">4</span>
+          <span id="g_5" class="gear-cell">5</span>
+          <span id="g_6" class="gear-cell active">6</span>
+          <span id="g_7" class="gear-cell">7</span>
+          <span id="g_8" class="gear-cell">8</span>
         </div>
       </div>
-
-      <!-- Linha 2: Brake (Freio) -->
-      <div class="pedal-row brake-row">
-        <div class="pedal-track brake-track">
-          <div id="brakeBar" class="pedal-bar brake" style="width: 0%;"></div>
-        </div>
-        <div class="pedal-info">
-          <span class="pedal-tag brake">BRAKE</span>
-        </div>
-      </div>
-
-      <!-- Linha 3: Régua de Marchas (N 1 2 3 4 5 6 7 8) -->
-      <div id="gearStrip" class="gear-strip">
-        <span id="g_R" class="gear-btn">R</span>
-        <span id="g_N" class="gear-btn">N</span>
-        <span id="g_1" class="gear-btn">1</span>
-        <span id="g_2" class="gear-btn">2</span>
-        <span id="g_3" class="gear-btn">3</span>
-        <span id="g_4" class="gear-btn">4</span>
-        <span id="g_5" class="gear-btn">5</span>
-        <span id="g_6" class="gear-btn active">6</span>
-        <span id="g_7" class="gear-btn">7</span>
-        <span id="g_8" class="gear-btn">8</span>
-      </div>
-    </div>
-
-    <!-- Temperaturas dos Pneus (Opcional) -->
-    <div id="tyres" class="tyres-overlay">
-      <span id="tyreText">FL 100°   FR 100°   RL 100°   RR 100°</span>
     </div>
   </div>
 
@@ -182,7 +127,6 @@
 
   <div id="connection" role="status">CONECTANDO AO BACKEND</div>
 </main>
-
 <script type="module" src="/static/halo.js"></script>
 <script type="module" src="halo.js"></script>
 </body>
