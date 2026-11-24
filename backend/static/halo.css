@@ -5,7 +5,7 @@
   --accent: #00F5D4;
   --neon-green: #76FF03;
   --neon-cyan: #00F0FF;
-  --panel: #080c10;
+  --panel: #060b10;
   --panel-opacity: 0.85;
   --throttle: #76FF03;
   --brake: #FF2A4D;
@@ -33,73 +33,73 @@ html, body {
   position: absolute; inset: 0;
   width: 100%; height: 100%;
   overflow: visible;
-  filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.95));
+  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.95));
 }
 
 /* ============================================== */
-/* 1. SILHUETA DO HALO (Path principal)           */
+/* 1. SILHUETA DA ASA DO HALO                     */
 /* ============================================== */
-.halo-silhouette {
+.halo-canopy-body {
   fill: var(--panel);
   fill-opacity: var(--panel-opacity);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
 
-.halo-outline-glow {
+.halo-neon-edge {
   fill: none;
-  stroke: url(#haloEdgeGrad);
-  stroke-width: 2.8;
+  stroke: url(#haloBorderGrad);
+  stroke-width: 2.4;
   stroke-linecap: round;
   stroke-linejoin: round;
-  filter: url(#f1Glow);
+  filter: url(#neonGlow);
 }
 
 .wing-divider {
   fill: none;
-  stroke: rgba(255, 255, 255, 0.16);
-  stroke-width: 1.2;
+  stroke: rgba(255, 255, 255, 0.14);
+  stroke-width: 1;
 }
 
 /* ============================================== */
-/* 2. POD CENTRAL (Velocímetro + RPM + DRS)       */
+/* 2. POD CENTRAL (VELOCÍMETRO + RPM + DRS)       */
 /* ============================================== */
 .pod-circle-base {
-  fill: #060a0e;
-  fill-opacity: 0.95;
+  fill: #04080c;
+  fill-opacity: 0.96;
   backdrop-filter: blur(8px);
 }
 
 .pod-circle-ring {
   fill: none;
   stroke: #00F0FF;
-  stroke-width: 2.2;
-  filter: drop-shadow(0 0 12px rgba(0, 240, 255, 0.6));
+  stroke-width: 2;
+  filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.6));
 }
 
 .speed-giant {
-  font-size: 54px;
+  font-size: 50px;
   font-weight: 900;
   font-style: italic;
   letter-spacing: -2px;
   fill: #FFFFFF;
   paint-order: stroke fill;
   stroke: #020508;
-  stroke-width: 2.5px;
+  stroke-width: 2px;
 }
 
 .rpm-title, .unit-title {
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 850;
   font-style: italic;
-  letter-spacing: 1.8px;
+  letter-spacing: 1.5px;
   fill: var(--muted);
 }
 
-/* Tacômetro de RPM (LEDs Radiais de -140° a -40°) */
+/* Tacômetro de RPM (LEDs Radiais de -150° a -30°) */
 .rpm-led {
   stroke: rgba(255, 255, 255, 0.14);
-  stroke-width: 4.8;
+  stroke-width: 4.5;
   stroke-linecap: round;
   transition: stroke 0.04s ease;
 }
@@ -119,17 +119,17 @@ html, body {
   filter: drop-shadow(0 0 10px rgba(255, 42, 77, 0.95));
 }
 
-/* Pílula DRS Encaixada Acima do Topo (y=88) */
+/* Pílula DRS Encaixada no Topo */
 .drs-pill rect {
-  fill: rgba(3, 12, 6, 0.94);
+  fill: rgba(3, 12, 6, 0.95);
   stroke: var(--neon-green);
-  stroke-width: 2.2;
+  stroke-width: 2;
   filter: url(#drsGlow);
   transition: all 0.15s ease-out;
 }
 
 .drs-text {
-  font-size: 17px;
+  font-size: 16px;
   font-weight: 900;
   font-style: italic;
   letter-spacing: 2px;
@@ -140,15 +140,15 @@ html, body {
 .drs-pill.ready rect {
   fill: rgba(4, 20, 10, 0.96);
   stroke: var(--neon-green);
-  stroke-width: 2.5;
-  filter: drop-shadow(0 0 15px rgba(118, 255, 3, 0.95));
+  stroke-width: 2.2;
+  filter: drop-shadow(0 0 14px rgba(118, 255, 3, 0.95));
 }
 
 .drs-pill.on rect {
   fill: var(--neon-green);
   stroke: #FFFFFF;
-  stroke-width: 1.8;
-  filter: drop-shadow(0 0 22px rgba(118, 255, 3, 1));
+  stroke-width: 1.6;
+  filter: drop-shadow(0 0 20px rgba(118, 255, 3, 1));
 }
 
 .drs-pill.on .drs-text {
@@ -168,21 +168,21 @@ html, body {
 /* 3. TEXTOS CURVADOS NA ASA ESQUERDA (<textPath>)*/
 /* ============================================== */
 .wing-pilot-text {
-  font-size: 19px;
+  font-size: 18px;
   font-weight: 900;
   font-style: italic;
   letter-spacing: 1px;
   fill: #FFFFFF;
   paint-order: stroke fill;
   stroke: #020508;
-  stroke-width: 2.2px;
+  stroke-width: 2px;
 }
 
 .wing-pilot-text .team-badge.ferrari { fill: #FFEB3B; }
 .wing-pilot-text .team-badge.merc { fill: #00F5D4; }
 
 .wing-delta-text {
-  font-size: 15px;
+  font-size: 14.5px;
   font-weight: 900;
   font-style: italic;
   fill: var(--neon-green);
@@ -192,7 +192,7 @@ html, body {
 
 /* Bateria ERS */
 .ers-label {
-  font-size: 11px;
+  font-size: 10.5px;
   font-weight: 850;
   font-style: italic;
   fill: var(--muted);
@@ -200,7 +200,7 @@ html, body {
 }
 
 .ers-pct {
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 900;
   font-style: italic;
   fill: #FFFFFF;
@@ -209,14 +209,14 @@ html, body {
 .ers-rail {
   fill: none;
   stroke: rgba(139, 155, 176, 0.2);
-  stroke-width: 6;
+  stroke-width: 5.5;
   stroke-linecap: round;
 }
 
 .ers-fill {
   fill: none;
   stroke: url(#ersGrad);
-  stroke-width: 6;
+  stroke-width: 5.5;
   stroke-linecap: round;
   filter: drop-shadow(0 0 6px rgba(0, 210, 190, 0.8));
 }
@@ -227,14 +227,14 @@ html, body {
 .throttle-rail {
   fill: none;
   stroke: rgba(255, 255, 255, 0.15);
-  stroke-width: 8;
+  stroke-width: 7.5;
   stroke-linecap: round;
 }
 
 .throttle-fill {
   fill: none;
   stroke: url(#throttleGrad);
-  stroke-width: 8;
+  stroke-width: 7.5;
   stroke-linecap: round;
   filter: drop-shadow(0 0 8px rgba(118, 255, 3, 0.8));
 }
@@ -242,20 +242,20 @@ html, body {
 .brake-rail {
   fill: none;
   stroke: rgba(255, 255, 255, 0.12);
-  stroke-width: 4;
+  stroke-width: 3.5;
   stroke-linecap: round;
 }
 
 .brake-fill {
   fill: none;
   stroke: var(--brake);
-  stroke-width: 4;
+  stroke-width: 3.5;
   stroke-linecap: round;
   filter: drop-shadow(0 0 8px rgba(255, 42, 77, 0.85));
 }
 
 .pedal-readout {
-  font-size: 12.5px;
+  font-size: 12px;
   font-weight: 900;
   font-style: italic;
   letter-spacing: 1px;
@@ -266,11 +266,11 @@ html, body {
 
 /* Régua Curva de Marchas (N 1 2 3 4 5 6 7 8) */
 .gear-strip-curved {
-  font-size: 21px;
+  font-size: 20px;
   font-weight: 900;
   font-style: italic;
   fill: #FFFFFF;
-  letter-spacing: 4px;
+  letter-spacing: 3px;
   paint-order: stroke fill;
   stroke: #020508;
   stroke-width: 2px;
@@ -282,7 +282,7 @@ html, body {
 
 .gear-strip-curved .g-cell.active {
   fill: var(--gear-active);
-  font-size: 24px;
+  font-size: 23px;
   filter: drop-shadow(0 0 12px rgba(0, 245, 212, 1));
 }
 
@@ -320,7 +320,7 @@ button:hover { background: rgba(0, 245, 212, 0.25); border-color: var(--accent);
 .locked #controls, .embedded #controls { display: none; }
 
 #connection {
-  position: absolute; bottom: 32px; left: 50%;
+  position: absolute; bottom: 30px; left: 50%;
   transform: translateX(-50%);
   font-size: 9px; font-weight: 800; letter-spacing: 1.2px;
   background: rgba(4, 10, 16, 0.85);

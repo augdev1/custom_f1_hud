@@ -10,16 +10,16 @@ const ns = 'http://www.w3.org/2000/svg';
 // 1. TACÔMETRO DE RPM (ARCO DE -140° A -40°)
 // ==========================================
 const TOTAL_LEDS = 24;
-const START_ANGLE = -140 * Math.PI / 180;
-const END_ANGLE = -40 * Math.PI / 180;
+const START_ANGLE = -150 * Math.PI / 180;
+const END_ANGLE = -30 * Math.PI / 180;
 
 const segments = Array.from({length: TOTAL_LEDS}, (_, i) => {
   const angle = START_ANGLE + (i * (END_ANGLE - START_ANGLE) / (TOTAL_LEDS - 1));
   const line = document.createElementNS(ns, 'line');
-  line.setAttribute('x1', (Math.cos(angle) * 76).toFixed(2));
-  line.setAttribute('y1', (Math.sin(angle) * 76).toFixed(2));
-  line.setAttribute('x2', (Math.cos(angle) * 86).toFixed(2));
-  line.setAttribute('y2', (Math.sin(angle) * 86).toFixed(2));
+  line.setAttribute('x1', (Math.cos(angle) * 65).toFixed(2));
+  line.setAttribute('y1', (Math.sin(angle) * 65).toFixed(2));
+  line.setAttribute('x2', (Math.cos(angle) * 74).toFixed(2));
+  line.setAttribute('y2', (Math.sin(angle) * 74).toFixed(2));
 
   const type = i < 6 ? ' cyan' : i >= 20 ? ' redline' : '';
   line.setAttribute('class', 'rpm-led' + type);
