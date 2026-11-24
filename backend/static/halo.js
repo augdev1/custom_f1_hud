@@ -7,19 +7,19 @@ document.body.classList.toggle('embedded', embedded);
 const ns = 'http://www.w3.org/2000/svg';
 
 // ==========================================
-// 1. TACÔMETRO SUPERIOR (LEDS RADIAIS DO POD)
+// 1. TACÔMETRO DE RPM (ARCO DE -140° A -40°)
 // ==========================================
 const TOTAL_LEDS = 24;
-const START_ANGLE = -155 * Math.PI / 180;
-const END_ANGLE = -25 * Math.PI / 180;
+const START_ANGLE = -140 * Math.PI / 180;
+const END_ANGLE = -40 * Math.PI / 180;
 
 const segments = Array.from({length: TOTAL_LEDS}, (_, i) => {
   const angle = START_ANGLE + (i * (END_ANGLE - START_ANGLE) / (TOTAL_LEDS - 1));
   const line = document.createElementNS(ns, 'line');
-  line.setAttribute('x1', (Math.cos(angle) * 66).toFixed(2));
-  line.setAttribute('y1', (Math.sin(angle) * 66).toFixed(2));
-  line.setAttribute('x2', (Math.cos(angle) * 76).toFixed(2));
-  line.setAttribute('y2', (Math.sin(angle) * 76).toFixed(2));
+  line.setAttribute('x1', (Math.cos(angle) * 76).toFixed(2));
+  line.setAttribute('y1', (Math.sin(angle) * 76).toFixed(2));
+  line.setAttribute('x2', (Math.cos(angle) * 86).toFixed(2));
+  line.setAttribute('y2', (Math.sin(angle) * 86).toFixed(2));
 
   const type = i < 6 ? ' cyan' : i >= 20 ? ' redline' : '';
   line.setAttribute('class', 'rpm-led' + type);
@@ -28,17 +28,17 @@ const segments = Array.from({length: TOTAL_LEDS}, (_, i) => {
 });
 
 // Comprimentos de traçado para animação fluida 60 FPS
-let throttleTotalLen = 340;
-let brakeTotalLen = 310;
-let ersTotalLen = 225;
+let throttleTotalLen = 350;
+let brakeTotalLen = 330;
+let ersTotalLen = 290;
 
 try {
   const tEl = $('throttleBar');
-  if (tEl && tEl.getTotalLength) throttleTotalLen = tEl.getTotalLength() || 340;
+  if (tEl && tEl.getTotalLength) throttleTotalLen = tEl.getTotalLength() || 350;
   const bEl = $('brakeBar');
-  if (bEl && bEl.getTotalLength) brakeTotalLen = bEl.getTotalLength() || 310;
+  if (bEl && bEl.getTotalLength) brakeTotalLen = bEl.getTotalLength() || 330;
   const eEl = $('ersBar');
-  if (eEl && eEl.getTotalLength) ersTotalLen = eEl.getTotalLength() || 225;
+  if (eEl && eEl.getTotalLength) ersTotalLen = eEl.getTotalLength() || 290;
 } catch {}
 
 const gearKeys = ['R', 'N', '1', '2', '3', '4', '5', '6', '7', '8'];
@@ -69,7 +69,6 @@ function updateStatus() {
   if (state !== 'LIVE') {
     // Estado de espera
     $('speedVal').textContent = '0';
-    $('mphVal').textContent = '0 MPH';
     if ($('throttlePctVal')) $('throttlePctVal').textContent = '0%';
     $('drsBadge').setAttribute('class', 'drs-pill off');
     if ($('throttleBar')) $('throttleBar').style.strokeDasharray = `0 ${throttleTotalLen}`;
@@ -81,15 +80,14 @@ function updateStatus() {
 function render(raw) {
   const f = normalizeTelemetry(raw);
 
-  // 1. Velocidade Principal (KM/H) e Secundária (MPH)
+  // 1. Velocidade Principal (KM/H)
   $('speedVal').textContent = f.speed;
-  $('mphVal').textContent = `${Math.round(f.speed * 0.621371)} MPH`;
 
   // 2. Tacômetro de RPM (LEDs Radiais em Arco)
   const activeCount = Math.round(clamp((f.rpm - 4000) / (f.maxRpm - 4000), 0, 1) * segments.length);
   segments.forEach((el, i) => el.classList.toggle('active', i < activeCount));
 
-  // 3. DRS Badge Central Encaixado no Topo
+  // 3. DRS Badge Encaixado no Topo do Círculo
   const drsClass = f.drs === 'ON' ? 'drs-pill on' : f.drs === 'READY' ? 'drs-pill ready' : 'drs-pill off';
   $('drsBadge').setAttribute('class', drsClass);
 
