@@ -194,10 +194,14 @@ function drawHUD(f, cfg) {
     ctx.lineCap = 'round';
     ctx.stroke();
   }
-  function label(value, x, frac, size = 18, color = white, align = 'left') {
+  function label(value, x, frac, size = 18, color = white, align = 'left', span = 105) {
+    const x2 = align === 'right' ? x - span : x + span;
+    const y1 = top(x) + wingH(x) * frac;
+    const y2 = top(x2) + wingH(x2) * frac;
+    const rot = align === 'right' ? Math.atan2(y1 - y2, x - x2) : Math.atan2(y2 - y1, x2 - x);
     ctx.save();
-    ctx.translate(x, top(x) + wingH(x) * frac);
-    ctx.rotate(angle(x));
+    ctx.translate(x, y1);
+    ctx.rotate(rot);
     ctx.font = `700 ${size}px "Titillium Web", "Segoe UI", sans-serif`;
     ctx.textAlign = align;
     ctx.textBaseline = 'middle';
