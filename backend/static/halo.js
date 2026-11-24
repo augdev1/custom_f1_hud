@@ -1,6 +1,6 @@
 // =============================================================================
 // F1 24 OFFICIAL BROADCAST HALO HUD - CANVAS 2D REPLICA (DPR 2x)
-// Réplica 1:1 de telemetria baseada na geometria e proporções oficiais F1 TV
+// Réplica 1:1 com curvas concêntricas, bordas fiéis e integração total F1 24
 // =============================================================================
 
 const $ = id => document.getElementById(id);
@@ -12,6 +12,21 @@ let raf;
 
 function clamp(v, min, max) {
   return Math.min(Math.max(v, min), max);
+}
+
+// Geometria concêntrica mestre do arco do Halo (1200 x 480)
+const ARCH_CX = 600;
+const ARCH_CY = 910;
+const ARCH_R = 720;
+
+function archY(x, offset = 0) {
+  const r = ARCH_R + offset;
+  const dx = x - ARCH_CX;
+  return ARCH_CY - Math.sqrt(Math.max(0, r * r - dx * dx));
+}
+
+function archAngle(x) {
+  return Math.atan2(x - ARCH_CX, ARCH_CY - archY(x));
 }
 
 // Utilitário de retângulos arredondados sem vazamento de paths
@@ -34,6 +49,48 @@ function drawRoundRect(c, x, y, width, height, radius) {
   c.closePath();
 }
 
+// Escudo Ferrari em Canvas (topo reto, base afilada)
+function drawFerrariShield(c, x, y, w, h) {
+  c.save();
+  c.beginPath();
+  c.moveTo(x, y);
+  c.lineTo(x + w, y);
+  c.lineTo(x + w, y + h * 0.55);
+  c.quadraticCurveTo(x + w * 0.85, y + h * 0.88, x + w * 0.5, y + h);
+  c.quadraticCurveTo(x + w * 0.15, y + h * 0.88, x, y + h * 0.55);
+  c.closePath();
+  c.fillStyle = '#FFD600';
+  c.fill();
+
+  // Silhueta sutil do Cavallino no centro do escudo
+  c.fillStyle = '#111111';
+  c.beginPath();
+  c.arc(x + w * 0.5, y + h * 0.52, w * 0.22, 0, Math.PI * 2);
+  c.fill();
+  c.restore();
+}
+
+// Seta curva verde de delta (igual ao broadcast F1)
+function drawDeltaArrow(c, x, y, color) {
+  c.save();
+  c.strokeStyle = color;
+  c.fillStyle = color;
+  c.lineWidth = 1.8;
+  c.lineCap = 'round';
+  c.beginPath();
+  c.moveTo(x, y + 2);
+  c.quadraticCurveTo(x + 7, y - 2, x + 13, y - 3);
+  c.stroke();
+
+  c.beginPath();
+  c.moveTo(x + 15, y - 3.5);
+  c.lineTo(x + 9, y - 6.5);
+  c.lineTo(x + 10.5, y + 0.5);
+  c.closePath();
+  c.fill();
+  c.restore();
+}
+
 // Configurações do HUD
 let currentCfg = {
   scale: 100,
@@ -42,13 +99,13 @@ let currentCfg = {
   panelBg: '#080c10',
   gearColor: '#00F5D4',
   ersColor: '#00D2BE',
-  throttleColor: '#76FF03',
+  throttleColor: '#66FF00',
   brakeColor: '#FF2A4D',
   showHaloBar: true,
   showTyres: false
 };
 
-// Estado da telemetria inicializado com os valores idênticos ao quadro da F1 TV
+// Estado da telemetria inicializado com os valores exatos da referência F1 TV
 let latestTelemetry = normalizeTelemetry({
   speed: 264,
   gear: 6,
@@ -70,173 +127,187 @@ let disposed = false;
 
 // =============================================================================
 // RENDERIZADOR CANVAS 2D DE ALTA RESOLUÇÃO (DPR 2x: 2400 x 960)
-// Proporções exatas extraídas do broadcast oficial da F1
 // =============================================================================
 function drawHUD(f, cfg) {
-  // Limpar canvas de 2400x960
   ctx.clearRect(0, 0, 2400, 960);
 
   ctx.save();
-  // Escala DPR 2x (Coordenadas virtuais: 1200 x 480)
   ctx.scale(2, 2);
 
-  // Escala opcional do usuário (centro em 600, 196)
   const userScale = clamp(cfg.scale || 100, 50, 150) / 100;
   if (userScale !== 1) {
-    ctx.translate(600, 196);
+    ctx.translate(600, 185);
     ctx.scale(userScale, userScale);
-    ctx.translate(-600, -196);
+    ctx.translate(-600, -185);
   }
 
-  // ---------------------------------------------------------------------------
-  // 0. ARCO DE FIBRA DE CARBONO DO HALO (BASE VISUAL REALISTA)
-  // ---------------------------------------------------------------------------
   const isEmbedded = window.location.search.includes('embedded=1');
   if (isEmbedded) {
     document.body.classList.add('embedded');
   }
+
+  // ---------------------------------------------------------------------------
+  // 0. ARCO DE FIBRA DE CARBONO DO HALO (BASE VISUAL NO MODO STANDALONE)
+  // ---------------------------------------------------------------------------
   if (!isEmbedded && cfg.showHaloBar) {
     ctx.save();
     ctx.beginPath();
-    // Borda externa do arco do Halo
-    ctx.moveTo(110, 360);
-    ctx.bezierCurveTo(240, 280, 410, 215, 600, 215);
-    ctx.bezierCurveTo(790, 215, 960, 280, 1090, 360);
-    // Borda interna do arco do Halo
-    ctx.bezierCurveTo(940, 320, 770, 275, 600, 275);
-    ctx.bezierCurveTo(430, 275, 260, 320, 110, 360);
+    ctx.moveTo(95, archY(95, 22));
+    for (let x = 110; x <= 1105; x += 25) {
+      ctx.lineTo(x, archY(x, 22));
+    }
+    for (let x = 1105; x >= 95; x -= 25) {
+      ctx.lineTo(x, archY(x, -44));
+    }
     ctx.closePath();
 
-    // Gradiente e textura de carbono metálico escuro
-    const haloGrad = ctx.createLinearGradient(600, 215, 600, 360);
-    haloGrad.addColorStop(0, '#1c2229');
-    haloGrad.addColorStop(0.3, '#2a3440');
-    haloGrad.addColorStop(0.7, '#14181e');
-    haloGrad.addColorStop(1, '#0c0f13');
+    const haloGrad = ctx.createLinearGradient(600, 155, 600, 420);
+    haloGrad.addColorStop(0, '#2a323b');
+    haloGrad.addColorStop(0.22, '#171c22');
+    haloGrad.addColorStop(0.6, '#0d1015');
+    haloGrad.addColorStop(1, '#050709');
     ctx.fillStyle = haloGrad;
     ctx.fill();
 
-    // Brilho especular sutil na borda superior do Halo
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.18)';
-    ctx.lineWidth = 1.6;
+    // Realce especular sutil no topo do carbono
     ctx.beginPath();
-    ctx.moveTo(110, 360);
-    ctx.bezierCurveTo(240, 280, 410, 215, 600, 215);
-    ctx.bezierCurveTo(790, 215, 960, 280, 1090, 360);
+    ctx.moveTo(95, archY(95, 20));
+    for (let x = 110; x <= 1105; x += 25) {
+      ctx.lineTo(x, archY(x, 20));
+    }
+    ctx.strokeStyle = 'rgba(255, 255, 255, 0.14)';
+    ctx.lineWidth = 1.4;
     ctx.stroke();
     ctx.restore();
   }
 
-  // Opacidade configurável do chassi de vidro
   const glassOpacity = clamp(cfg.opacity != null ? cfg.opacity : 85, 0, 100) / 100;
+  const accent = cfg.accentColor || '#00F0FF';
 
   // ---------------------------------------------------------------------------
-  // 1. CHASSI DO HALO (SILHUETA SUAVE ASA DE GAIVOTA / GULL-WING)
+  // 1. CHASSI PRINCIPAL DO HALO HUD (BORDAS FIÉIS À REFERÊNCIA)
   // ---------------------------------------------------------------------------
   ctx.beginPath();
-  // Ponta da asa esquerda
-  ctx.moveTo(120, 285);
-  // Borda superior da asa esquerda subindo suavemente
-  ctx.bezierCurveTo(126, 230, 160, 185, 220, 160);
-  ctx.bezierCurveTo(340, 125, 460, 115, 542, 108);
-  // Cúpula superior do DRS (Hump central elevado)
-  ctx.bezierCurveTo(565, 52, 635, 52, 658, 108);
+  // Ponta inferior esquerda apoiada no arco do Halo
+  ctx.moveTo(125, archY(125, 0));
+  // Lateral esquerda inclinada subindo até o ombro com canto nítido
+  ctx.lineTo(148, 220);
+  ctx.quadraticCurveTo(150, 204, 168, 196);
+  // Borda superior da asa esquerda convergindo ao pod central
+  ctx.bezierCurveTo(285, 152, 415, 126, 502, 110);
+  // Cúpula elevada do DRS envolvendo a pílula com folga uniforme
+  ctx.bezierCurveTo(526, 104, 535, 58, 566, 54);
+  ctx.quadraticCurveTo(600, 50, 634, 54);
+  ctx.bezierCurveTo(665, 58, 674, 104, 698, 110);
   // Borda superior da asa direita descendo suavemente
-  ctx.bezierCurveTo(740, 115, 860, 125, 980, 160);
-  ctx.bezierCurveTo(1040, 185, 1074, 230, 1080, 285);
-  // Ponta curva da asa direita
-  ctx.bezierCurveTo(1085, 315, 1072, 345, 1045, 355);
-  // Borda inferior da asa direita subindo em arco
-  ctx.bezierCurveTo(940, 305, 820, 255, 678, 230);
-  // Curva sob o pod central do velocímetro
-  ctx.bezierCurveTo(645, 258, 555, 258, 522, 230);
-  // Borda inferior da asa esquerda descendo em arco
-  ctx.bezierCurveTo(380, 255, 260, 305, 155, 355);
-  // Ponta curva da asa esquerda
-  ctx.bezierCurveTo(128, 345, 115, 315, 120, 285);
+  ctx.bezierCurveTo(785, 126, 915, 152, 1032, 196);
+  ctx.quadraticCurveTo(1050, 204, 1052, 220);
+  // Lateral direita inclinada descendo até o arco do Halo
+  ctx.lineTo(1075, archY(1075, 0));
+
+  // Borda inferior direita acompanhando a curvatura exata do Halo
+  for (let x = 1060; x >= 685; x -= 25) {
+    ctx.lineTo(x, archY(x, 0));
+  }
+  // Curva suave sob o mostrador circular central
+  ctx.bezierCurveTo(654, 256, 546, 256, 515, archY(515, 0));
+  // Borda inferior esquerda acompanhando a curvatura exata do Halo
+  for (let x = 500; x >= 125; x -= 25) {
+    ctx.lineTo(x, archY(x, 0));
+  }
   ctx.closePath();
 
-  // Fundo em vidro fumê translúcido com gradiente vertical escuro
-  const bgGrad = ctx.createLinearGradient(600, 52, 600, 355);
-  bgGrad.addColorStop(0, `rgba(12, 22, 32, ${0.82 * glassOpacity})`);
-  bgGrad.addColorStop(1, `rgba(4, 8, 12, ${0.94 * glassOpacity})`);
+  // Preenchimento vidro fumê escuro translúcido
+  const bgGrad = ctx.createLinearGradient(600, 52, 600, 360);
+  bgGrad.addColorStop(0, `rgba(10, 22, 32, ${0.80 * glassOpacity})`);
+  bgGrad.addColorStop(0.55, `rgba(6, 14, 22, ${0.86 * glassOpacity})`);
+  bgGrad.addColorStop(1, `rgba(4, 9, 14, ${0.92 * glassOpacity})`);
   ctx.fillStyle = bgGrad;
   ctx.fill();
 
-  // Contorno neon superior contínuo com glow brilhante
+  // Borda neon ciano externa contínua com gradiente e glow
   ctx.save();
-  ctx.shadowBlur = 18;
-  ctx.shadowColor = cfg.accentColor || '#00F0FF';
-  const edgeGrad = ctx.createLinearGradient(120, 285, 1080, 285);
-  edgeGrad.addColorStop(0, '#00F5D4');
-  edgeGrad.addColorStop(0.35, '#00F0FF');
-  edgeGrad.addColorStop(0.5, '#76FF03');
-  edgeGrad.addColorStop(0.65, '#00F0FF');
-  edgeGrad.addColorStop(1, '#00F5D4');
+  ctx.shadowBlur = 16;
+  ctx.shadowColor = accent;
+  const edgeGrad = ctx.createLinearGradient(125, 340, 1075, 340);
+  edgeGrad.addColorStop(0, 'rgba(0, 245, 212, 0.35)');
+  edgeGrad.addColorStop(0.08, '#00F0FF');
+  edgeGrad.addColorStop(0.5, accent);
+  edgeGrad.addColorStop(0.92, '#00F0FF');
+  edgeGrad.addColorStop(1, 'rgba(0, 245, 212, 0.35)');
   ctx.strokeStyle = edgeGrad;
-  ctx.lineWidth = 2.4;
+  ctx.lineWidth = 2.0;
+  ctx.stroke();
+  ctx.restore();
+
+  // Linha divisória interna ciano brilhante na asa esquerda (Sainz / Russell)
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(148, archY(148, 56));
+  for (let x = 165; x <= 512; x += 20) {
+    ctx.lineTo(x, archY(x, 56));
+  }
+  ctx.strokeStyle = '#00E5FF';
+  ctx.shadowBlur = 10;
+  ctx.shadowColor = '#00E5FF';
+  ctx.lineWidth = 1.5;
   ctx.stroke();
   ctx.restore();
 
   // ---------------------------------------------------------------------------
-  // 2. POD CENTRAL (VELOCÍMETRO + TACÔMETRO + DRS)
+  // 2. POD CENTRAL (DRS + TACÔMETRO + VELOCÍMETRO)
   // ---------------------------------------------------------------------------
-  // Fundo circular do velocímetro (cx=600, cy=192, r=76)
+  const POD_CX = 600;
+  const POD_CY = 178;
+
+  // Fundo circular escuro do mostrador
   ctx.save();
-  const podGrad = ctx.createRadialGradient(600, 192, 10, 600, 192, 76);
-  podGrad.addColorStop(0, '#0f1722');
-  podGrad.addColorStop(0.85, '#070b10');
-  podGrad.addColorStop(1, '#020406');
+  const podGrad = ctx.createRadialGradient(POD_CX, POD_CY, 12, POD_CX, POD_CY, 74);
+  podGrad.addColorStop(0, 'rgba(14, 22, 32, 0.94)');
+  podGrad.addColorStop(0.82, 'rgba(6, 10, 16, 0.96)');
+  podGrad.addColorStop(1, 'rgba(3, 6, 10, 0.4)');
   ctx.beginPath();
-  ctx.arc(600, 192, 76, 0, Math.PI * 2);
+  ctx.arc(POD_CX, POD_CY, 74, 0, Math.PI * 2);
   ctx.fillStyle = podGrad;
   ctx.fill();
-
-  // Borda metálica sutil do mostrador
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.16)';
-  ctx.lineWidth = 1.8;
-  ctx.stroke();
   ctx.restore();
 
-  // Tacômetro de RPM (LEDs Radiais em Arco: de 150° a 30° passando pelo topo)
-  const TOTAL_LEDS = 24;
-  const START_DEG = 150;
-  const END_DEG = 390; // 360 + 30
+  // Tacômetro de RPM em arco (138° até 332° = de ~7h30 até ~2h00 como na referência)
+  const TOTAL_LEDS = 22;
+  const START_DEG = 138;
+  const END_DEG = 336;
   const activeLeds = Math.round(clamp((f.rpm - 4000) / (f.maxRpm - 4000), 0, 1) * TOTAL_LEDS);
 
   for (let i = 0; i < TOTAL_LEDS; i++) {
     const deg = START_DEG + (i * (END_DEG - START_DEG) / (TOTAL_LEDS - 1));
     const rad = (deg * Math.PI) / 180;
-    const r1 = 62;
-    const r2 = 73;
-    const x1 = 600 + Math.cos(rad) * r1;
-    const y1 = 192 + Math.sin(rad) * r1;
-    const x2 = 600 + Math.cos(rad) * r2;
-    const y2 = 192 + Math.sin(rad) * r2;
+    const r1 = 56;
+    const r2 = 70;
+    const x1 = POD_CX + Math.cos(rad) * r1;
+    const y1 = POD_CY + Math.sin(rad) * r1;
+    const x2 = POD_CX + Math.cos(rad) * r2;
+    const y2 = POD_CY + Math.sin(rad) * r2;
 
     ctx.save();
     ctx.beginPath();
     ctx.moveTo(x1, y1);
     ctx.lineTo(x2, y2);
-    ctx.lineWidth = 4.2;
-    ctx.lineCap = 'round';
+    ctx.lineWidth = 5.4;
+    ctx.lineCap = 'butt';
 
     if (i < activeLeds) {
-      if (i >= 18) {
-        // Redline: Vermelho Telemetria
-        ctx.strokeStyle = '#FF1744';
+      if (i >= 17) {
+        ctx.strokeStyle = '#FF2200';
         ctx.shadowBlur = 12;
-        ctx.shadowColor = '#FF1744';
+        ctx.shadowColor = '#FF2200';
       } else if (i < 5) {
-        // Início: Ciano Néon
-        ctx.strokeStyle = '#00F0FF';
-        ctx.shadowBlur = 8;
-        ctx.shadowColor = '#00F0FF';
-      } else {
-        // Médio: Verde Limão / Amarelo
-        ctx.strokeStyle = '#76FF03';
+        ctx.strokeStyle = '#00F5D4';
         ctx.shadowBlur = 10;
-        ctx.shadowColor = '#76FF03';
+        ctx.shadowColor = '#00F5D4';
+      } else {
+        ctx.strokeStyle = i >= 14 ? '#CCFF00' : '#55FF00';
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = '#66FF00';
       }
       ctx.stroke();
     } else {
@@ -246,261 +317,327 @@ function drawHUD(f, cfg) {
     ctx.restore();
   }
 
-  // Pílula DRS Encaixada no Topo (x=552, y=58, w=96, h=26, r=13)
+  // Anel interno fino branco/cinza ao redor da velocidade
+  ctx.save();
+  ctx.beginPath();
+  ctx.arc(POD_CX, POD_CY, 49, (125 * Math.PI) / 180, (320 * Math.PI) / 180);
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.85)';
+  ctx.lineWidth = 2.0;
+  ctx.stroke();
+
+  ctx.beginPath();
+  ctx.arc(POD_CX, POD_CY, 49, (-40 * Math.PI) / 180, (70 * Math.PI) / 180);
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.20)';
+  ctx.lineWidth = 1.4;
+  ctx.stroke();
+
+  // Pequeno ponteiro branco no topo direito do anel interno (~1h)
+  const tickAng = (-36 * Math.PI) / 180;
+  ctx.beginPath();
+  ctx.moveTo(POD_CX + Math.cos(tickAng) * 45, POD_CY + Math.sin(tickAng) * 45);
+  ctx.lineTo(POD_CX + Math.cos(tickAng) * 53, POD_CY + Math.sin(tickAng) * 53);
+  ctx.strokeStyle = 'rgba(255, 255, 255, 0.75)';
+  ctx.lineWidth = 1.6;
+  ctx.stroke();
+  ctx.restore();
+
+  // Pílula DRS Encaixada na Cúpula (fundo verde escuro translúcido + borda verde néon)
   ctx.save();
   const drsOn = f.drs === 'ON';
   const drsReady = f.drs === 'READY' || drsOn;
   if (drsOn) {
-    ctx.fillStyle = '#76FF03';
-    ctx.shadowBlur = 20;
-    ctx.shadowColor = '#76FF03';
-    drawRoundRect(ctx, 552, 58, 96, 26, 13);
-    ctx.fill();
-    ctx.shadowBlur = 0;
-    ctx.font = '900 italic 15px "Titillium Web", sans-serif';
-    ctx.fillStyle = '#03080E';
-    ctx.textAlign = 'center';
-    ctx.fillText('DRS', 600, 76);
-  } else if (drsReady) {
-    ctx.fillStyle = 'rgba(4, 20, 10, 0.96)';
-    drawRoundRect(ctx, 552, 58, 96, 26, 13);
+    ctx.fillStyle = 'rgba(10, 52, 22, 0.92)';
+    drawRoundRect(ctx, 556, 63, 88, 26, 13);
     ctx.fill();
     ctx.shadowBlur = 16;
-    ctx.shadowColor = '#76FF03';
-    ctx.strokeStyle = '#76FF03';
+    ctx.shadowColor = '#39FF14';
+    ctx.strokeStyle = '#39FF14';
     ctx.lineWidth = 2.2;
     ctx.stroke();
-    ctx.shadowBlur = 0;
-    ctx.font = '900 italic 15px "Titillium Web", sans-serif';
-    ctx.fillStyle = '#76FF03';
+    ctx.shadowBlur = 8;
+    ctx.font = '800 15px "Titillium Web", sans-serif';
+    ctx.fillStyle = '#55FF33';
     ctx.textAlign = 'center';
-    ctx.fillText('DRS', 600, 76);
-  } else {
-    ctx.fillStyle = 'rgba(4, 12, 8, 0.9)';
-    drawRoundRect(ctx, 552, 58, 96, 26, 13);
+    ctx.fillText('DRS', POD_CX, 81);
+  } else if (drsReady) {
+    ctx.fillStyle = 'rgba(6, 28, 14, 0.9)';
+    drawRoundRect(ctx, 556, 63, 88, 26, 13);
     ctx.fill();
-    ctx.strokeStyle = 'rgba(139, 155, 176, 0.4)';
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = '#00E676';
+    ctx.strokeStyle = '#00E676';
+    ctx.lineWidth = 1.8;
+    ctx.stroke();
+    ctx.shadowBlur = 0;
+    ctx.font = '800 15px "Titillium Web", sans-serif';
+    ctx.fillStyle = '#00E676';
+    ctx.textAlign = 'center';
+    ctx.fillText('DRS', POD_CX, 81);
+  } else {
+    ctx.fillStyle = 'rgba(8, 14, 18, 0.85)';
+    drawRoundRect(ctx, 556, 63, 88, 26, 13);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(139, 155, 176, 0.45)';
     ctx.lineWidth = 1.5;
     ctx.stroke();
-    ctx.font = '900 italic 15px "Titillium Web", sans-serif';
+    ctx.font = '800 15px "Titillium Web", sans-serif';
     ctx.fillStyle = '#8B9BB0';
     ctx.textAlign = 'center';
-    ctx.fillText('DRS', 600, 76);
+    ctx.fillText('DRS', POD_CX, 81);
   }
   ctx.restore();
 
-  // Textos Internos do Mostrador
-  ctx.font = '850 italic 11px "Titillium Web", sans-serif';
-  ctx.fillStyle = '#8B9BB0';
+  // Textos internos do Velocímetro
+  ctx.font = '700 11px "Titillium Web", sans-serif';
+  ctx.fillStyle = '#A8B8C8';
   ctx.textAlign = 'center';
-  ctx.fillText('RPM', 600, 150);
+  ctx.fillText('RPM', POD_CX, 146);
 
-  // Velocidade Digital (264)
   ctx.save();
-  ctx.font = '900 italic 54px "Titillium Web", "Chakra Petch", sans-serif';
+  ctx.font = '900 44px "Chakra Petch", "Titillium Web", sans-serif';
   ctx.fillStyle = '#FFFFFF';
   ctx.textAlign = 'center';
   ctx.shadowBlur = 12;
-  ctx.shadowColor = 'rgba(255, 255, 255, 0.45)';
-  ctx.fillText(String(f.speed), 600, 200);
+  ctx.shadowColor = 'rgba(255, 255, 255, 0.4)';
+  ctx.fillText(String(f.speed), POD_CX, 190);
   ctx.restore();
 
-  // KM/H (sem MPH)
-  ctx.font = '850 italic 11px "Titillium Web", sans-serif';
-  ctx.fillStyle = '#8B9BB0';
+  ctx.font = '700 11px "Titillium Web", sans-serif';
+  ctx.fillStyle = '#A8B8C8';
   ctx.textAlign = 'center';
-  ctx.fillText('KM/H', 600, 224);
+  ctx.fillText('KM/H', POD_CX, 211);
 
   // ---------------------------------------------------------------------------
-  // 3. ASA ESQUERDA: PILOTOS + DELTAS + ERS (Ângulo suave ~14°)
+  // 3. ASA ESQUERDA: PILOTOS + DELTAS + ERS (POSICIONADOS NA CURVA DO HALO)
   // ---------------------------------------------------------------------------
+  // Linha 1 (Topo): 11 SAINZ
   ctx.save();
-  ctx.translate(535, 180);
-  ctx.rotate(-0.24); // ~ -13.8 graus acompanhando perfeitamente a asa do Halo
-
-  // Piloto 1 (11 SAINZ)
-  // Escudo Ferrari Amarelo
-  ctx.fillStyle = '#FFEB3B';
-  drawRoundRect(ctx, -340, -34, 12, 16, 2);
-  ctx.fill();
-
-  ctx.font = '900 italic 18px "Titillium Web", sans-serif';
+  const sX = 188;
+  ctx.translate(sX, archY(sX, 74));
+  ctx.rotate(archAngle(265));
+  drawFerrariShield(ctx, 0, -13, 13, 16);
+  ctx.font = '800 italic 17px "Titillium Web", sans-serif';
   ctx.fillStyle = '#FFFFFF';
   ctx.textAlign = 'left';
-  ctx.fillText('11  SAINZ', -318, -21);
+  ctx.fillText('11  SAINZ', 22, 0);
+  ctx.restore();
 
-  // Delta com seta curva
-  ctx.font = '900 italic 14px "Titillium Web", sans-serif';
+  // Delta Sainz
+  ctx.save();
+  const sdX = 435;
+  ctx.translate(sdX, archY(sdX, 72));
+  ctx.rotate(archAngle(sdX));
+  ctx.font = '800 italic 14px "Titillium Web", sans-serif';
   ctx.fillStyle = '#76FF03';
   ctx.textAlign = 'right';
-  ctx.fillText('+0.241s ➔', -48, -21);
+  ctx.fillText('+0.241s', -4, 0);
+  drawDeltaArrow(ctx, 4, -5, '#76FF03');
+  ctx.restore();
 
-  // Linha sutil separadora entre Sainz e Russell
-  ctx.strokeStyle = 'rgba(255, 255, 255, 0.12)';
-  ctx.lineWidth = 1;
-  ctx.beginPath();
-  ctx.moveTo(-340, -4);
-  ctx.lineTo(-48, -4);
-  ctx.stroke();
-
-  // Piloto 2 (12 RUSSELL)
-  // Ícone Mercedes Ciano com 3 raios
+  // Linha 2 (Meio): 12 RUSSELL
   ctx.save();
+  const rX = 198;
+  ctx.translate(rX, archY(rX, 32));
+  ctx.rotate(archAngle(280));
+  // Ícone Mercedes 3 raios
   ctx.strokeStyle = '#00F5D4';
   ctx.lineWidth = 1.5;
   ctx.beginPath();
-  ctx.arc(-334, 14, 6, 0, Math.PI * 2);
+  ctx.arc(6, -5, 6, 0, Math.PI * 2);
   ctx.stroke();
   for (let s = 0; s < 3; s++) {
-    const sAng = (s * 120 - 90) * Math.PI / 180;
+    const sAng = ((s * 120 - 90) * Math.PI) / 180;
     ctx.beginPath();
-    ctx.moveTo(-334, 14);
-    ctx.lineTo(-334 + Math.cos(sAng) * 6, 14 + Math.sin(sAng) * 6);
+    ctx.moveTo(6, -5);
+    ctx.lineTo(6 + Math.cos(sAng) * 6, -5 + Math.sin(sAng) * 6);
+    ctx.stroke();
+  }
+  ctx.font = '800 italic 17px "Titillium Web", sans-serif';
+  ctx.fillStyle = '#FFFFFF';
+  ctx.textAlign = 'left';
+  ctx.fillText('12  RUSSELL', 22, 0);
+  ctx.restore();
+
+  // Delta Russell
+  ctx.save();
+  const rdX = 435;
+  ctx.translate(rdX, archY(rdX, 34));
+  ctx.rotate(archAngle(rdX));
+  ctx.font = '800 italic 14px "Titillium Web", sans-serif';
+  ctx.fillStyle = '#76FF03';
+  ctx.textAlign = 'right';
+  ctx.fillText('+0.241s', -4, 0);
+  drawDeltaArrow(ctx, 4, -5, '#76FF03');
+  ctx.restore();
+
+  // ERS (78% + arco de energia na borda inferior)
+  ctx.save();
+  const ersTextX = 148;
+  ctx.translate(ersTextX, archY(ersTextX, 11));
+  ctx.rotate(archAngle(180));
+  ctx.font = '800 italic 11px "Titillium Web", sans-serif';
+  ctx.fillStyle = cfg.ersColor || '#00F5D4';
+  ctx.textAlign = 'left';
+  ctx.fillText(`${Math.round(f.ers)}%`, 0, 0);
+  ctx.restore();
+
+  // Barra curva de ERS ao longo do arco inferior esquerdo
+  const ersStartX = 195;
+  const ersMaxEndX = 425;
+  const ersCurrEndX = ersStartX + ((ersMaxEndX - ersStartX) * clamp(f.ers, 0, 100)) / 100;
+
+  ctx.save();
+  ctx.beginPath();
+  ctx.moveTo(ersStartX, archY(ersStartX, 11));
+  for (let x = ersStartX; x <= ersMaxEndX; x += 15) {
+    ctx.lineTo(x, archY(x, 11));
+  }
+  ctx.strokeStyle = 'rgba(0, 245, 212, 0.18)';
+  ctx.lineWidth = 2.4;
+  ctx.stroke();
+
+  if (f.ers > 1) {
+    ctx.beginPath();
+    ctx.moveTo(ersStartX, archY(ersStartX, 11));
+    for (let x = ersStartX; x <= ersCurrEndX; x += 10) {
+      ctx.lineTo(x, archY(x, 11));
+    }
+    const eGrad = ctx.createLinearGradient(ersStartX, 0, ersMaxEndX, 0);
+    eGrad.addColorStop(0, cfg.ersColor || '#00F5D4');
+    eGrad.addColorStop(1, '#66FF00');
+    ctx.strokeStyle = eGrad;
+    ctx.shadowBlur = 8;
+    ctx.shadowColor = cfg.ersColor || '#00F5D4';
+    ctx.lineWidth = 2.6;
     ctx.stroke();
   }
   ctx.restore();
 
-  ctx.font = '900 italic 18px "Titillium Web", sans-serif';
-  ctx.fillStyle = '#FFFFFF';
-  ctx.textAlign = 'left';
-  ctx.fillText('12  RUSSELL', -318, 19);
-
-  // Delta com seta curva
-  ctx.font = '900 italic 14px "Titillium Web", sans-serif';
-  ctx.fillStyle = '#76FF03';
-  ctx.textAlign = 'right';
-  ctx.fillText('+0.241s ➔', -48, 19);
-
-  // Bateria ERS Integrada na Curva Inferior
-  ctx.font = '900 italic 12px "Titillium Web", sans-serif';
-  ctx.fillStyle = cfg.ersColor || '#00F5D4';
-  ctx.textAlign = 'left';
-  ctx.fillText(`${Math.round(f.ers)}%`, -340, 44);
-
-  // Linha/arco de ERS
-  ctx.save();
-  ctx.fillStyle = 'rgba(139, 155, 176, 0.2)';
-  drawRoundRect(ctx, -300, 38, 252, 4, 2);
-  ctx.fill();
-
-  const ersWidth = Math.max(0, 252 * f.ers / 100);
-  if (ersWidth > 0) {
-    const eGrad = ctx.createLinearGradient(-300, 0, -48, 0);
-    eGrad.addColorStop(0, '#0088FF');
-    eGrad.addColorStop(1, cfg.ersColor || '#00F5D4');
-    ctx.fillStyle = eGrad;
-    ctx.shadowBlur = 8;
-    ctx.shadowColor = cfg.ersColor || '#00F5D4';
-    drawRoundRect(ctx, -300, 38, ersWidth, 4, 2);
-    ctx.fill();
-  }
-  ctx.restore();
-
-  ctx.restore();
-
   // ---------------------------------------------------------------------------
-  // 4. ASA DIREITA: THROTTLE + BRAKE + MARCHAS (Ângulo suave ~14°)
+  // 4. ASA DIREITA: THROTTLE CURVO + BRAKE + RÉGUA DE MARCHAS CURVA
   // ---------------------------------------------------------------------------
-  ctx.save();
-  ctx.translate(665, 180);
-  ctx.rotate(0.24); // ~ +13.8 graus acompanhando perfeitamente a asa do Halo
-
-  // Barra de Throttle (18 blocos segmentados em cápsulas verdes/limão)
-  const TOTAL_THR_BLOCKS = 18;
+  // Barra segmentada curva de Throttle (20 cápsulas no topo da asa direita)
+  const TOTAL_THR_BLOCKS = 20;
   const activeThr = Math.round((f.throttle / 100) * TOTAL_THR_BLOCKS);
+  const thrStartX = 716;
+  const thrStep = 10.5;
 
   for (let i = 0; i < TOTAL_THR_BLOCKS; i++) {
-    const bx = 42 + i * 11;
-    const by = -28;
-    const bw = 8;
-    const bh = 8;
+    const bx = thrStartX + i * thrStep;
+    const by = archY(bx, 66);
+    const ang = archAngle(bx);
+
+    ctx.save();
+    ctx.translate(bx, by);
+    ctx.rotate(ang);
 
     if (i < activeThr) {
-      ctx.save();
-      const thrRatio = i / (TOTAL_THR_BLOCKS - 1);
-      const thrColor = thrRatio > 0.7 ? '#CCFF00' : thrRatio > 0.3 ? '#76FF03' : '#00F5D4';
+      const thrColor = i < 4 ? '#00F5D4' : (i > 14 ? '#AAFF00' : (cfg.throttleColor || '#66FF00'));
       ctx.fillStyle = thrColor;
       ctx.shadowBlur = 8;
       ctx.shadowColor = thrColor;
-      drawRoundRect(ctx, bx, by, bw, bh, 2);
+      drawRoundRect(ctx, -3.5, -7, 7, 13, 1.8);
       ctx.fill();
-      ctx.restore();
     } else {
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.12)';
-      drawRoundRect(ctx, bx, by, bw, bh, 2);
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.14)';
+      drawRoundRect(ctx, -3.5, -7, 7, 13, 1.8);
       ctx.fill();
     }
-  }
-
-  // Rótulos de Throttle e Porcentagem
-  ctx.font = '900 italic 14px "Titillium Web", sans-serif';
-  ctx.fillStyle = '#76FF03';
-  ctx.textAlign = 'left';
-  ctx.fillText(`${Math.round(f.throttle)}%`, 246, -21);
-
-  ctx.font = '900 italic 11px "Titillium Web", sans-serif';
-  ctx.fillStyle = cfg.throttleColor || '#76FF03';
-  ctx.textAlign = 'left';
-  ctx.fillText('THROTTLE', 292, -26);
-
-  // Barra e Rótulo de Freio
-  const brkWidth = (f.brake / 100) * 190;
-  if (brkWidth > 0) {
-    ctx.save();
-    ctx.fillStyle = cfg.brakeColor || '#FF2A4D';
-    ctx.shadowBlur = 8;
-    ctx.shadowColor = cfg.brakeColor || '#FF2A4D';
-    drawRoundRect(ctx, 42, -15, brkWidth, 4, 2);
-    ctx.fill();
     ctx.restore();
   }
 
-  ctx.font = '900 italic 11px "Titillium Web", sans-serif';
-  ctx.fillStyle = cfg.brakeColor || '#FF2A4D';
-  ctx.textAlign = 'left';
-  ctx.fillText('BRAKE', 292, -14);
+  // Porcentagem 100% + Rótulos THROTTLE / BRAKE curvados
+  ctx.save();
+  const pctX = 948;
+  ctx.translate(pctX, archY(pctX, 64));
+  ctx.rotate(archAngle(pctX));
+  ctx.fillStyle = 'rgba(102, 255, 0, 0.22)';
+  drawRoundRect(ctx, -22, -10, 44, 17, 4);
+  ctx.fill();
+  ctx.font = '900 12px "Titillium Web", sans-serif';
+  ctx.fillStyle = '#FFFFFF';
+  ctx.textAlign = 'center';
+  ctx.fillText(`${Math.round(f.throttle)}%`, 0, 3);
+  ctx.restore();
 
-  // Régua de Marchas: N 1 2 3 4 5 6 7 8 (Sem o R e sem pular o 6)
+  ctx.save();
+  const lblX = 1010;
+  ctx.translate(lblX, archY(lblX, 65));
+  ctx.rotate(archAngle(lblX));
+  ctx.font = '800 10px "Titillium Web", sans-serif';
+  ctx.fillStyle = cfg.throttleColor || '#66FF00';
+  ctx.textAlign = 'center';
+  ctx.fillText('THROTTLE', 0, -2);
+  ctx.fillStyle = cfg.brakeColor || '#FF2A4D';
+  ctx.fillText('BRAKE', 0, 12);
+  ctx.restore();
+
+  // Barra curva vermelha de Brake quando pressionado
+  if (f.brake > 0) {
+    const brkEndX = thrStartX + ((TOTAL_THR_BLOCKS * thrStep) * clamp(f.brake, 0, 100)) / 100;
+    ctx.save();
+    ctx.beginPath();
+    ctx.moveTo(thrStartX, archY(thrStartX, 50));
+    for (let x = thrStartX; x <= brkEndX; x += 10) {
+      ctx.lineTo(x, archY(x, 50));
+    }
+    ctx.strokeStyle = cfg.brakeColor || '#FF2A4D';
+    ctx.shadowBlur = 10;
+    ctx.shadowColor = cfg.brakeColor || '#FF2A4D';
+    ctx.lineWidth = 3.2;
+    ctx.stroke();
+    ctx.restore();
+  }
+
+  // Régua de Marchas curva na base da asa direita: N 1 2 3 4 5 6 7 8
   const gears = ['N', '1', '2', '3', '4', '5', '6', '7', '8'];
+  const gearStartX = 716;
+  const gearStep = 31;
+
   gears.forEach((gear, idx) => {
-    const gx = 46 + idx * 28;
-    const gy = 18;
+    const gx = gearStartX + idx * gearStep;
+    const gy = archY(gx, 22);
+    const ang = archAngle(gx) * 0.9;
     const isActive = (gear === f.gear) || (gear === 'N' && f.gear === 'R');
 
+    ctx.save();
+    ctx.translate(gx, gy);
+    ctx.rotate(ang);
+
     if (isActive) {
-      // Destaque Ciano Brilhante na Marcha Ativa
-      ctx.save();
       ctx.fillStyle = cfg.gearColor || '#00F5D4';
       ctx.shadowBlur = 16;
       ctx.shadowColor = cfg.gearColor || '#00F5D4';
-      drawRoundRect(ctx, gx - 12, gy - 16, 24, 24, 4);
+      drawRoundRect(ctx, -12, -13, 24, 24, 4);
       ctx.fill();
       ctx.shadowBlur = 0;
 
-      // Número escuro sobre o fundo ciano aceso
-      ctx.font = '900 italic 17px "Titillium Web", sans-serif';
+      ctx.font = '900 17px "Titillium Web", sans-serif';
       ctx.fillStyle = '#031218';
       ctx.textAlign = 'center';
-      ctx.fillText(gear, gx, gy + 2);
-      ctx.restore();
+      ctx.fillText(gear, 0, 5);
     } else {
-      ctx.font = '800 italic 16px "Titillium Web", sans-serif';
-      ctx.fillStyle = '#B0BEC5';
+      ctx.font = '700 16px "Titillium Web", sans-serif';
+      ctx.fillStyle = '#B8C6D4';
       ctx.textAlign = 'center';
-      ctx.fillText(gear, gx, gy + 2);
+      ctx.fillText(gear, 0, 5);
     }
+    ctx.restore();
   });
 
-  // Traço de acento vermelho no final da régua de marchas (como na referência)
+  // Borda vermelha curva acompanhando o final da régua de marchas (5 6 7 8 ┐)
   ctx.save();
-  ctx.strokeStyle = '#FF2A4D';
-  ctx.lineWidth = 2.4;
   ctx.beginPath();
-  ctx.moveTo(300, 3);
-  ctx.lineTo(308, 21);
+  ctx.moveTo(860, archY(860, 40));
+  for (let x = 875; x <= 1005; x += 15) {
+    ctx.lineTo(x, archY(x, 40));
+  }
+  ctx.quadraticCurveTo(1022, archY(1022, 40), 1028, archY(1028, 8));
+  ctx.strokeStyle = cfg.brakeColor || '#FF2A4D';
+  ctx.shadowBlur = 8;
+  ctx.shadowColor = cfg.brakeColor || '#FF2A4D';
+  ctx.lineWidth = 2.0;
   ctx.stroke();
-  ctx.restore();
-
   ctx.restore();
 
   // ---------------------------------------------------------------------------
@@ -510,7 +647,7 @@ function drawHUD(f, cfg) {
     ctx.font = '10px "Titillium Web", sans-serif';
     ctx.fillStyle = '#8B9BB0';
     ctx.textAlign = 'center';
-    ctx.fillText(`FL ${f.tyres.fl}°   FR ${f.tyres.fr}°   RL ${f.tyres.rl}°   RR ${f.tyres.rr}°`, 600, 460);
+    ctx.fillText(`FL ${f.tyres.fl}°   FR ${f.tyres.fr}°   RL ${f.tyres.rl}°   RR ${f.tyres.rr}°`, 600, 456);
   }
 
   ctx.restore();
@@ -536,11 +673,9 @@ export function normalizeTelemetry(raw) {
 
   const d = (raw.data && typeof raw.data === 'object') ? raw.data : raw;
 
-  // Velocidade (km/h)
   const spd = Number(d.speed ?? d.m_speed ?? d.Speed ?? 0);
   const speed = Number.isFinite(spd) ? Math.max(0, Math.round(spd)) : 0;
 
-  // Marcha (normalizar para 'R', 'N', '1'..'8')
   let g = d.gear ?? d.m_gear ?? d.Gear ?? 0;
   if (typeof g === 'number') {
     if (g === -1) g = 'R';
@@ -551,26 +686,21 @@ export function normalizeTelemetry(raw) {
   }
   const gear = ['R', 'N', '1', '2', '3', '4', '5', '6', '7', '8'].includes(g) ? g : 'N';
 
-  // RPM e Max RPM
   const rpmVal = Number(d.engineRPM ?? d.engineRpm ?? d.m_engineRPM ?? d.rpm ?? 0);
   const rpm = Number.isFinite(rpmVal) ? Math.max(0, Math.round(rpmVal)) : 0;
   const maxRpmVal = Number(d.maxRPM ?? d.maxRpm ?? d.m_maxRPM ?? 13500);
   const maxRpm = Number.isFinite(maxRpmVal) && maxRpmVal > 0 ? maxRpmVal : 13500;
 
-  // Acelerador (0 - 100%)
   const thrRaw = Number(d.throttle ?? d.m_throttle ?? d.Throttle ?? 0);
   const throttle = thrRaw <= 1.0 ? Math.round(thrRaw * 100) : clamp(Math.round(thrRaw), 0, 100);
 
-  // Freio (0 - 100%)
   const brkRaw = Number(d.brake ?? d.m_brake ?? d.Brake ?? 0);
   const brake = brkRaw <= 1.0 ? Math.round(brkRaw * 100) : clamp(Math.round(brkRaw), 0, 100);
 
-  // DRS ('OFF', 'READY', 'ON')
   const drsActive = Boolean(d.drs ?? d.m_drs ?? d.DRS ?? 0);
   const drsAllowed = Boolean(d.drsAllowed ?? d.m_drsAllowed ?? 0);
   const drs = drsActive ? 'ON' : (drsAllowed ? 'READY' : 'OFF');
 
-  // ERS (0 - 100%)
   let ers = 0;
   const ersEnergy = d.ersStoreEnergy ?? d.m_ersStoreEnergy;
   if (ersEnergy != null) {
@@ -579,7 +709,6 @@ export function normalizeTelemetry(raw) {
     ers = clamp(Math.round(Number(d.ers)), 0, 100);
   }
 
-  // Pneus (opcional)
   let tyres = null;
   const st = d.tyresSurfaceTemperature ?? d.m_tyresSurfaceTemperature;
   if (Array.isArray(st) && st.length >= 4) {
@@ -648,7 +777,6 @@ function scheduleReconnect() {
   retry = setTimeout(connect, 1000);
 }
 
-// Loop de animação contínuo (60-120 fps)
 function tick() {
   if (disposed) return;
   if (pending) {
@@ -705,7 +833,6 @@ window.addEventListener('beforeunload', () => {
   ws?.close();
 });
 
-// Carregar configuração persistida inicial
 const apiBase = location.protocol === 'file:' ? 'http://127.0.0.1:8765' : '';
 fetch(apiBase + '/api/config')
   .then(r => {
