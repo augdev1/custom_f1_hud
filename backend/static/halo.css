@@ -5,7 +5,7 @@
   --accent: #00F5D4;
   --neon-green: #76FF03;
   --neon-cyan: #00F0FF;
-  --panel: #060b10;
+  --panel: #080c10;
   --panel-opacity: 0.85;
   --throttle: #76FF03;
   --brake: #FF2A4D;
@@ -26,276 +26,335 @@ html, body {
 #hudRoot {
   width: 100%; height: 100%;
   position: relative;
-  background: transparent;
+  background: transparent !important;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-#halo {
-  position: absolute; inset: 0;
-  width: 100%; height: 100%;
-  overflow: visible;
-  filter: drop-shadow(0 8px 24px rgba(0, 0, 0, 0.95));
+#haloContainer {
+  position: relative;
+  width: 1140px;
+  height: 460px;
+  background: transparent !important;
 }
 
 /* ============================================== */
-/* 1. SILHUETA DA ASA DO HALO                     */
+/* CAMADA 0: SILHUETA DA BASE DO HALO             */
 /* ============================================== */
-.halo-canopy-body {
+.halo-base-layer {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 0;
+  filter: drop-shadow(0 10px 30px rgba(0, 0, 0, 0.95));
+}
+
+.halo-silhouette-path {
   fill: var(--panel);
   fill-opacity: var(--panel-opacity);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
 }
 
-.halo-neon-edge {
+.halo-border-path {
   fill: none;
   stroke: url(#haloBorderGrad);
-  stroke-width: 2.4;
+  stroke-width: 2.8;
   stroke-linecap: round;
   stroke-linejoin: round;
   filter: url(#neonGlow);
 }
 
-.wing-divider {
-  fill: none;
-  stroke: rgba(255, 255, 255, 0.14);
-  stroke-width: 1;
-}
-
 /* ============================================== */
-/* 2. POD CENTRAL (VELOCÍMETRO + RPM + DRS)       */
+/* CAMADA 1: BLOCO ESQUERDO (transform: rotate(-18deg)) */
 /* ============================================== */
-.pod-circle-base {
-  fill: #04080c;
-  fill-opacity: 0.96;
-  backdrop-filter: blur(8px);
+.wing-left {
+  position: absolute;
+  left: 80px;
+  top: 175px;
+  width: 380px;
+  transform: rotate(-18deg);
+  transform-origin: right center;
+  z-index: 5;
 }
 
-.pod-circle-ring {
-  fill: none;
-  stroke: #00F0FF;
-  stroke-width: 2;
-  filter: drop-shadow(0 0 10px rgba(0, 240, 255, 0.6));
+.driver-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 6px;
 }
 
-.speed-giant {
-  font-size: 50px;
+.driver-id {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 19px;
   font-weight: 900;
   font-style: italic;
-  letter-spacing: -2px;
-  fill: #FFFFFF;
-  paint-order: stroke fill;
-  stroke: #020508;
-  stroke-width: 2px;
+  color: #FFFFFF;
+  text-shadow: 0 1px 3px #000;
 }
 
-.rpm-title, .unit-title {
-  font-size: 10.5px;
+.team-badge.ferrari { color: #FFEB3B; font-size: 14px; }
+.team-badge.merc { color: #00F5D4; font-size: 14px; }
+.driver-num { font-weight: 850; }
+.driver-name { font-weight: 900; letter-spacing: 1px; }
+
+.driver-delta {
+  font-size: 15px;
+  font-weight: 900;
+  font-style: italic;
+  color: var(--neon-green);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.delta-arrow { font-size: 10px; }
+
+.wing-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.16);
+  margin: 6px 0;
+}
+
+.ers-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 8px;
+  font-size: 11px;
   font-weight: 850;
   font-style: italic;
-  letter-spacing: 1.5px;
-  fill: var(--muted);
+}
+.ers-label { color: var(--muted); letter-spacing: 1px; }
+.ers-track {
+  flex: 1;
+  height: 6px;
+  background: rgba(139, 155, 176, 0.22);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.ers-bar {
+  height: 100%;
+  background: linear-gradient(90deg, #0088FF, #00F5D4);
+  box-shadow: 0 0 6px #00F5D4;
+  transition: width 0.08s ease;
+}
+.ers-pct { font-size: 12px; font-weight: 900; color: #FFFFFF; }
+
+/* ============================================== */
+/* CAMADA 2: POD CENTRAL (VELOCÍMETRO + DRS)     */
+/* ============================================== */
+#centerPodBlock {
+  position: absolute;
+  left: 570px;
+  top: 175px;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 10;
 }
 
-/* Tacômetro de RPM (LEDs Radiais de -150° a -30°) */
+/* Pílula DRS Encaixada no Topo */
+.drs-pill {
+  width: 96px;
+  height: 28px;
+  border-radius: 14px;
+  background: rgba(3, 12, 6, 0.95);
+  border: 2px solid var(--neon-green);
+  box-shadow: 0 0 14px rgba(118, 255, 3, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 4px;
+  transition: all 0.15s ease-out;
+}
+.drs-label {
+  font-size: 15px;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: 2px;
+  color: var(--neon-green);
+}
+.drs-pill.ready {
+  background: rgba(4, 20, 10, 0.96);
+  border-color: var(--neon-green);
+}
+.drs-pill.on {
+  background: var(--neon-green);
+  border-color: #FFFFFF;
+  box-shadow: 0 0 22px rgba(118, 255, 3, 1);
+}
+.drs-pill.on .drs-label { color: #03080E; }
+.drs-pill.off {
+  border-color: rgba(139, 155, 176, 0.4);
+  box-shadow: none;
+}
+.drs-pill.off .drs-label { color: var(--muted); }
+
+/* Velocímetro Circular */
+.speed-dial {
+  position: relative;
+  width: 176px;
+  height: 176px;
+  border-radius: 50%;
+  background: #060a0e;
+  border: 2.2px solid #00F0FF;
+  box-shadow: 0 0 16px rgba(0, 240, 255, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.rpm-dial-svg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
 .rpm-led {
   stroke: rgba(255, 255, 255, 0.14);
-  stroke-width: 4.5;
+  stroke-width: 4.8;
   stroke-linecap: round;
   transition: stroke 0.04s ease;
 }
-
 .rpm-led.active {
   stroke: var(--neon-green);
   filter: drop-shadow(0 0 8px rgba(118, 255, 3, 0.85));
 }
-
 .rpm-led.cyan.active {
   stroke: var(--neon-cyan);
   filter: drop-shadow(0 0 8px rgba(0, 240, 255, 0.85));
 }
-
 .rpm-led.redline.active {
   stroke: #FF2A4D;
   filter: drop-shadow(0 0 10px rgba(255, 42, 77, 0.95));
 }
 
-/* Pílula DRS Encaixada no Topo */
-.drs-pill rect {
-  fill: rgba(3, 12, 6, 0.95);
-  stroke: var(--neon-green);
-  stroke-width: 2;
-  filter: url(#drsGlow);
-  transition: all 0.15s ease-out;
+.dial-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
 }
-
-.drs-text {
-  font-size: 16px;
+.speed-number {
+  font-size: 54px;
   font-weight: 900;
   font-style: italic;
-  letter-spacing: 2px;
-  fill: var(--neon-green);
-  paint-order: stroke fill;
+  letter-spacing: -2px;
+  color: #FFFFFF;
+  line-height: 1;
+  margin: 2px 0;
+  text-shadow: 0 0 8px rgba(255, 255, 255, 0.45);
 }
-
-.drs-pill.ready rect {
-  fill: rgba(4, 20, 10, 0.96);
-  stroke: var(--neon-green);
-  stroke-width: 2.2;
-  filter: drop-shadow(0 0 14px rgba(118, 255, 3, 0.95));
-}
-
-.drs-pill.on rect {
-  fill: var(--neon-green);
-  stroke: #FFFFFF;
-  stroke-width: 1.6;
-  filter: drop-shadow(0 0 20px rgba(118, 255, 3, 1));
-}
-
-.drs-pill.on .drs-text {
-  fill: #03080E;
-  stroke: none;
-}
-
-.drs-pill.off rect {
-  stroke: rgba(139, 155, 176, 0.35);
-  filter: none;
-}
-.drs-pill.off .drs-text {
-  fill: var(--muted);
-}
-
-/* ============================================== */
-/* 3. TEXTOS CURVADOS NA ASA ESQUERDA (<textPath>)*/
-/* ============================================== */
-.wing-pilot-text {
-  font-size: 18px;
-  font-weight: 900;
-  font-style: italic;
-  letter-spacing: 1px;
-  fill: #FFFFFF;
-  paint-order: stroke fill;
-  stroke: #020508;
-  stroke-width: 2px;
-}
-
-.wing-pilot-text .team-badge.ferrari { fill: #FFEB3B; }
-.wing-pilot-text .team-badge.merc { fill: #00F5D4; }
-
-.wing-delta-text {
-  font-size: 14.5px;
-  font-weight: 900;
-  font-style: italic;
-  fill: var(--neon-green);
-  letter-spacing: 0.5px;
-}
-.wing-delta-text .chevron { font-size: 10px; }
-
-/* Bateria ERS */
-.ers-label {
-  font-size: 10.5px;
+.rpm-label, .unit-label {
+  font-size: 11px;
   font-weight: 850;
   font-style: italic;
-  fill: var(--muted);
-  letter-spacing: 1px;
-}
-
-.ers-pct {
-  font-size: 12px;
-  font-weight: 900;
-  font-style: italic;
-  fill: #FFFFFF;
-}
-
-.ers-rail {
-  fill: none;
-  stroke: rgba(139, 155, 176, 0.2);
-  stroke-width: 5.5;
-  stroke-linecap: round;
-}
-
-.ers-fill {
-  fill: none;
-  stroke: url(#ersGrad);
-  stroke-width: 5.5;
-  stroke-linecap: round;
-  filter: drop-shadow(0 0 6px rgba(0, 210, 190, 0.8));
+  color: var(--muted);
+  letter-spacing: 1.8px;
 }
 
 /* ============================================== */
-/* 4. BARRAS E MARCHAS NA ASA DIREITA (<textPath>)*/
+/* CAMADA 3: BLOCO DIREITO (transform: rotate(18deg)) */
 /* ============================================== */
-.throttle-rail {
-  fill: none;
-  stroke: rgba(255, 255, 255, 0.15);
-  stroke-width: 7.5;
-  stroke-linecap: round;
+.wing-right {
+  position: absolute;
+  right: 80px;
+  top: 175px;
+  width: 380px;
+  transform: rotate(18deg);
+  transform-origin: left center;
+  z-index: 5;
 }
 
-.throttle-fill {
-  fill: none;
-  stroke: url(#throttleGrad);
-  stroke-width: 7.5;
-  stroke-linecap: round;
-  filter: drop-shadow(0 0 8px rgba(118, 255, 3, 0.8));
+.pedal-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+.pedal-track {
+  flex: 1;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.pedal-track.brake-track {
+  height: 4.5px;
+  background: rgba(255, 255, 255, 0.12);
+}
+.pedal-bar.throttle {
+  height: 100%;
+  background: linear-gradient(90deg, #00F5D4, #76FF03, #CCFF00);
+  box-shadow: 0 0 8px #76FF03;
+  transition: width 0.06s ease;
+}
+.pedal-bar.brake {
+  height: 100%;
+  background: var(--brake);
+  box-shadow: 0 0 8px #FF2A4D;
+  transition: width 0.06s ease;
 }
 
-.brake-rail {
-  fill: none;
-  stroke: rgba(255, 255, 255, 0.12);
-  stroke-width: 3.5;
-  stroke-linecap: round;
-}
-
-.brake-fill {
-  fill: none;
-  stroke: var(--brake);
-  stroke-width: 3.5;
-  stroke-linecap: round;
-  filter: drop-shadow(0 0 8px rgba(255, 42, 77, 0.85));
-}
-
-.pedal-readout {
+.pedal-info {
+  display: flex;
+  align-items: center;
+  gap: 6px;
   font-size: 12px;
   font-weight: 900;
   font-style: italic;
-  letter-spacing: 1px;
+  width: 130px;
 }
-.pedal-readout .pct { fill: var(--neon-green); }
-.pedal-readout .tag.throttle { fill: var(--neon-green); }
-.pedal-readout .tag.brake { fill: var(--brake); }
+.pedal-pct { color: var(--neon-green); }
+.pedal-tag.throttle { color: var(--neon-green); letter-spacing: 1px; }
+.pedal-tag.brake { color: var(--brake); letter-spacing: 1px; }
 
-/* Régua Curva de Marchas (N 1 2 3 4 5 6 7 8) */
-.gear-strip-curved {
+/* Régua de Marchas */
+.gear-strip {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  margin-top: 10px;
+}
+.gear-btn {
   font-size: 20px;
   font-weight: 900;
   font-style: italic;
-  fill: #FFFFFF;
-  letter-spacing: 3px;
-  paint-order: stroke fill;
-  stroke: #020508;
-  stroke-width: 2px;
-}
-
-.gear-strip-curved .g-cell {
+  color: #FFFFFF;
+  padding: 2px 7px;
+  border-radius: 4px;
   transition: all 0.1s ease;
 }
-
-.gear-strip-curved .g-cell.active {
-  fill: var(--gear-active);
-  font-size: 23px;
-  filter: drop-shadow(0 0 12px rgba(0, 245, 212, 1));
+.gear-btn.active {
+  background: var(--gear-active);
+  color: #03080E;
+  box-shadow: 0 0 12px rgba(0, 245, 212, 0.95);
 }
 
-/* Tyres Readout */
-.tyre-readout {
+/* Tyres Overlay */
+.tyres-overlay {
+  position: absolute;
+  bottom: 12px;
+  left: 50%;
+  transform: translateX(-50%);
   font-size: 10px;
-  fill: var(--muted);
+  color: var(--muted);
   letter-spacing: 1.2px;
+  display: none;
 }
-#tyres { display: none; }
-.show-tyres #tyres { display: block; }
+.show-tyres .tyres-overlay { display: block; }
 
-/* Controles Pywebview */
+/* Barra de Controles Pywebview */
 #controls {
   position: absolute; bottom: 0; left: 50%;
   transform: translateX(-50%);
@@ -306,6 +365,7 @@ html, body {
   padding: 4px 12px;
   font-size: 10px;
   white-space: nowrap;
+  z-index: 99;
 }
 button {
   font: inherit;
@@ -327,7 +387,8 @@ button:hover { background: rgba(0, 245, 212, 0.25); border-color: var(--accent);
   border: 1px solid rgba(255, 212, 0, 0.45);
   padding: 3px 12px; border-radius: 3px;
   color: #FFD400;
+  z-index: 99;
 }
 .embedded #connection { bottom: 6px; }
 .live #connection { display: none; }
-.stale #halo, .offline #halo { opacity: 0.55; }
+.stale #haloContainer, .offline #haloContainer { opacity: 0.55; }

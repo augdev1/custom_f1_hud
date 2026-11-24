@@ -7,7 +7,7 @@ document.body.classList.toggle('embedded', embedded);
 const ns = 'http://www.w3.org/2000/svg';
 
 // ==========================================
-// 1. TACÔMETRO DE RPM (ARCO DE -140° A -40°)
+// 1. TACÔMETRO DE RPM (ARCO DE -150° A -30°)
 // ==========================================
 const TOTAL_LEDS = 24;
 const START_ANGLE = -150 * Math.PI / 180;
@@ -16,30 +16,16 @@ const END_ANGLE = -30 * Math.PI / 180;
 const segments = Array.from({length: TOTAL_LEDS}, (_, i) => {
   const angle = START_ANGLE + (i * (END_ANGLE - START_ANGLE) / (TOTAL_LEDS - 1));
   const line = document.createElementNS(ns, 'line');
-  line.setAttribute('x1', (Math.cos(angle) * 65).toFixed(2));
-  line.setAttribute('y1', (Math.sin(angle) * 65).toFixed(2));
-  line.setAttribute('x2', (Math.cos(angle) * 74).toFixed(2));
-  line.setAttribute('y2', (Math.sin(angle) * 74).toFixed(2));
+  line.setAttribute('x1', (Math.cos(angle) * 74).toFixed(2));
+  line.setAttribute('y1', (Math.sin(angle) * 74).toFixed(2));
+  line.setAttribute('x2', (Math.cos(angle) * 85).toFixed(2));
+  line.setAttribute('y2', (Math.sin(angle) * 85).toFixed(2));
 
   const type = i < 6 ? ' cyan' : i >= 20 ? ' redline' : '';
   line.setAttribute('class', 'rpm-led' + type);
   $('rpmSegments').append(line);
   return line;
 });
-
-// Comprimentos de traçado para animação fluida 60 FPS
-let throttleTotalLen = 350;
-let brakeTotalLen = 330;
-let ersTotalLen = 290;
-
-try {
-  const tEl = $('throttleBar');
-  if (tEl && tEl.getTotalLength) throttleTotalLen = tEl.getTotalLength() || 350;
-  const bEl = $('brakeBar');
-  if (bEl && bEl.getTotalLength) brakeTotalLen = bEl.getTotalLength() || 330;
-  const eEl = $('ersBar');
-  if (eEl && eEl.getTotalLength) ersTotalLen = eEl.getTotalLength() || 290;
-} catch {}
 
 const gearKeys = ['R', 'N', '1', '2', '3', '4', '5', '6', '7', '8'];
 
@@ -67,12 +53,12 @@ function updateStatus() {
   $('connection').textContent = labels[state];
 
   if (state !== 'LIVE') {
-    // Estado de espera
+    // Estado de espera / standby
     $('speedVal').textContent = '0';
     if ($('throttlePctVal')) $('throttlePctVal').textContent = '0%';
+    if ($('throttleBar')) $('throttleBar').style.width = '0%';
+    if ($('brakeBar')) $('brakeBar').style.width = '0%';
     $('drsBadge').setAttribute('class', 'drs-pill off');
-    if ($('throttleBar')) $('throttleBar').style.strokeDasharray = `0 ${throttleTotalLen}`;
-    if ($('brakeBar')) $('brakeBar').style.strokeDasharray = `0 ${brakeTotalLen}`;
     segments.forEach(el => el.classList.remove('active'));
   }
 }
@@ -87,35 +73,32 @@ function render(raw) {
   const activeCount = Math.round(clamp((f.rpm - 4000) / (f.maxRpm - 4000), 0, 1) * segments.length);
   segments.forEach((el, i) => el.classList.toggle('active', i < activeCount));
 
-  // 3. DRS Badge Encaixado no Topo do Círculo
+  // 3. DRS Badge Encaixado no Topo
   const drsClass = f.drs === 'ON' ? 'drs-pill on' : f.drs === 'READY' ? 'drs-pill ready' : 'drs-pill off';
   $('drsBadge').setAttribute('class', drsClass);
 
-  // 4. Acelerador Curvo (Throttle)
-  const tLen = (throttleTotalLen * f.throttle / 100).toFixed(1);
+  // 4. Acelerador (Throttle)
   if ($('throttleBar')) {
-    $('throttleBar').style.strokeDasharray = `${tLen} ${throttleTotalLen}`;
+    $('throttleBar').style.width = `${f.throttle}%`;
   }
   if ($('throttlePctVal')) {
     $('throttlePctVal').textContent = `${Math.round(f.throttle)}%`;
   }
 
-  // 5. Freio Curvo (Brake)
-  const bLen = (brakeTotalLen * f.brake / 100).toFixed(1);
+  // 5. Freio (Brake)
   if ($('brakeBar')) {
-    $('brakeBar').style.strokeDasharray = `${bLen} ${brakeTotalLen}`;
+    $('brakeBar').style.width = `${f.brake}%`;
   }
 
-  // 6. Régua Curva de Marchas
+  // 6. Régua de Marchas (N 1 2 3 4 5 6 7 8)
   gearKeys.forEach(g => {
     const el = $('g_' + g);
     if (el) el.classList.toggle('active', g === f.gear);
   });
 
-  // 7. Bateria ERS Integrada na Curva
-  const eLen = (ersTotalLen * f.ers / 100).toFixed(1);
+  // 7. Bateria ERS Integrada
   if ($('ersBar')) {
-    $('ersBar').style.strokeDasharray = `${eLen} ${ersTotalLen}`;
+    $('ersBar').style.width = `${f.ers}%`;
   }
   if ($('ersPctText')) {
     $('ersPctText').textContent = `${Math.round(f.ers)}%`;
@@ -152,8 +135,11 @@ export function applyConfig(cfg) {
 
   if (cfg.scale != null) {
     const scale = clamp(cfg.scale, 50, 150) / 100;
-    $('halo').style.transform = `scale(${scale})`;
-    $('halo').style.transformOrigin = '50% 50%';
+    const container = $('haloContainer');
+    if (container) {
+      container.style.transform = `scale(${scale})`;
+      container.style.transformOrigin = '50% 50%';
+    }
   }
 
   document.body.classList.toggle('show-tyres', cfg.showTyres === true);

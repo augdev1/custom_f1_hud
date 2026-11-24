@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>F1 24 Live Halo HUD</title>
+  <title>F1 24 Live Halo HUD Broadcast</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:ital,wght@0,600;0,700;1,700;1,800&family=Titillium+Web:ital,wght@0,700;0,800;0,900;1,700;1,900&display=swap" rel="stylesheet">
@@ -12,223 +12,175 @@
 </head>
 <body>
 <main id="hudRoot">
-<svg id="halo" viewBox="0 0 1200 380" role="img" aria-label="F1 24 Official Broadcast Halo HUD">
-  <defs>
-    <!-- Gradiente Neon da Borda da Asa do Halo -->
-    <linearGradient id="haloBorderGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#00F5D4" stop-opacity="0.85"/>
-      <stop offset="35%" stop-color="#00F0FF" stop-opacity="1"/>
-      <stop offset="50%" stop-color="#76FF03" stop-opacity="1"/>
-      <stop offset="65%" stop-color="#00F0FF" stop-opacity="1"/>
-      <stop offset="100%" stop-color="#00F5D4" stop-opacity="0.85"/>
-    </linearGradient>
-
-    <!-- Gradiente de Throttle -->
-    <linearGradient id="throttleGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#00F5D4"/>
-      <stop offset="65%" stop-color="#76FF03"/>
-      <stop offset="100%" stop-color="#CCFF00"/>
-    </linearGradient>
-
-    <!-- Gradiente de ERS -->
-    <linearGradient id="ersGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" stop-color="#0088FF"/>
-      <stop offset="100%" stop-color="#00F5D4"/>
-    </linearGradient>
-
-    <!-- Filtros de Glow -->
-    <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
-      <feGaussianBlur stdDeviation="3.5" result="blur"/>
-      <feMerge>
-        <feMergeNode in="blur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
-
-    <filter id="drsGlow" x="-30%" y="-30%" width="160%" height="160%">
-      <feGaussianBlur stdDeviation="5" result="blur"/>
-      <feMerge>
-        <feMergeNode in="blur"/>
-        <feMergeNode in="SourceGraphic"/>
-      </feMerge>
-    </filter>
+  <div id="haloContainer">
+    <!-- ============================================== -->
+    <!-- CAMADA 0: SILHUETA DE BASE DO HALO (ARCO INVERTIDO) -->
+    <!-- ============================================== -->
+    <svg class="halo-base-layer" viewBox="0 0 1140 460" preserveAspectRatio="none">
+      <defs>
+        <linearGradient id="haloBorderGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stop-color="#00F5D4" stop-opacity="0.85"/>
+          <stop offset="35%" stop-color="#00F0FF" stop-opacity="1"/>
+          <stop offset="50%" stop-color="#76FF03" stop-opacity="1"/>
+          <stop offset="65%" stop-color="#00F0FF" stop-opacity="1"/>
+          <stop offset="100%" stop-color="#00F5D4" stop-opacity="0.85"/>
+        </linearGradient>
+        <filter id="neonGlow" x="-20%" y="-20%" width="140%" height="140%">
+          <feGaussianBlur stdDeviation="4" result="blur"/>
+          <feMerge>
+            <feMergeNode in="blur"/>
+            <feMergeNode in="SourceGraphic"/>
+          </feMerge>
+        </filter>
+      </defs>
+      <!-- Base sólida em arco invertido (asas inclinadas descendo ~20° e centro elevado) -->
+      <path class="halo-silhouette-path" d="
+        M 50,390
+        C 180,240 370,165 485,155
+        A 88,88 0 0,1 655,155
+        C 770,165 960,240 1090,390
+        L 1000,430
+        C 890,290 760,230 650,225
+        A 88,88 0 0,1 490,225
+        C 380,230 250,290 140,430
+        Z
+      "/>
+      <path class="halo-border-path" d="
+        M 50,390
+        C 180,240 370,165 485,155
+        A 88,88 0 0,1 655,155
+        C 770,165 960,240 1090,390
+        L 1000,430
+        C 890,290 760,230 650,225
+        A 88,88 0 0,1 490,225
+        C 380,230 250,290 140,430
+        Z
+      "/>
+    </svg>
 
     <!-- ============================================== -->
-    <!-- PATHS GUIA COM INCLINAÇÃO REAL DE 13 GRAUS    -->
+    <!-- CAMADA 1: BLOCO ESQUERDO (PILOTOS + ERS)       -->
+    <!-- transform: rotate(-18deg)                      -->
     <!-- ============================================== -->
-    <!-- Asa Esquerda: Piloto 1 (11 SAINZ) -->
-    <path id="pathDriver1" d="M 160,230 Q 335,200 510,180" fill="none"/>
-    <!-- Asa Esquerda: Piloto 2 (12 RUSSELL) -->
-    <path id="pathDriver2" d="M 180,268 Q 350,238 515,218" fill="none"/>
-    <!-- Asa Esquerda: Bateria ERS -->
-    <path id="pathErs" d="M 205,302 Q 365,272 520,250" fill="none"/>
+    <div id="leftWingBlock" class="hud-block wing-left">
+      <!-- Linha 1: Piloto à Frente -->
+      <div class="driver-row">
+        <div class="driver-id">
+          <span class="team-badge ferrari">■</span>
+          <span class="driver-num">11</span>
+          <span class="driver-name">SAINZ</span>
+        </div>
+        <div class="driver-delta">
+          <span class="delta-val">+0.241s</span>
+          <span class="delta-arrow">▶</span>
+        </div>
+      </div>
 
-    <!-- Asa Direita: Throttle (Acelerador 0-100%) -->
-    <path id="pathThrottle" d="M 685,180 Q 860,200 1035,230" fill="none"/>
-    <!-- Asa Direita: Freio (Brake) -->
-    <path id="pathBrake" d="M 690,200 Q 860,220 1025,250" fill="none"/>
-    <!-- Asa Direita: Marchas (N 1 2 3 4 5 6 7 8) -->
-    <path id="pathGears" d="M 680,225 Q 845,245 1010,275" fill="none"/>
-  </defs>
+      <div class="wing-divider"></div>
 
-  <!-- ============================================== -->
-  <!-- 1. SILHUETA REAL DO HALO (ASA SUAVE DE 13°)    -->
-  <!-- ============================================== -->
-  <g id="haloChassis">
-    <!-- Carenagem Principal de Vidro Fumê com Blur -->
-    <path class="halo-canopy-body" d="
-      M 140,240
-      C 250,205 380,175 515,160
-      C 530,135 550,85 600,85
-      C 650,85 670,135 685,160
-      C 820,175 950,205 1060,240
-      C 1075,260 1065,295 1040,310
-      C 930,275 800,248 675,235
-      A 75,75 0 0,1 525,235
-      C 400,248 270,275 160,310
-      C 135,295 125,260 140,240
-      Z
-    "/>
+      <!-- Linha 2: Seu Carro -->
+      <div class="driver-row">
+        <div class="driver-id">
+          <span class="team-badge merc">●</span>
+          <span class="driver-num">12</span>
+          <span class="driver-name">RUSSELL</span>
+        </div>
+        <div class="driver-delta live">
+          <span id="deltaText" class="delta-val live">+0.241s</span>
+          <span class="delta-arrow">▶</span>
+        </div>
+      </div>
 
-    <!-- Borda Externa Neon Brilhante -->
-    <path class="halo-neon-edge" d="
-      M 140,240
-      C 250,205 380,175 515,160
-      C 530,135 550,85 600,85
-      C 650,85 670,135 685,160
-      C 820,175 950,205 1060,240
-      C 1075,260 1065,295 1040,310
-      C 930,275 800,248 675,235
-      A 75,75 0 0,1 525,235
-      C 400,248 270,275 160,310
-      C 135,295 125,260 140,240
-      Z
-    "/>
+      <!-- Linha 3: Bateria ERS -->
+      <div class="ers-row">
+        <span class="ers-label">ERS</span>
+        <div class="ers-track">
+          <div id="ersBar" class="ers-bar" style="width: 78%;"></div>
+        </div>
+        <span id="ersPctText" class="ers-pct">78%</span>
+      </div>
+    </div>
 
-    <!-- Linha Divisória Fina na Asa Esquerda -->
-    <path class="wing-divider" d="M 170,250 Q 340,220 515,200"/>
-  </g>
+    <!-- ============================================== -->
+    <!-- CAMADA 2: POD CENTRAL (VELOCÍMETRO + DRS)     -->
+    <!-- Centro elevado com velocímetro circular        -->
+    <!-- ============================================== -->
+    <div id="centerPodBlock">
+      <!-- Pílula DRS Encaixada no Topo -->
+      <div id="drsBadge" class="drs-pill ready">
+        <span id="drsText" class="drs-label">DRS</span>
+      </div>
 
-  <!-- ============================================== -->
-  <!-- 2. POD CENTRAL (TACÔMETRO + VELOCIDADE + DRS)  -->
-  <!-- ============================================== -->
-  <g id="centerPod">
-    <!-- Disco Central em cx=600 cy=190 r=75 -->
-    <circle class="pod-circle-base" cx="600" cy="190" r="75"/>
-    <circle class="pod-circle-ring" cx="600" cy="190" r="75"/>
+      <!-- Velocímetro Circular -->
+      <div class="speed-dial">
+        <!-- Arco de LEDs de RPM em SVG -->
+        <svg class="rpm-dial-svg" viewBox="0 0 180 180">
+          <g id="rpmSegments" transform="translate(90 90)"></g>
+        </svg>
 
-    <!-- Tacômetro Superior: LEDs Radiais em Arco (-150° a -30°) -->
-    <g id="rpmSegments" transform="translate(600 190)"></g>
+        <div class="dial-content">
+          <span class="rpm-label">RPM</span>
+          <span id="speedVal" class="speed-number">264</span>
+          <span class="unit-label">KM/H</span>
+        </div>
+      </div>
+    </div>
 
-    <!-- Textos Internos do Velocímetro -->
-    <text class="rpm-title" x="600" y="146" text-anchor="middle">RPM</text>
-    <text id="speedVal" class="speed-giant" x="600" y="200" text-anchor="middle">264</text>
-    <text class="unit-title" x="600" y="226" text-anchor="middle">KM/H</text>
+    <!-- ============================================== -->
+    <!-- CAMADA 3: BLOCO DIREITO (THROTTLE + MARCHAS)   -->
+    <!-- transform: rotate(18deg)                       -->
+    <!-- ============================================== -->
+    <div id="rightWingBlock" class="hud-block wing-right">
+      <!-- Linha 1: Throttle (Acelerador 0-100%) -->
+      <div class="pedal-row">
+        <div class="pedal-track">
+          <div id="throttleBar" class="pedal-bar throttle" style="width: 100%;"></div>
+        </div>
+        <div class="pedal-info">
+          <span id="throttlePctVal" class="pedal-pct">100%</span>
+          <span class="pedal-tag throttle">THROTTLE</span>
+        </div>
+      </div>
 
-    <!-- Pílula DRS Encaixada Imediatamente Acima do Topo do Círculo -->
-    <g id="drsBadge" class="drs-pill ready" transform="translate(600 86)">
-      <rect x="-48" y="0" width="96" height="28" rx="14"/>
-      <text id="drsText" class="drs-text" x="0" y="18" text-anchor="middle">DRS</text>
-    </g>
-  </g>
+      <!-- Linha 2: Brake (Freio) -->
+      <div class="pedal-row brake-row">
+        <div class="pedal-track brake-track">
+          <div id="brakeBar" class="pedal-bar brake" style="width: 0%;"></div>
+        </div>
+        <div class="pedal-info">
+          <span class="pedal-tag brake">BRAKE</span>
+        </div>
+      </div>
 
-  <!-- ============================================== -->
-  <!-- 3. ASA ESQUERDA: DRIVER BATTLE (<textPath>)   -->
-  <!-- ============================================== -->
-  <g id="leftWingTexts">
-    <!-- Linha 1: 11 SAINZ + Delta -->
-    <text class="wing-pilot-text">
-      <textPath href="#pathDriver1" startOffset="3%">
-        <tspan class="team-badge ferrari">■ </tspan>
-        <tspan class="num">11 </tspan>
-        <tspan class="name">SAINZ</tspan>
-      </textPath>
-    </text>
-    <text class="wing-delta-text">
-      <textPath href="#pathDriver1" startOffset="68%">
-        +0.241s <tspan class="chevron">▶</tspan>
-      </textPath>
-    </text>
+      <!-- Linha 3: Régua de Marchas (N 1 2 3 4 5 6 7 8) -->
+      <div id="gearStrip" class="gear-strip">
+        <span id="g_R" class="gear-btn">R</span>
+        <span id="g_N" class="gear-btn">N</span>
+        <span id="g_1" class="gear-btn">1</span>
+        <span id="g_2" class="gear-btn">2</span>
+        <span id="g_3" class="gear-btn">3</span>
+        <span id="g_4" class="gear-btn">4</span>
+        <span id="g_5" class="gear-btn">5</span>
+        <span id="g_6" class="gear-btn active">6</span>
+        <span id="g_7" class="gear-btn">7</span>
+        <span id="g_8" class="gear-btn">8</span>
+      </div>
+    </div>
 
-    <!-- Linha 2: 12 RUSSELL + Delta -->
-    <text class="wing-pilot-text">
-      <textPath href="#pathDriver2" startOffset="3%">
-        <tspan class="team-badge merc">● </tspan>
-        <tspan class="num">12 </tspan>
-        <tspan class="name">RUSSELL</tspan>
-      </textPath>
-    </text>
-    <text class="wing-delta-text live">
-      <textPath href="#pathDriver2" startOffset="68%" id="deltaTextPath">
-        +0.241s <tspan class="chevron">▶</tspan>
-      </textPath>
-    </text>
+    <!-- Temperaturas dos Pneus (Opcional) -->
+    <div id="tyres" class="tyres-overlay">
+      <span id="tyreText">FL 100°   FR 100°   RL 100°   RR 100°</span>
+    </div>
+  </div>
 
-    <!-- Barra de Bateria ERS na Borda Inferior -->
-    <text class="ers-label">
-      <textPath href="#pathErs" startOffset="2%">ERS</textPath>
-    </text>
-    <path class="ers-rail" d="M 235,296 Q 375,268 510,248"/>
-    <path id="ersBar" class="ers-fill" d="M 235,296 Q 375,268 510,248"/>
-    <text class="ers-pct">
-      <textPath href="#pathErs" startOffset="88%" id="ersPctText">78%</textPath>
-    </text>
-  </g>
+  <nav id="controls" class="pywebview-drag-region" aria-label="Controles da HUD">
+    <span>F1 24 OFFICIAL HALO HUD</span>
+    <button id="lockButton">Travar · F8</button>
+    <button id="centerButton">Centralizar</button>
+    <button id="closeButton" aria-label="Fechar HUD">×</button>
+  </nav>
 
-  <!-- ============================================== -->
-  <!-- 4. ASA DIREITA: TELEMETRIA (<textPath>)       -->
-  <!-- ============================================== -->
-  <g id="rightWingTelemetry">
-    <!-- Barra Curva de Throttle (0-100%) -->
-    <path class="throttle-rail" d="M 685,180 Q 860,200 1035,230"/>
-    <path id="throttleBar" class="throttle-fill" d="M 685,180 Q 860,200 1035,230"/>
-    <text class="pedal-readout">
-      <textPath href="#pathThrottle" startOffset="74%">
-        <tspan id="throttlePctVal" class="pct">100%</tspan>
-        <tspan class="tag throttle"> THROTTLE</tspan>
-      </textPath>
-    </text>
-
-    <!-- Barra Curva de Freio (Brake) -->
-    <path class="brake-rail" d="M 690,200 Q 860,220 1025,250"/>
-    <path id="brakeBar" class="brake-fill" d="M 690,200 Q 860,220 1025,250"/>
-    <text class="pedal-readout">
-      <textPath href="#pathBrake" startOffset="82%">
-        <tspan class="tag brake">BRAKE</tspan>
-      </textPath>
-    </text>
-
-    <!-- Régua Curva de Marchas: N 1 2 3 4 5 6 7 8 -->
-    <text class="gear-strip-curved">
-      <textPath href="#pathGears" startOffset="3%">
-        <tspan id="g_R" class="g-cell">R </tspan>
-        <tspan id="g_N" class="g-cell">N </tspan>
-        <tspan id="g_1" class="g-cell">1 </tspan>
-        <tspan id="g_2" class="g-cell">2 </tspan>
-        <tspan id="g_3" class="g-cell">3 </tspan>
-        <tspan id="g_4" class="g-cell">4 </tspan>
-        <tspan id="g_5" class="g-cell">5 </tspan>
-        <tspan id="g_6" class="g-cell active">6 </tspan>
-        <tspan id="g_7" class="g-cell">7 </tspan>
-        <tspan id="g_8" class="g-cell">8</tspan>
-      </textPath>
-    </text>
-  </g>
-
-  <!-- Temperaturas dos Pneus (Opcional - via Studio) -->
-  <g id="tyres" transform="translate(600 355)">
-    <text id="tyreText" class="tyre-readout" text-anchor="middle">FL 100°   FR 100°   RL 100°   RR 100°</text>
-  </g>
-</svg>
-
-<nav id="controls" class="pywebview-drag-region" aria-label="Controles da HUD">
-  <span>F1 24 OFFICIAL HALO HUD</span>
-  <button id="lockButton">Travar · F8</button>
-  <button id="centerButton">Centralizar</button>
-  <button id="closeButton" aria-label="Fechar HUD">×</button>
-</nav>
-
-<div id="connection" role="status">CONECTANDO AO BACKEND</div>
+  <div id="connection" role="status">CONECTANDO AO BACKEND</div>
 </main>
 
 <script type="module" src="/static/halo.js"></script>
